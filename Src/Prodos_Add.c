@@ -10,7 +10,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+// OS X (and everything else) should get this from stdlib.h?
+#if !defined(__APPLE__) && !defined(__MACH__)
 #include <malloc.h>
+#endif
 #include <time.h>
 #include <sys/types.h>
 #include <sys/stat.h>

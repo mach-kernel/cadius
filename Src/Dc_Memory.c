@@ -9,7 +9,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+// OS X (and everything else) should get this from stdlib.h?
+#if !defined(__APPLE__) && !defined(__MACH__)
 #include <malloc.h>
+#endif
+
 #include <errno.h>
 
 #include "Dc_Shared.h"
