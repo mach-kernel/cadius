@@ -237,7 +237,6 @@ int CreateTextFile(char *file_path, unsigned char *data, int length)
   return(0);
 }
 
-
 /********************************************************/
 /*  BuildFileList() :  Construit la liste des fichiers. */
 /********************************************************/
@@ -332,9 +331,12 @@ char **BuildFileList(char *hierarchy, int *nb_file_rtn)
 }
 
 
-/***********************************************************************/
-/*  MatchHierarchie() : Indique si un nom appartient à une hiérarchie. */
-/***********************************************************************/
+/**
+ * @brief MatchHierarchie Check if a file belongs to a directory tree
+ * @param name File name
+ * @param hierarchie Path
+ * @return
+ */
 int MatchHierarchie(char *name, char *hierarchie)
 {
   int i,j,k;

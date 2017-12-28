@@ -8,28 +8,26 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-// OS X (and everything else) should get this from stdlib.h?
-#if !defined(__APPLE__) && !defined(__MACH__)
-#include <malloc.h>
+
+#if IS_WINDOWS
+  #include <malloc.h>
+  #include <io.h>
+  #include <direct.h>
+  #include <windows.h>
+#else
+  #include <dirent.h>
+
+  #if IS_LINUX
+    #include <strings.h>
+  #endif
 #endif
+
 #include <string.h>
-#ifdef LINUX
-#include <strings.h>
-#endif
-#if defined(WIN32) || defined(WIN64)
-#include <io.h>
-#include <direct.h>
-#endif
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/timeb.h>
-
 #include <errno.h>
-
-#if defined(WIN32) || defined(WIN64)
-#include <windows.h>
-#endif
 
 #include "Dc_Shared.h"
 #include "Dc_Prodos.h"
@@ -52,6 +50,70 @@ void my_DeleteFile(char *file_path)
 
   /* Supprime le fichier */
   unlink(file_path);
+}
+
+/**
+ * Appears to be invoked via char **BuildFileList(), which is then
+ * used for things like the CLI set high bit or indent actions.
+ *
+ * Heap allocs the path and then inserts it into a singleton store
+ * via my_Memory.
+ *
+ * @brief GetFolderFiles Query OS and load path structure into store
+ * @param folder_path
+ * @param hierarchy
+ * @return
+ */
+int GetFolderFiles(char *folder_path, char *hierarchy)
+{
+  int error = 0;
+  if (folder_path == NULL || strlen(folder_path) == 0) return(0);
+
+
+  // I'd make a POSIX joke but MSFT has a stock
+  // handle and GNU does not.
+  #if IS_WINDOWS
+    error = 1;
+  // rewrite the other code
+  #else
+    DIR *dirstream = opendir(folder_path);
+    if (dirstream == NULL) return(1);
+
+    while(dirstream != NULL) {
+      dirent *entry = readdir(dirstream);
+
+      // If we encounter a directory other than .,..
+      // recurse upon it.
+      if (entry->d_type == DT_DIR) {
+        if (entry->d_name == "." || entry->d_name == "..") {
+          continue;
+        }
+
+        error = GetFolderFiles(folder_path, hierarchy);
+        if (error) break;
+      }
+      else {
+        char *heap_path = calloc(num, sizeof(folder_path));
+        strcpy(heap_path, folder_path);
+
+        // Technically, we don't need to alloc larger than the
+        // string that already contains the filename
+        char *heap_filename = calloc(num, sizeof(folder_path));
+
+        char last_char = heap_path[strlen(heap_path) - 1];
+        if (last_char != '/' && last_char != '\\') {
+
+        }
+
+
+//        if (MatchHierarchie(heap_path,hierarchy)) {
+//          my_Memory(MEMORY_ADD_FILE,heap_path,NULL);
+//        }
+      }
+    }
+  #endif
+
+  return error;
 }
 
 
@@ -168,13 +230,12 @@ int my_CreateDirectory(char *directory)
   
   /* On veut savoir si le ce repertoire existe et on verifie qu'on a un repertoire */
   if(stat(buffer,&sts))
-    mkdir(buffer);
+    my_mkdir(buffer);
   else if(!S_ISDIR(sts.st_mode))
     return(1);
 
   return(0);
 }
-
 
 /******************************************************/
 /*  MakeAllDir() :  Creation d'un nouveau répertoire  */
@@ -192,7 +253,7 @@ static int MakeAllDir(char *newdir)
   if(buffer[len-1] == '/' || buffer[len-1] == '\\')
     buffer[len-1] = '\0';
 
-  if(mkdir(buffer) == 0)
+  if(my_mkdir(buffer) == 0)
     return(1);
 
   p = buffer+1;
@@ -204,7 +265,7 @@ static int MakeAllDir(char *newdir)
         p++;
       hold = *p;
       *p = 0;
-      if((mkdir(buffer) == -1) && (errno == ENOENT))
+      if((my_mkdir(buffer) == -1) && (errno == ENOENT))
         return(0);
       if(hold == 0)
         break;
@@ -216,11 +277,11 @@ static int MakeAllDir(char *newdir)
 
 
 /**********************************************************************************************/
-/*  my_SetFileCreationModificationDate() :  Positionne les dates de Création et Modification. */
+/* SetFileCreationModificationDate() :  Positionne les dates de Création et Modification. */
 /**********************************************************************************************/
 void my_SetFileCreationModificationDate(char *file_data_path, struct file_descriptive_entry *current_entry)
 {
-#if defined(WIN32) || defined(WIN64)
+#if IS_WINDOWS
   BOOL result;
   HANDLE fd;
   SYSTEMTIME system_date;
@@ -271,7 +332,7 @@ void my_SetFileCreationModificationDate(char *file_data_path, struct file_descri
 /********************************************************************************************/
 void my_GetFileCreationModificationDate(char *file_data_path, struct prodos_file *current_file)
 {
-#if defined(WIN32) || defined(WIN64)
+#if IS_WINDOWS
   BOOL result;
   HANDLE fd;
   SYSTEMTIME system_utc;
@@ -316,7 +377,7 @@ void my_GetFileCreationModificationDate(char *file_data_path, struct prodos_file
 /****************************************************************/
 void my_SetFileAttribute(char *file_path, int flag)
 {
-#if defined(WIN32) || defined(WIN64)
+#if IS_WINDOWS
   DWORD file_attributes;
 
   /* Attributs du fichier */
@@ -338,13 +399,22 @@ void my_SetFileAttribute(char *file_path, int flag)
 #endif
 }
 
+/**
+ * Creates a directory
+ *
+ * @param buf An arbitrary buffer
+ * @return
+ */
+int my_mkdir(char *buf) {
+  return -1;
+}
 
 /*********************************************************/
 /*  my_stricmp() :  Comparaison de chaine sans la casse. */
 /*********************************************************/
 int my_stricmp(char *string1, char *string2)
 {
-#if defined(WIN32) || defined(WIN64)
+#if IS_WINDOWS
   return(stricmp(string1,string2));
 #else
   return(strcasecmp(string1,string2));
@@ -357,7 +427,7 @@ int my_stricmp(char *string1, char *string2)
 /**********************************************************/
 int my_strnicmp(char *string1, char *string2, size_t length)
 {
-#if defined(WIN32) || defined(WIN64)
+#if IS_WINDOWS
   return(strnicmp(string1,string2,length));
 #else
   return(strncasecmp(string1,string2,length));
