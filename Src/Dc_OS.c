@@ -69,9 +69,6 @@ int GetFolderFiles(char *folder_path, char *hierarchy)
   int error = 0;
   if (folder_path == NULL || strlen(folder_path) == 0) return(0);
 
-
-  // I'd make a POSIX joke but MSFT has a stock
-  // handle and GNU does not.
   #if IS_WINDOWS
     error = 1;
   // rewrite the other code
@@ -96,19 +93,22 @@ int GetFolderFiles(char *folder_path, char *hierarchy)
         char *heap_path = calloc(num, sizeof(folder_path));
         strcpy(heap_path, folder_path);
 
-        // Technically, we don't need to alloc larger than the
-        // string that already contains the filename
-        char *heap_filename = calloc(num, sizeof(folder_path));
+        // Most POSIX filename limits are 255 bytes.
+        char *heap_path_filename = calloc(num, sizeof(folder_path) + 255);
+        strcpy(heap_path_filename, heap_path);
 
+        // If there's no trailing dir slash, we append it, and a glob
+        // (but no longer check for the Win-style terminator)
         char last_char = heap_path[strlen(heap_path) - 1];
-        if (last_char != '/' && last_char != '\\') {
+        if (last_char != '/') strcat(heap_path, FOLDER_CHARACTER);
+        strcat(heap_path, "*.*");
 
+        // Append the filename to the path we copied earlier
+        strcat(heap_path_filename, entry->d_name);
+
+        if (MatchHierarchie(heap_path_filename, hierarchy)){
+          my_Memory(MEMORY_ADD_FILE, heap_path_filename);
         }
-
-
-//        if (MatchHierarchie(heap_path,hierarchy)) {
-//          my_Memory(MEMORY_ADD_FILE,heap_path,NULL);
-//        }
       }
     }
   #endif
