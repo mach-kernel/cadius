@@ -1,6 +1,6 @@
 /***********************************************************************/
 /*                                                                     */
-/*   Dc_OS.c : Module pour les fonctions spécifiques à l'OS.           */
+/*   Dc_OS.c : Module pour les fonctions spÃ©cifiques Ã  l'OS.           */
 /*                                                                     */
 /***********************************************************************/
 /*  Auteur : Olivier ZARDINI  *  Brutal Deluxe Software  *  Mar 2012   */
@@ -53,7 +53,7 @@ void my_DeleteFile(char *file_path)
 
 
 /********************************************************************/
-/*  GetFolderFiles() :  Récupère tous les fichiers d'un répertoire. */
+/*  GetFolderFiles() :  RÃ©cupÃ¨re tous les fichiers d'un rÃ©pertoire. */
 /********************************************************************/
 int GetFolderFiles(char *folder_path, char *hierarchy)
 {
@@ -64,14 +64,14 @@ int GetFolderFiles(char *folder_path, char *hierarchy)
   char *buffer_folder_path = NULL;
   char *buffer_file_path = NULL;
 
-  /* Rien à faire */
+  /* Rien Ã  faire */
   if(folder_path == NULL)
     return(0);
   if(strlen(folder_path) == 0)
     return(0);
   error = 0;
 
-  /* Allocation mémoire */
+  /* Allocation mÃ©moire */
   buffer_folder_path = (char *) calloc(1,1024);
   buffer_file_path = (char *) calloc(1,1024);
   if(buffer_folder_path == NULL || buffer_file_path == NULL)
@@ -81,7 +81,7 @@ int GetFolderFiles(char *folder_path, char *hierarchy)
     strcat(buffer_folder_path,FOLDER_CHARACTER);
   strcat(buffer_folder_path,"*.*");
 
-  /** On boucle sur tous les fichiers présents **/
+  /** On boucle sur tous les fichiers prÃ©sents **/
   while(1)
     {
       if(first_time == 1)
@@ -92,18 +92,18 @@ int GetFolderFiles(char *folder_path, char *hierarchy)
       else
         rc = _findnext(hFile,&c_file);
 
-        /* On analyse le résultat */
+        /* On analyse le rÃ©sultat */
     	if(rc == -1)
           break;    /* no more files */
  
-      /** On traite cette entrée **/
+      /** On traite cette entrÃ©e **/
       first_time++;
       strcpy(buffer_file_path,folder_path);
       if(buffer_file_path[strlen(buffer_file_path)-1] != '\\' && buffer_file_path[strlen(buffer_file_path)-1] != '/')
         strcat(buffer_file_path,FOLDER_CHARACTER);
       strcat(buffer_file_path,c_file.name);
 
-      /** Traite le dossier de façon récursive **/
+      /** Traite le dossier de faÃ§on rÃ©cursive **/
       if((c_file.attrib & _A_SUBDIR) == _A_SUBDIR)
         {
           /* On ne traite ni . ni .. */
@@ -126,7 +126,7 @@ int GetFolderFiles(char *folder_path, char *hierarchy)
   /* On ferme */
   _findclose(hFile);
 
-  /* Libération mémoire */
+  /* LibÃ©ration mÃ©moire */
   free(buffer_folder_path);
   free(buffer_file_path);
 
@@ -135,7 +135,7 @@ int GetFolderFiles(char *folder_path, char *hierarchy)
 
 
 /******************************************************/
-/*  my_CreateDirectory() :  Création d'un répertoire. */
+/*  my_CreateDirectory() :  CrÃ©ation d'un rÃ©pertoire. */
 /******************************************************/
 int my_CreateDirectory(char *directory)
 {
@@ -143,7 +143,7 @@ int my_CreateDirectory(char *directory)
   struct stat sts;
   char buffer[1024];
 
-  /* Isole le nom du répertoire */
+  /* Isole le nom du rÃ©pertoire */
   strcpy(buffer,directory);
   for(i=strlen(directory); i>=0; i--)
     if(buffer[i] == '\\' || buffer[i] == '/')
@@ -152,13 +152,13 @@ int my_CreateDirectory(char *directory)
         break;
       }
 
-  /* Vérifie s'il existe */
+  /* VÃ©rifie s'il existe */
   error = stat(buffer,&sts);
   if(error == 0)
     if(S_ISDIR(sts.st_mode))
       return(0);
 
-  /** Création des répertoires **/
+  /** CrÃ©ation des rÃ©pertoires **/
   error = MakeAllDir(buffer);
   if(error == 0)
     return(1);
@@ -174,7 +174,7 @@ int my_CreateDirectory(char *directory)
 
 
 /******************************************************/
-/*  MakeAllDir() :  Creation d'un nouveau répertoire  */
+/*  MakeAllDir() :  Creation d'un nouveau rÃ©pertoire  */
 /******************************************************/
 static int MakeAllDir(char *newdir)
 {
@@ -213,7 +213,7 @@ static int MakeAllDir(char *newdir)
 
 
 /**********************************************************************************************/
-/*  my_SetFileCreationModificationDate() :  Positionne les dates de Création et Modification. */
+/*  my_SetFileCreationModificationDate() :  Positionne les dates de CrÃ©ation et Modification. */
 /**********************************************************************************************/
 void my_SetFileCreationModificationDate(char *file_data_path, struct file_descriptive_entry *current_entry)
 {
@@ -229,13 +229,13 @@ void my_SetFileCreationModificationDate(char *file_data_path, struct file_descri
   memset(&creation_date,0,sizeof(FILETIME));
   memset(&modification_date,0,sizeof(FILETIME));
 
-  /* Récupère un Handle sur le fichier */
+  /* RÃ©cupÃ¨re un Handle sur le fichier */
   fd = CreateFile((LPCTSTR)file_data_path,GENERIC_READ|GENERIC_WRITE,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
   if(fd == INVALID_HANDLE_VALUE)
     return;
 
-  /** Création des dates au format Windows **/
-  /* Création Date */
+  /** CrÃ©ation des dates au format Windows **/
+  /* CrÃ©ation Date */
   memset(&system_date,0,sizeof(SYSTEMTIME));
   system_date.wYear = current_entry->file_creation_date.year + ((current_entry->file_creation_date.year < 70) ? 2000 : 1900);
   system_date.wMonth = current_entry->file_creation_date.month;
@@ -264,7 +264,7 @@ void my_SetFileCreationModificationDate(char *file_data_path, struct file_descri
 
 
 /********************************************************************************************/
-/*  my_GetFileCreationModificationDate() :  Récupère les dates de Création et Modification. */
+/*  my_GetFileCreationModificationDate() :  RÃ©cupÃ¨re les dates de CrÃ©ation et Modification. */
 /********************************************************************************************/
 void my_GetFileCreationModificationDate(char *file_data_path, struct prodos_file *current_file)
 {
@@ -281,19 +281,19 @@ void my_GetFileCreationModificationDate(char *file_data_path, struct prodos_file
   memset(&creation_date,0,sizeof(FILETIME));
   memset(&modification_date,0,sizeof(FILETIME));
 
-  /* Récupère un Handle sur le fichier */
+  /* RÃ©cupÃ¨re un Handle sur le fichier */
   fd = CreateFile((LPCTSTR)file_data_path,GENERIC_READ|GENERIC_WRITE,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
   if(fd == INVALID_HANDLE_VALUE)
     return;
 
-  /* Récupération des dates */
+  /* RÃ©cupÃ©ration des dates */
   result = GetFileTime(fd,&creation_date,&access_date,&modification_date);
 
   /* Fermeture du fichier */
   CloseHandle(fd);
 
-  /** Création des dates au format Prodos **/
-  /* Création Date */
+  /** CrÃ©ation des dates au format Prodos **/
+  /* CrÃ©ation Date */
   FileTimeToSystemTime(&creation_date,&system_utc);
   SystemTimeToTzSpecificLocalTime(NULL,&system_utc,&system_date);
   current_file->file_creation_date = BuildProdosDate(system_date.wDay,system_date.wMonth,system_date.wYear);
@@ -309,7 +309,7 @@ void my_GetFileCreationModificationDate(char *file_data_path, struct prodos_file
 
 
 /****************************************************************/
-/*  my_SetFileAttribute() :  Change la visibilité d'un fichier. */
+/*  my_SetFileAttribute() :  Change la visibilitÃ© d'un fichier. */
 /****************************************************************/
 void my_SetFileAttribute(char *file_path, int flag)
 {
@@ -319,7 +319,7 @@ void my_SetFileAttribute(char *file_path, int flag)
   /* Attributs du fichier */
   file_attributes = GetFileAttributes(file_path);
 
-  /* Change la visibilité */
+  /* Change la visibilitÃ© */
   if(flag == SET_FILE_VISIBLE)
     {
       /* Montre le fichier */

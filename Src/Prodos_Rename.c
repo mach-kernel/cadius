@@ -29,7 +29,7 @@ void RenameProdosFile(struct prodos_image *current_image, char *prodos_file_path
   struct file_descriptive_entry *current_entry;
   unsigned char directory_block[BLOCK_SIZE];
 
-  /* Recherche l'entrée Prodos */
+  /* Recherche l'entrÃ©e Prodos */
   current_entry = GetProdosFile(current_image,prodos_file_path);
   if(current_entry == NULL)
     {
@@ -37,7 +37,7 @@ void RenameProdosFile(struct prodos_image *current_image, char *prodos_file_path
       return;
     }
 
-  /* Vérification du nouveau nom */
+  /* VÃ©rification du nouveau nom */
   is_valid = CheckProdosName(new_file_name);
   if(is_valid == 0)
     {
@@ -45,7 +45,7 @@ void RenameProdosFile(struct prodos_image *current_image, char *prodos_file_path
       return;
     }
 
-  /* On vérifie si ce n'est pas le même nom */
+  /* On vÃ©rifie si ce n'est pas le mÃªme nom */
   if(!strcmp(current_entry->file_name_case,new_file_name))
     return;
 
@@ -54,7 +54,7 @@ void RenameProdosFile(struct prodos_image *current_image, char *prodos_file_path
   for(i=0; i<(int)strlen(upper_case); i++)
     upper_case[i] = toupper(upper_case[i]);
 
-  /* 16 bit décrivant la case */
+  /* 16 bit dÃ©crivant la case */
   name_case = BuildProdosCase(new_file_name);
 
   /* Longueur du nom */
@@ -67,7 +67,7 @@ void RenameProdosFile(struct prodos_image *current_image, char *prodos_file_path
   GetCurrentDate(&now_date,&now_time);
 
   /*****************************************************/
-  /** On va modifier le nom dans la structure mémoire **/
+  /** On va modifier le nom dans la structure mÃ©moire **/
   current_entry->name_length = (int) name_length;
   strcpy(current_entry->file_name,upper_case);
   strcpy(current_entry->file_name_case,new_file_name);
@@ -112,7 +112,7 @@ void RenameProdosFolder(struct prodos_image *current_image, char *prodos_folder_
       return;
     }
 
-  /* Vérification du nouveau nom */
+  /* VÃ©rification du nouveau nom */
   is_valid = CheckProdosName(new_folder_name);
   if(is_valid == 0)
     {
@@ -120,7 +120,7 @@ void RenameProdosFolder(struct prodos_image *current_image, char *prodos_folder_
       return;
     }
 
-  /* On vérifie si ce n'est pas le même nom */
+  /* On vÃ©rifie si ce n'est pas le mÃªme nom */
   if(!strcmp(current_entry->file_name_case,new_folder_name))
     return;
 
@@ -129,7 +129,7 @@ void RenameProdosFolder(struct prodos_image *current_image, char *prodos_folder_
   for(i=0; i<(int)strlen(upper_case); i++)
     upper_case[i] = toupper(upper_case[i]);
 
-  /* 16 bit décrivant la case */
+  /* 16 bit dÃ©crivant la case */
   name_case = BuildProdosCase(new_folder_name);
 
   /* Longueur du nom */
@@ -142,7 +142,7 @@ void RenameProdosFolder(struct prodos_image *current_image, char *prodos_folder_
   GetCurrentDate(&now_date,&now_time);
 
   /*****************************************************/
-  /** On va modifier le nom dans la structure mémoire **/
+  /** On va modifier le nom dans la structure mÃ©moire **/
   current_entry->name_length = (int) name_length;
   strcpy(current_entry->file_name,upper_case);
   strcpy(current_entry->file_name_case,new_folder_name);
@@ -189,7 +189,7 @@ void RenameProdosVolume(struct prodos_image *current_image, char *new_volume_nam
   unsigned char name_length;
   unsigned char volume_block[BLOCK_SIZE];
 
-  /* Vérification du nouveau nom */
+  /* VÃ©rification du nouveau nom */
   is_valid = CheckProdosName(new_volume_name);
   if(is_valid == 0)
     {
@@ -197,7 +197,7 @@ void RenameProdosVolume(struct prodos_image *current_image, char *new_volume_nam
       return;
     }
 
-  /* On vérifie si ce n'est pas le même nom */
+  /* On vÃ©rifie si ce n'est pas le mÃªme nom */
   if(!strcmp(current_image->volume_header->volume_name_case,new_volume_name))
     return;
 
@@ -206,7 +206,7 @@ void RenameProdosVolume(struct prodos_image *current_image, char *new_volume_nam
   for(i=0; i<(int)strlen(upper_case); i++)
     upper_case[i] = toupper(upper_case[i]);
 
-  /* 16 bit décrivant la case */
+  /* 16 bit dÃ©crivant la case */
   name_case = BuildProdosCase(new_volume_name);
 
   /* Longueur du nom */
@@ -219,7 +219,7 @@ void RenameProdosVolume(struct prodos_image *current_image, char *new_volume_nam
   GetCurrentDate(&now_date,&now_time);
 
   /*****************************************************/
-  /** On va modifier le nom dans la structure mémoire **/
+  /** On va modifier le nom dans la structure mÃ©moire **/
   current_image->volume_header->name_length = (int) name_length;
   strcpy(current_image->volume_header->volume_name,upper_case);
   strcpy(current_image->volume_header->volume_name_case,new_volume_name);

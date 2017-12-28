@@ -34,7 +34,7 @@ static WORD CreateSaplingContent(struct prodos_image *,struct prodos_file *,unsi
 static WORD CreateTreeContent(struct prodos_image *,struct prodos_file *,unsigned char *,int,int,int,int);
 
 /***************************************************************/
-/*  AddFile() :  Ajoute un fichier Windows à l'archive Prodos. */
+/*  AddFile() :  Ajoute un fichier Windows Ã  l'archive Prodos. */
 /***************************************************************/
 int AddFile(struct prodos_image *current_image, char *file_path, char *target_folder_path, int update_image)
 {
@@ -49,7 +49,7 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
   if(current_file == NULL)
     return(1);
 
-  /** On vérifie si ce fichier est compatible Prodos **/
+  /** On vÃ©rifie si ce fichier est compatible Prodos **/
   /* Nom */
   is_valid = CheckProdosName(current_file->file_name);
   if(is_valid == 0)
@@ -68,7 +68,7 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
       return(1);
     } 
 
-  /** Calcule le nombre de block nécessaire pour stocker le fichier (gestion du Sparse) **/
+  /** Calcule le nombre de block nÃ©cessaire pour stocker le fichier (gestion du Sparse) **/
   ComputeFileBlockUsage(current_file);
   if(current_file->tab_data_block == NULL || current_file->tab_resource_block == NULL)
     {
@@ -78,7 +78,7 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
       return(1);
     }
 
-  /** Vérifie qu'il reste suffisament de place pour stocker le fichier **/
+  /** VÃ©rifie qu'il reste suffisament de place pour stocker le fichier **/
   if(current_file->entry_disk_block > current_image->nb_free_block)
     {
       printf("  Error : No enough space in the image : '%d' bytes required ('%d' bytes available).\n",BLOCK_SIZE*current_file->entry_disk_block,BLOCK_SIZE*current_image->nb_free_block);
@@ -87,7 +87,7 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
       return(1);
     }
 
-  /** Recherche/Construit le dossier Prodos Cible où placer le fichier **/
+  /** Recherche/Construit le dossier Prodos Cible oÃ¹ placer le fichier **/
   target_folder = BuildProdosFolderPath(current_image,target_folder_path,&is_volume_header,1);
   if(target_folder == NULL && is_volume_header == 0)
     {
@@ -96,10 +96,10 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
       return(1);
     }
 
-  /** Vérifie que le nom de fichier ne correspond pas déjà à un nom de fichier/dossier pris **/
+  /** VÃ©rifie que le nom de fichier ne correspond pas dÃ©jÃ  Ã  un nom de fichier/dossier pris **/
   if(target_folder == NULL)
     {
-      /* Vérification à la racine du Volume */
+      /* VÃ©rification Ã  la racine du Volume */
       for(i=0; i<current_image->nb_file; i++)
         if(!my_stricmp(current_file->file_name_case,current_image->tab_file[i]->file_name))
           {
@@ -119,7 +119,7 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
     }
   else
     {
-      /* Vérification dans le dossier */
+      /* VÃ©rification dans le dossier */
       for(i=0; i<target_folder->nb_file; i++)
         if(!my_stricmp(current_file->file_name_case,target_folder->tab_file[i]->file_name))
           {
@@ -138,7 +138,7 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
           }
     }
 
-  /** Recherche d'une entrée libre dans le répertoire **/
+  /** Recherche d'une entrÃ©e libre dans le rÃ©pertoire **/
   error = AllocateFolderEntry(current_image,target_folder,&directory_block_number,&directory_entry_number,&directory_header_pointer);
   if(error)
     {
@@ -147,7 +147,7 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
       return(1);
     }
 
-  /** Vérifie qu'il reste suffisament de place pour stocker le fichier (la réservation du nom dans le directory a peut être consommé 1 block **/
+  /** VÃ©rifie qu'il reste suffisament de place pour stocker le fichier (la rÃ©servation du nom dans le directory a peut Ãªtre consommÃ© 1 block **/
   if(current_file->entry_disk_block > current_image->nb_free_block)
     {
       printf("  Error : No enough space in the image : '%d' bytes required ('%d' bytes available).\n",BLOCK_SIZE*current_file->entry_disk_block,BLOCK_SIZE*current_image->nb_free_block);
@@ -156,7 +156,7 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
       return(1);
     }
 
-  /*** Création du contenu fichier (index+data+resource) ***/
+  /*** CrÃ©ation du contenu fichier (index+data+resource) ***/
   file_block_number = CreateFileContent(current_image,current_file);  
   if(file_block_number == 0)
     {
@@ -165,10 +165,10 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
       return(1);
     }
 
-  /** Remplissage de l'entrée du fichier dans le répertoire **/
+  /** Remplissage de l'entrÃ©e du fichier dans le rÃ©pertoire **/
   CreateFileEntry(current_image,current_file,file_block_number,target_folder,directory_block_number,directory_entry_number,directory_header_pointer);
 
-  /** Création de l'entrée en mémoire **/
+  /** CrÃ©ation de l'entrÃ©e en mÃ©moire **/
   error = CreateMemoryEntry(current_image,target_folder,directory_block_number,directory_entry_number);
   if(error)
     {
@@ -178,7 +178,7 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
       return(1);
     }
 
-  /* Libération mémoire */
+  /* LibÃ©ration mÃ©moire */
   mem_free_file(current_file);
     
   /** Ecrit le fichier Image **/
@@ -192,7 +192,7 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
 
 
 /********************************************************************************/
-/*  AddFolder() :  Ajoute les fichiers Windows d'un dossier à l'archive Prodos. */
+/*  AddFolder() :  Ajoute les fichiers Windows d'un dossier Ã  l'archive Prodos. */
 /********************************************************************************/
 void AddFolder(struct prodos_image *current_image, char *folder_path, char *target_folder_path)
 {
@@ -203,7 +203,7 @@ void AddFolder(struct prodos_image *current_image, char *folder_path, char *targ
   char full_folder_path[1024];
   char prodos_folder_path[1024];
 
-  /** Recherche/Construit le dossier Prodos Cible où placer les fichiers **/
+  /** Recherche/Construit le dossier Prodos Cible oÃ¹ placer les fichiers **/
   target_folder = BuildProdosFolderPath(current_image,target_folder_path,&is_volume_header,1);
   if(target_folder == NULL && is_volume_header == 0)
     {
@@ -211,14 +211,14 @@ void AddFolder(struct prodos_image *current_image, char *folder_path, char *targ
       return;
     }
 
-  /* Prépare le chemin */
+  /* PrÃ©pare le chemin */
   strcpy(full_folder_path,folder_path);
   if(strlen(full_folder_path) > 0)
     if(full_folder_path[strlen(full_folder_path)-1] != '\\' && full_folder_path[strlen(full_folder_path)-1] != '/')
       strcat(full_folder_path,FOLDER_CHARACTER);
   strcat(full_folder_path,"*");
 
-  /** Récupère la liste des fichiers du répertoire **/
+  /** RÃ©cupÃ¨re la liste des fichiers du rÃ©pertoire **/
   tab_file = BuildFileList(full_folder_path,&nb_file);
   if(tab_file == NULL || nb_file == 0)
     {
@@ -228,7 +228,7 @@ void AddFolder(struct prodos_image *current_image, char *folder_path, char *targ
       return;
     }
 
-  /** Création des fichiers dans l'image **/
+  /** CrÃ©ation des fichiers dans l'image **/
   for(i=0; i<nb_file; i++)
     {
       /* On ne copie pas les fichiers *_ResourceFork.bin */
@@ -262,11 +262,11 @@ void AddFolder(struct prodos_image *current_image, char *folder_path, char *targ
             break;
           }
       
-      /** Ajoute ce fichier à l'archive **/
+      /** Ajoute ce fichier Ã  l'archive **/
       error = AddFile(current_image,tab_file[i],prodos_folder_path,0);
     }
 
-  /* Libération table des fichiers */
+  /* LibÃ©ration table des fichiers */
   mem_free_list(nb_file,tab_file);
 
   /** Ecrit le fichier Image **/
@@ -285,7 +285,7 @@ static struct prodos_file *LoadFile(char *file_path_data)
   char folder_path[2048];
   char file_path[2048];
 
-  /* Allocation mémoire */
+  /* Allocation mÃ©moire */
   current_file = (struct prodos_file *) calloc(1,sizeof(struct prodos_file));
   if(current_file == NULL)
     {
@@ -293,7 +293,7 @@ static struct prodos_file *LoadFile(char *file_path_data)
       return(NULL);
     }
   
-  /* Extrait le répertoire du nom de fichier */
+  /* Extrait le rÃ©pertoire du nom de fichier */
   strcpy(folder_path,file_path_data);
   for(i=strlen(folder_path); i>=0; i--)
     if(folder_path[i] == '\\' || folder_path[i] == '/')
@@ -346,7 +346,7 @@ static struct prodos_file *LoadFile(char *file_path_data)
   found = GetFileInformation(file_path,file_name,current_file);
   if(!found)
     {
-      /* Valeurs par défaut */
+      /* Valeurs par dÃ©faut */
       current_file->type = 0x00;
       current_file->aux_type = 0x0000;
       current_file->version_create = 0x00;
@@ -354,7 +354,7 @@ static struct prodos_file *LoadFile(char *file_path_data)
       current_file->access = 0xE3;
     }
 
-  /** Récupération des Propriétés Date/Time du fichier **/
+  /** RÃ©cupÃ©ration des PropriÃ©tÃ©s Date/Time du fichier **/
   my_GetFileCreationModificationDate(file_path_data,current_file);
 
   /* Renvoie la structure */
@@ -363,7 +363,7 @@ static struct prodos_file *LoadFile(char *file_path_data)
 
 
 /********************************************************************/
-/*  GetFileInformation() :  Récupère les informations d'un fichier. */ 
+/*  GetFileInformation() :  RÃ©cupÃ¨re les informations d'un fichier. */ 
 /********************************************************************/
 static int GetFileInformation(char *file_information_path, char *file_name, struct prodos_file *current_file)
 {
@@ -374,7 +374,7 @@ static int GetFileInformation(char *file_information_path, char *file_name, stru
   char line_file_name[1024];
   char local_buffer[1024];
 
-  /** Charge en mémoire le fichier **/
+  /** Charge en mÃ©moire le fichier **/
   line_tab = BuildUniqueListFromFile(file_information_path,&nb_line);
   if(line_tab == NULL)
     return(0);
@@ -391,7 +391,7 @@ static int GetFileInformation(char *file_information_path, char *file_name, stru
       memcpy(line_file_name,line_tab[i],next_sep-line_tab[i]);
       line_file_name[next_sep-line_tab[i]] = '\0';
 
-      /** On récupère les informations **/
+      /** On rÃ©cupÃ¨re les informations **/
       if(!my_stricmp(line_file_name,file_name))
         {
           GetLineValue(line_tab[i],"Type",local_buffer);
@@ -439,20 +439,20 @@ static int GetFileInformation(char *file_information_path, char *file_name, stru
                 current_file->resource_finderinfo_2[j] = (unsigned char) value;
               }
             
-          /* Trouvé */
+          /* TrouvÃ© */
           mem_free_list(nb_line,line_tab);
           return(1);
         }
     }
 
-  /* Pas trouvé */
+  /* Pas trouvÃ© */
   mem_free_list(nb_line,line_tab);
   return(0);
 }
 
 
 /*********************************************************************/
-/*  GetLineValue() :  Récupère la valeur d'une variable de la ligne. */
+/*  GetLineValue() :  RÃ©cupÃ¨re la valeur d'une variable de la ligne. */
 /*********************************************************************/
 static void GetLineValue(char *line, char *variable, char *value_rtn)
 {
@@ -469,20 +469,20 @@ static void GetLineValue(char *line, char *variable, char *value_rtn)
     if(!my_strnicmp(&line[i],variable,strlen(variable)))
       if((line[i-1] == '=' || line[i-1] == ',') && line[i+strlen(variable)] == '(')
         {
-          /* Récupère la valeur */
+          /* RÃ©cupÃ¨re la valeur */
           strcpy(value_rtn,&line[i+strlen(variable)+1]);
           next_sep = strchr(value_rtn,')');
           if(next_sep)
             *next_sep = '\0';
           else
-             strcpy(value_rtn,"");    /* Erreur, il manque la dernière ) */
+             strcpy(value_rtn,"");    /* Erreur, il manque la derniÃ¨re ) */
           return;
         }
 }
 
 
 /********************************************************************************************/
-/*  ComputeFileBlockUsage() :  Détermine le nombre de block utiles pour stocker le fichier. */
+/*  ComputeFileBlockUsage() :  DÃ©termine le nombre de block utiles pour stocker le fichier. */
 /********************************************************************************************/
 static void ComputeFileBlockUsage(struct prodos_file *current_file)
 {
@@ -491,10 +491,10 @@ static void ComputeFileBlockUsage(struct prodos_file *current_file)
   
   /* Init */
   memset(empty_block,0x00,BLOCK_SIZE);
-  current_file->block_disk_data = 0;      /* Nb de blocks disk utilisés pour les data */
-  current_file->empty_data = 0;           /* Tout est à zéro */
-  current_file->block_disk_resource = 0;  /* Nb de blocks disk utilisés pour les resource */
-  current_file->empty_resource = 0;       /* Tout est à zéro */
+  current_file->block_disk_data = 0;      /* Nb de blocks disk utilisÃ©s pour les data */
+  current_file->empty_data = 0;           /* Tout est Ã  zÃ©ro */
+  current_file->block_disk_resource = 0;  /* Nb de blocks disk utilisÃ©s pour les resource */
+  current_file->empty_resource = 0;       /* Tout est Ã  zÃ©ro */
   
   /** Nombre de block pour les Data **/
   current_file->block_data = GetContainerNumber(current_file->data_length,BLOCK_SIZE);
@@ -506,12 +506,12 @@ static void ComputeFileBlockUsage(struct prodos_file *current_file)
       else
         result = memcmp(&current_file->data[i],empty_block,current_file->data_length-i);
         
-      /* Block à réserver ? */
+      /* Block Ã  rÃ©server ? */
       current_file->block_disk_data += (result == 0) ? 0 : 1;
     }
   if(current_file->block_disk_data == 0)
     {
-      current_file->block_disk_data = 1;      /* Même pour les fichiers vides, on réserve 1 block de Data */
+      current_file->block_disk_data = 1;      /* MÃªme pour les fichiers vides, on rÃ©serve 1 block de Data */
       current_file->empty_data = 1;
     }
 
@@ -527,12 +527,12 @@ static void ComputeFileBlockUsage(struct prodos_file *current_file)
           else
             result = memcmp(&current_file->resource[i],empty_block,current_file->resource_length-i);
             
-          /* Block à réserver ? */
+          /* Block Ã  rÃ©server ? */
           current_file->block_disk_resource += (result == 0) ? 0 : 1;
         }
       if(current_file->block_disk_resource == 0)
         {
-          current_file->block_disk_resource = 1;      /* Même pour les fichiers vides, on réserve 1 block de Resources */
+          current_file->block_disk_resource = 1;      /* MÃªme pour les fichiers vides, on rÃ©serve 1 block de Resources */
           current_file->empty_resource = 1;
         }
     }
@@ -609,14 +609,14 @@ static void ComputeFileBlockUsage(struct prodos_file *current_file)
       current_file->entry_disk_block = 1 + (current_file->index_data + current_file->index_resource) + (current_file->block_disk_data + current_file->block_disk_resource);
     }
 
-  /* Allocation mémoire pour la tableau de block */
+  /* Allocation mÃ©moire pour la tableau de block */
   current_file->tab_data_block = (int *) calloc(current_file->index_data + current_file->block_disk_data + 1,sizeof(int));
   current_file->tab_resource_block = (int *) calloc(current_file->index_resource + current_file->block_disk_resource + 1,sizeof(int));
 }
 
 
 /*********************************************************************************/
-/*  CreateFileContent() :  Création du contenu du fichier (index+data+resource). */
+/*  CreateFileContent() :  CrÃ©ation du contenu du fichier (index+data+resource). */
 /*********************************************************************************/
 static WORD CreateFileContent(struct prodos_image *current_image, struct prodos_file *current_file)
 {
@@ -713,13 +713,13 @@ static WORD CreateFileContent(struct prodos_image *current_image, struct prodos_
       SetBlockData(current_image,file_block_number,&extended_block[0]);
     }
 
-  /* Renvoi le numéro de block du contenu du fichier */
+  /* Renvoi le numÃ©ro de block du contenu du fichier */
   return(file_block_number);
 }
 
 
 /***************************************************************/
-/*  CreateSeedlingContent() :  Création d'une entrée Seedling. */
+/*  CreateSeedlingContent() :  CrÃ©ation d'une entrÃ©e Seedling. */
 /***************************************************************/
 static WORD CreateSeedlingContent(struct prodos_image *current_image, struct prodos_file *current_file, unsigned char *data, int data_length, int empty_data, int is_data)
 {
@@ -756,7 +756,7 @@ static WORD CreateSeedlingContent(struct prodos_image *current_image, struct pro
 
 
 /*************************************************************/
-/*  CreateSaplingContent() :  Création d'une entrée Sapling. */
+/*  CreateSaplingContent() :  CrÃ©ation d'une entrÃ©e Sapling. */
 /*************************************************************/
 static WORD CreateSaplingContent(struct prodos_image *current_image, struct prodos_file *current_file, unsigned char *data, int data_length, int block_disk_data, int is_data)
 {
@@ -816,7 +816,7 @@ static WORD CreateSaplingContent(struct prodos_image *current_image, struct prod
       else
         is_empty = !memcmp(&data[i],empty_block,data_length-i);
         
-      /* Numéro du block */
+      /* NumÃ©ro du block */
       if(is_data)
         data_block_number = (is_empty == 1) ? 0 : current_file->tab_data_block[j++];
       else
@@ -847,7 +847,7 @@ static WORD CreateSaplingContent(struct prodos_image *current_image, struct prod
 
 
 /*******************************************************/
-/*  CreateTreeContent() :  Création d'une entrée Tree. */
+/*  CreateTreeContent() :  CrÃ©ation d'une entrÃ©e Tree. */
 /*******************************************************/
 static WORD CreateTreeContent(struct prodos_image *current_image, struct prodos_file *current_file, unsigned char *data, int data_length, int block_disk_data, int index_data, int is_data)
 {
@@ -939,7 +939,7 @@ static WORD CreateTreeContent(struct prodos_image *current_image, struct prodos_
       else
         is_empty = !memcmp(&data[i],empty_block,data_length-i);
         
-      /* Numéro du block */
+      /* NumÃ©ro du block */
       data_block_number = (is_empty == 1) ? 0 : ((is_data) ? current_file->tab_data_block[j++] : current_file->tab_resource_block[j++]);
 
       /* Place dans l'index */
@@ -985,7 +985,7 @@ static WORD CreateTreeContent(struct prodos_image *current_image, struct prodos_
 
 
 /****************************************************************************/
-/*  CreateFileEntry() :  Création de l'entrée du fichier dans le Directory. */
+/*  CreateFileEntry() :  CrÃ©ation de l'entrÃ©e du fichier dans le Directory. */
 /****************************************************************************/
 static void CreateFileEntry(struct prodos_image *current_image, struct prodos_file *current_file, WORD file_block_number,
                             struct file_descriptive_entry *target_folder, WORD directory_block_number, BYTE directory_entry_number, WORD directory_header_pointer)
@@ -997,10 +997,10 @@ static void CreateFileEntry(struct prodos_image *current_image, struct prodos_fi
   /* Entry Length */
   entry_length = 0x27;
 
-  /* Lecture : Block contenant l'entrée */
+  /* Lecture : Block contenant l'entrÃ©e */
   GetBlockData(current_image,directory_block_number,&directory_block[0]);
 
-  /** Création de l'entrée SubDirectory **/
+  /** CrÃ©ation de l'entrÃ©e SubDirectory **/
   offset = 4 + (directory_entry_number-1)*entry_length;
 
   /* Storage Type / Name length */
@@ -1046,10 +1046,10 @@ static void CreateFileEntry(struct prodos_image *current_image, struct prodos_fi
   /* Header Pointer */
   SetWordValue(directory_block,offset+0x25,(WORD)((target_folder == NULL) ? 2 : target_folder->key_pointer_block));
 
-  /* Ecrit les données */
+  /* Ecrit les donnÃ©es */
   SetBlockData(current_image,directory_block_number,&directory_block[0]);
 
-  /** Modifie le nombre d'entrées valides du Target Folder : +1 **/
+  /** Modifie le nombre d'entrÃ©es valides du Target Folder : +1 **/
   GetBlockData(current_image,directory_header_pointer,&directory_block[0]);
   file_count = GetWordValue(directory_block,0x25);
   SetWordValue(directory_block,0x25,(WORD)(file_count+1));
@@ -1058,7 +1058,7 @@ static void CreateFileEntry(struct prodos_image *current_image, struct prodos_fi
 
 
 /***********************************************************************/
-/*  CreateMemoryEntry() :  Création de l'entrée du fichier en mémoire. */
+/*  CreateMemoryEntry() :  CrÃ©ation de l'entrÃ©e du fichier en mÃ©moire. */
 /***********************************************************************/
 static int CreateMemoryEntry(struct prodos_image *current_image, struct file_descriptive_entry *target_folder, WORD directory_block_number, BYTE directory_entry_number)
 {
@@ -1067,7 +1067,7 @@ static int CreateMemoryEntry(struct prodos_image *current_image, struct file_des
   unsigned char directory_block[BLOCK_SIZE];
   char folder_path[1024];
 
-  /* Lecture du block où est positionnée l'entrée */
+  /* Lecture du block oÃ¹ est positionnÃ©e l'entrÃ©e */
   GetBlockData(current_image,directory_block_number,&directory_block[0]);
   entry_length = 0x27;;
   offset = 4 + (directory_entry_number-1)*entry_length;
@@ -1078,22 +1078,22 @@ static int CreateMemoryEntry(struct prodos_image *current_image, struct file_des
   else
     strcpy(folder_path,target_folder->file_path);
 
-  /* Récupère l'entrée */
+  /* RÃ©cupÃ¨re l'entrÃ©e */
   current_entry = ODSReadFileDescriptiveEntry(current_image,folder_path,&directory_block[offset]);
   if(current_entry == NULL)
     return(1);
 
-  /* Positionnement de cette entrée dans l'image */
+  /* Positionnement de cette entrÃ©e dans l'image */
   current_entry->depth = (target_folder == NULL) ? 1 : target_folder->depth+1;
   current_entry->parent_directory = target_folder;
   current_entry->block_location = directory_block_number;
   current_entry->entry_offset = offset;
 
-  /* Ajoute cette entrée en mémoire */
+  /* Ajoute cette entrÃ©e en mÃ©moire */
   my_Memory(MEMORY_ADD_ENTRY,current_entry,NULL);
   my_Memory(MEMORY_BUILD_ENTRY_TAB,NULL,NULL);
 
-  /** Met à jour le Dossier Cible (+1 fichier) **/
+  /** Met Ã  jour le Dossier Cible (+1 fichier) **/
   if(target_folder == NULL)
     error = UpdateEntryTable(UPDATE_ADD,&current_image->nb_file,&current_image->tab_file,current_entry);
   else

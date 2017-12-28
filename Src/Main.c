@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
   /* Message Information */
   printf("%s v 1.1, (c) Brutal Deluxe 2011-2013.\n",argv[0]);
 
-  /* Vérification des paramètres */
+  /* VÃ©rification des paramÃ¨tres */
   if(argc < 3)
     {
       usage(argv[0]);
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
   if(!my_stricmp(argv[argc-1],"-V"))
     verbose = 1;
 
-  /** Décode les paramètres **/
+  /** DÃ©code les paramÃ¨tres **/
   param = GetParamLine(argc-verbose,argv);
   if(param == NULL)
     return(2);
@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
       /** Affichage du contenu de l'image **/
       DumpProdosImage(current_image,param->verbose);
 
-      /* Libération mémoire */
+      /* LibÃ©ration mÃ©moire */
       mem_free_image(current_image);
     }
   else if(param->action == ACTION_CHECK_VOLUME)
@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
       /** Affichage des informations sur le contenu de l'image **/
       CheckProdosImage(current_image,param->verbose);
 
-      /* Libération mémoire */
+      /* LibÃ©ration mÃ©moire */
       mem_free_image(current_image);
     }
   else if(param->action == ACTION_EXTRACT_FILE)
@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
       /** Extrait le fichier sur disque **/
       ExtractOneFile(current_image,param->prodos_file_path,param->output_directory_path);
 
-      /* Libération mémoire */
+      /* LibÃ©ration mÃ©moire */
       mem_free_image(current_image);
     }
   else if(param->action == ACTION_EXTRACT_FOLDER)
@@ -155,18 +155,18 @@ int main(int argc, char *argv[])
       if(current_image == NULL)
         return(3);
 
-      /** Recherche l'entrée du dossier **/
+      /** Recherche l'entrÃ©e du dossier **/
       folder_entry = GetProdosFolder(current_image,param->prodos_folder_path,1);
       if(folder_entry == NULL)
         return(4);
 
-      /** Extrait les fichiers du répertoire **/
+      /** Extrait les fichiers du rÃ©pertoire **/
       ExtractFolderFiles(current_image,folder_entry,param->output_directory_path);
 
       /* Stat */
       printf("    => File(s) : %d,  Folder(s) : %d,  Error(s) : %d\n",current_image->nb_extract_file,current_image->nb_extract_folder,current_image->nb_extract_error);
 
-      /* Libération mémoire */
+      /* LibÃ©ration mÃ©moire */
       mem_free_image(current_image);
     }
   else if(param->action == ACTION_EXTRACT_VOLUME)
@@ -185,7 +185,7 @@ int main(int argc, char *argv[])
       /* Stat */
       printf("    => File(s) : %d,  Folder(s) : %d,  Error(s) : %d\n",current_image->nb_extract_file,current_image->nb_extract_folder,current_image->nb_extract_error);
 
-      /* Libération mémoire */
+      /* LibÃ©ration mÃ©moire */
       mem_free_image(current_image);
     }
   else if(param->action == ACTION_RENAME_FILE)
@@ -201,7 +201,7 @@ int main(int argc, char *argv[])
       /** Renome le fichier **/
       RenameProdosFile(current_image,param->prodos_file_path,param->new_file_name);
 
-      /* Libération mémoire */
+      /* LibÃ©ration mÃ©moire */
       mem_free_image(current_image);
     }
   else if(param->action == ACTION_RENAME_FOLDER)
@@ -217,7 +217,7 @@ int main(int argc, char *argv[])
       /** Renome le dossier **/
       RenameProdosFolder(current_image,param->prodos_folder_path,param->new_folder_name);
 
-      /* Libération mémoire */
+      /* LibÃ©ration mÃ©moire */
       mem_free_image(current_image);
     }
   else if(param->action == ACTION_RENAME_VOLUME)
@@ -233,7 +233,7 @@ int main(int argc, char *argv[])
       /** Renome le volume **/
       RenameProdosVolume(current_image,param->new_volume_name);
 
-      /* Libération mémoire */
+      /* LibÃ©ration mÃ©moire */
       mem_free_image(current_image);
     }
   else if(param->action == ACTION_MOVE_FILE)
@@ -246,10 +246,10 @@ int main(int argc, char *argv[])
       /* Information */
       printf("  - Move file '%s' to folder '%s' :\n",param->prodos_file_path,param->new_file_path);
 
-      /** Déplace le fichier **/
+      /** DÃ©place le fichier **/
       MoveProdosFile(current_image,param->prodos_file_path,param->new_file_path);
 
-      /* Libération mémoire */
+      /* LibÃ©ration mÃ©moire */
       mem_free_image(current_image);
     }
   else if(param->action == ACTION_MOVE_FOLDER)
@@ -262,10 +262,10 @@ int main(int argc, char *argv[])
       /* Information */
       printf("  - Move folder '%s' to '%s' :\n",param->prodos_folder_path,param->new_folder_path);
 
-      /** Déplace le dossier **/
+      /** DÃ©place le dossier **/
       MoveProdosFolder(current_image,param->prodos_folder_path,param->new_folder_path);
 
-      /* Libération mémoire */
+      /* LibÃ©ration mÃ©moire */
       mem_free_image(current_image);
     }
   else if(param->action == ACTION_DELETE_FILE)
@@ -281,7 +281,7 @@ int main(int argc, char *argv[])
       /** Supprime le fichier **/
       DeleteProdosFile(current_image,param->prodos_file_path);
 
-      /* Libération mémoire */
+      /* LibÃ©ration mÃ©moire */
       mem_free_image(current_image);
     }
   else if(param->action == ACTION_DELETE_FOLDER)
@@ -297,7 +297,7 @@ int main(int argc, char *argv[])
       /** Supprime le dossier **/
       DeleteProdosFolder(current_image,param->prodos_folder_path);
 
-      /* Libération mémoire */
+      /* LibÃ©ration mÃ©moire */
       mem_free_image(current_image);
     }
   else if(param->action == ACTION_DELETE_VOLUME)
@@ -313,7 +313,7 @@ int main(int argc, char *argv[])
       /** Supprime le volume **/
       DeleteProdosVolume(current_image);
 
-      /* Libération mémoire */
+      /* LibÃ©ration mÃ©moire */
       mem_free_image(current_image);
     }
   else if(param->action == ACTION_CREATE_FOLDER)
@@ -326,10 +326,10 @@ int main(int argc, char *argv[])
       /* Information */
       printf("  - Create folder '%s' :\n",param->prodos_folder_path);
 
-      /** Création du Folder **/
+      /** CrÃ©ation du Folder **/
       CreateProdosFolder(current_image,param->prodos_folder_path);
 
-      /* Libération mémoire */
+      /* LibÃ©ration mÃ©moire */
       mem_free_image(current_image);
     }
   else if(param->action == ACTION_CREATE_VOLUME)
@@ -337,12 +337,12 @@ int main(int argc, char *argv[])
       /* Information */
       printf("  - Create volume '%s' :\n",param->image_file_path);
 
-      /** Création de l'image 2mg **/
+      /** CrÃ©ation de l'image 2mg **/
       current_image = CreateProdosVolume(param->image_file_path,param->new_volume_name,param->new_volume_size_kb);
       if(current_image == NULL)
         return(3);
 
-      /* Libération mémoire */
+      /* LibÃ©ration mÃ©moire */
       mem_free_image(current_image);
     }
   else if(param->action == ACTION_ADD_FILE)
@@ -358,7 +358,7 @@ int main(int argc, char *argv[])
       /** Ajoute le fichier dans l'archive **/
       AddFile(current_image,param->file_path,param->prodos_folder_path,1);
 
-      /* Libération mémoire */
+      /* LibÃ©ration mÃ©moire */
       mem_free_image(current_image);
     }
   else if(param->action == ACTION_ADD_FOLDER)
@@ -371,13 +371,13 @@ int main(int argc, char *argv[])
       /* Information */
       printf("  - Add folder '%s' :\n",param->folder_path);
 
-      /** Ajoute l'ensemble des fichiers du répertoire dans l'archive **/
+      /** Ajoute l'ensemble des fichiers du rÃ©pertoire dans l'archive **/
       AddFolder(current_image,param->folder_path,param->prodos_folder_path);
 
       /* Stat */
       printf("    => File(s) : %d,  Folder(s) : %d,  Error(s) : %d\n",current_image->nb_add_file,current_image->nb_add_folder,current_image->nb_add_error);
 
-      /* Libération mémoire */
+      /* LibÃ©ration mÃ©moire */
       mem_free_image(current_image);
     }
   else if(param->action == ACTION_CLEAR_HIGH_BIT)
@@ -385,14 +385,14 @@ int main(int argc, char *argv[])
       /** Construit la liste des fichiers **/
       filepath_tab = BuildFileList(param->file_path,&nb_filepath);
 
-      /** Met à 0 le bit 7 des octets du fichier **/
+      /** Met Ã  0 le bit 7 des octets du fichier **/
       for(i=0; i<nb_filepath; i++)
         {
           printf("  - Clear High bit for file '%s'\n",filepath_tab[i]);
           ClearFileHighBit(filepath_tab[i]);
         }
 
-      /* Libération mémoire */
+      /* LibÃ©ration mÃ©moire */
       mem_free_list(nb_filepath,filepath_tab);
     }
   else if(param->action == ACTION_SET_HIGH_BIT)
@@ -400,14 +400,14 @@ int main(int argc, char *argv[])
       /** Construit la liste des fichiers **/
       filepath_tab = BuildFileList(param->file_path,&nb_filepath);
 
-      /** Met à 1 le bit 7 des octets du fichier **/
+      /** Met Ã  1 le bit 7 des octets du fichier **/
       for(i=0; i<nb_filepath; i++)
         {
           printf("  - Set High bit for file '%s'\n",filepath_tab[i]);
           SetFileHighBit(filepath_tab[i]);
         }
 
-      /* Libération mémoire */
+      /* LibÃ©ration mÃ©moire */
       mem_free_list(nb_filepath,filepath_tab);
     }
   else if(param->action == ACTION_INDENT_FILE)
@@ -422,7 +422,7 @@ int main(int argc, char *argv[])
           IndentFile(filepath_tab[i]);
         }
 
-      /* Libération mémoire */
+      /* LibÃ©ration mÃ©moire */
       mem_free_list(nb_filepath,filepath_tab);
     }
   else if(param->action == ACTION_OUTDENT_FILE)
@@ -430,18 +430,18 @@ int main(int argc, char *argv[])
       /** Construit la liste des fichiers **/
       filepath_tab = BuildFileList(param->file_path,&nb_filepath);
 
-      /** Dé-Indente les lignes de code du fichier **/
+      /** DÃ©-Indente les lignes de code du fichier **/
       for(i=0; i<nb_filepath; i++)
         {
           printf("  - Outdent file '%s'\n",filepath_tab[i]);
           OutdentFile(filepath_tab[i]);
         }
 
-      /* Libération mémoire */
+      /* LibÃ©ration mÃ©moire */
       mem_free_list(nb_filepath,filepath_tab);
     }
 
-  /* Libération mémoire */
+  /* LibÃ©ration mÃ©moire */
   mem_free_param(param);
   my_Memory(MEMORY_FREE,NULL,NULL);
 
@@ -451,7 +451,7 @@ int main(int argc, char *argv[])
 
 
 /************************************************************/
-/*  usage() :  Indique les différentes options du logiciel. */
+/*  usage() :  Indique les diffÃ©rentes options du logiciel. */
 /************************************************************/
 void usage(char *program_path)
 {
@@ -490,21 +490,21 @@ void usage(char *program_path)
 
 
 /***********************************************************************/
-/*  GetParamLine() :  Décodage des paramètres de la ligne de commande. */
+/*  GetParamLine() :  DÃ©codage des paramÃ¨tres de la ligne de commande. */
 /***********************************************************************/
 struct parameter *GetParamLine(int argc, char *argv[])
 {
   struct parameter *param;
   char local_buffer[256];
 
-  /* Vérifications */
+  /* VÃ©rifications */
   if(argc < 3)
     {
       usage(argv[0]);
       return(NULL);
     }
 
-  /* Allocation mémoire */
+  /* Allocation mÃ©moire */
   param = (struct parameter *) calloc(1,sizeof(struct parameter));
   if(param == NULL)
     {
@@ -559,10 +559,10 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Chemin du fichier Prodos */
       param->prodos_file_path = strdup(argv[3]);
 
-      /* Chemin du Répertoire Windows */
+      /* Chemin du RÃ©pertoire Windows */
       param->output_directory_path = strdup(argv[4]);
 
-      /* Vérification */
+      /* VÃ©rification */
       if(param->image_file_path == NULL || param->prodos_file_path == NULL || param->output_directory_path == NULL)
         {
           printf("  Error : Impossible to allocate memory for structure Param.\n");
@@ -585,10 +585,10 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Chemin du fichier Prodos */
       param->prodos_folder_path = strdup(argv[3]);
 
-      /* Chemin du Répertoire Windows */
+      /* Chemin du RÃ©pertoire Windows */
       param->output_directory_path = strdup(argv[4]);
 
-      /* Vérification */
+      /* VÃ©rification */
       if(param->image_file_path == NULL || param->prodos_folder_path == NULL || param->output_directory_path == NULL)
         {
           printf("  Error : Impossible to allocate memory for structure Param.\n");
@@ -608,10 +608,10 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Chemin du fichier Image */
       param->image_file_path = strdup(argv[2]);
 
-      /* Chemin du Répertoire Windows */
+      /* Chemin du RÃ©pertoire Windows */
       param->output_directory_path = strdup(argv[3]);
 
-      /* Vérification */
+      /* VÃ©rification */
       if(param->image_file_path == NULL || param->output_directory_path == NULL)
         {
           printf("  Error : Impossible to allocate memory for structure Param.\n");
@@ -637,7 +637,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Nouveau nom de fichier */
       param->new_file_name = strdup(argv[4]);
 
-      /* Vérification */
+      /* VÃ©rification */
       if(param->image_file_path == NULL || param->prodos_file_path == NULL || param->new_file_name == NULL)
         {
           printf("  Error : Impossible to allocate memory for structure Param.\n");
@@ -663,7 +663,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Nouveau nom de dossier */
       param->new_folder_name = strdup(argv[4]);
 
-      /* Vérification */
+      /* VÃ©rification */
       if(param->image_file_path == NULL || param->prodos_folder_path == NULL || param->new_folder_name == NULL)
         {
           printf("  Error : Impossible to allocate memory for structure Param.\n");
@@ -686,7 +686,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Nouveau nom de volume */
       param->new_volume_name = strdup(argv[3]);
 
-      /* Vérification */
+      /* VÃ©rification */
       if(param->image_file_path == NULL || param->new_volume_name == NULL)
         {
           printf("  Error : Impossible to allocate memory for structure Param.\n");
@@ -712,7 +712,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Nouveau nom de fichier */
       param->new_file_path = strdup(argv[4]);
 
-      /* Vérification */
+      /* VÃ©rification */
       if(param->image_file_path == NULL || param->prodos_file_path == NULL || param->new_file_path == NULL)
         {
           printf("  Error : Impossible to allocate memory for structure Param.\n");
@@ -738,7 +738,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Nouveau nom de dossier */
       param->new_folder_path = strdup(argv[4]);
 
-      /* Vérification */
+      /* VÃ©rification */
       if(param->image_file_path == NULL || param->prodos_folder_path == NULL || param->new_folder_path == NULL)
         {
           printf("  Error : Impossible to allocate memory for structure Param.\n");
@@ -761,7 +761,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Chemin du fichier Prodos */
       param->prodos_file_path = strdup(argv[3]);
 
-      /* Vérification */
+      /* VÃ©rification */
       if(param->image_file_path == NULL || param->prodos_file_path == NULL)
         {
           printf("  Error : Impossible to allocate memory for structure Param.\n");
@@ -784,7 +784,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Chemin du dossier Prodos */
       param->prodos_folder_path = strdup(argv[3]);
 
-      /* Vérification */
+      /* VÃ©rification */
       if(param->image_file_path == NULL || param->prodos_folder_path == NULL)
         {
           printf("  Error : Impossible to allocate memory for structure Param.\n");
@@ -804,7 +804,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Chemin du fichier Image */
       param->image_file_path = strdup(argv[2]);
 
-      /* Vérification */
+      /* VÃ©rification */
       if(param->image_file_path == NULL)
         {
           printf("  Error : Impossible to allocate memory for structure Param.\n");
@@ -827,7 +827,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Nom du Dossier Prodos */
       param->prodos_folder_path = strdup(argv[3]);
 
-      /* Vérification */
+      /* VÃ©rification */
       if(param->image_file_path == NULL || param->prodos_folder_path == NULL)
         {
           printf("  Error : Impossible to allocate memory for structure Param.\n");
@@ -869,7 +869,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
           return(NULL);
         }
 
-      /* Vérification */
+      /* VÃ©rification */
       if(param->image_file_path == NULL || param->new_volume_name == NULL)
         {
           printf("  Error : Impossible to allocate memory for structure Param.\n");
@@ -889,13 +889,13 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Chemin du fichier Image */
       param->image_file_path = strdup(argv[2]);
 
-      /* Chemin du dossier où copier ce fichier */
+      /* Chemin du dossier oÃ¹ copier ce fichier */
       param->prodos_folder_path = strdup(argv[3]);
 
       /* Chemin du fichier Windows */
       param->file_path = strdup(argv[4]);
 
-      /* Vérification */
+      /* VÃ©rification */
       if(param->image_file_path == NULL || param->file_path == NULL || param->prodos_folder_path == NULL)
         {
           printf("  Error : Impossible to allocate memory for structure Param.\n");
@@ -915,13 +915,13 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Chemin du fichier Image */
       param->image_file_path = strdup(argv[2]);
 
-      /* Chemin du dossier où copier ce fichier */
+      /* Chemin du dossier oÃ¹ copier ce fichier */
       param->prodos_folder_path = strdup(argv[3]);
 
       /* Chemin du fichier Windows */
       param->folder_path = strdup(argv[4]);
 
-      /* Vérification */
+      /* VÃ©rification */
       if(param->image_file_path == NULL || param->prodos_folder_path == NULL || param->folder_path == NULL)
         {
           printf("  Error : Impossible to allocate memory for structure Param.\n");
@@ -941,7 +941,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Chemin du fichier */
       param->file_path = strdup(argv[2]);
 
-      /* Vérification */
+      /* VÃ©rification */
       if(param->file_path == NULL)
         {
           printf("  Error : Impossible to allocate memory for structure Param.\n");
@@ -961,7 +961,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Chemin du fichier */
       param->file_path = strdup(argv[2]);
 
-      /* Vérification */
+      /* VÃ©rification */
       if(param->file_path == NULL)
         {
           printf("  Error : Impossible to allocate memory for structure Param.\n");
@@ -981,7 +981,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Chemin du fichier */
       param->file_path = strdup(argv[2]);
 
-      /* Vérification */
+      /* VÃ©rification */
       if(param->file_path == NULL)
         {
           printf("  Error : Impossible to allocate memory for structure Param.\n");
@@ -1001,7 +1001,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Chemin du fichier */
       param->file_path = strdup(argv[2]);
 
-      /* Vérification */
+      /* VÃ©rification */
       if(param->file_path == NULL)
         {
           printf("  Error : Impossible to allocate memory for structure Param.\n");
@@ -1016,7 +1016,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
   /* Action inconnue */
   usage(argv[0]);
 
-  /* Libération */
+  /* LibÃ©ration */
   mem_free_param(param);
 
   /* Unknow Action */

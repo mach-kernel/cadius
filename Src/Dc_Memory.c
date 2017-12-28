@@ -1,6 +1,6 @@
 /***********************************************************************/
 /*                                                                     */
-/* Dc_Memory.c : Module pour la bibliothèque de gestion de la mémoire. */
+/* Dc_Memory.c : Module pour la bibliothÃ¨que de gestion de la mÃ©moire. */
 /*                                                                     */
 /***********************************************************************/
 /*  Auteur : Olivier ZARDINI  *  Brutal Deluxe Software  *  Dec 2011   */
@@ -17,7 +17,7 @@
 #include "Dc_Memory.h"
 
 /***************************************************/
-/*  my_Memory() :  Gestion des ressources mémoire. */
+/*  my_Memory() :  Gestion des ressources mÃ©moire. */
 /***************************************************/
 void my_Memory(int code, void *data, void *value)
 {
@@ -76,14 +76,14 @@ void my_Memory(int code, void *data, void *value)
         break;
 
       /*********************************************/
-      /*  Liste chainée des structure entry : File */
+      /*  Liste chainÃ©e des structure entry : File */
       /*********************************************/
       case MEMORY_ADD_ENTRY :
         current_entry = (struct file_descriptive_entry *) data;
         if(current_entry == NULL)
           return;
 
-        /* Ajoute à la fin de la liste */
+        /* Ajoute Ã  la fin de la liste */
         if(first_entry == NULL)
           first_entry = current_entry;
         else
@@ -109,7 +109,7 @@ void my_Memory(int code, void *data, void *value)
         break;
 
       case MEMORY_BUILD_ENTRY_TAB :
-        /* Libération */
+        /* LibÃ©ration */
         if(tab_entry)
           free(tab_entry);
 
@@ -137,14 +137,14 @@ void my_Memory(int code, void *data, void *value)
           }
         else if(first_entry == delete_entry)
           {
-            /* En 1ère position */
+            /* En 1Ã¨re position */
             first_entry = first_entry->next;
             memmove(&tab_entry[0],&tab_entry[1],(nb_entry-1)*sizeof(struct file_descriptive_entry *));
             nb_entry--;
           }
         else if(last_entry == delete_entry)
           {
-            /* En dernière position */
+            /* En derniÃ¨re position */
             tab_entry[nb_entry-2]->next = NULL;
             last_entry = tab_entry[nb_entry-2];
             nb_entry--;
@@ -179,14 +179,14 @@ void my_Memory(int code, void *data, void *value)
         break;
 
       /***********************************************/
-      /*  Liste chainée des structure entry : SubDir */
+      /*  Liste chainÃ©e des structure entry : SubDir */
       /***********************************************/
       case MEMORY_ADD_DIRECTORY :
         current_directory = (struct file_descriptive_entry *) data;
         if(current_directory == NULL)
           return;
 
-        /* Ajoute à la fin de la liste */
+        /* Ajoute Ã  la fin de la liste */
         if(first_directory == NULL)
           first_directory = current_directory;
         else
@@ -212,7 +212,7 @@ void my_Memory(int code, void *data, void *value)
         break;
 
       case MEMORY_BUILD_DIRECTORY_TAB :
-        /* Libération */
+        /* LibÃ©ration */
         if(tab_directory)
           free(tab_directory);
 
@@ -240,14 +240,14 @@ void my_Memory(int code, void *data, void *value)
           }
         else if(first_directory == delete_directory)
           {
-            /* En 1ère position */
+            /* En 1Ã¨re position */
             first_directory = first_directory->next;
             memmove(&tab_directory[0],&tab_directory[1],(nb_directory-1)*sizeof(struct file_descriptive_entry *));
             nb_directory--;
           }
         else if(last_directory == delete_directory)
           {
-            /* En dernière position */
+            /* En derniÃ¨re position */
             tab_directory[nb_directory-2]->next = NULL;
             last_directory = tab_directory[nb_directory-2];
             nb_directory--;
@@ -282,12 +282,12 @@ void my_Memory(int code, void *data, void *value)
         break;
 
       /*******************************************/
-      /*  Liste chainée des structure file_path  */
+      /*  Liste chainÃ©e des structure file_path  */
       /*******************************************/
       case MEMORY_ADD_FILE :
         path = (char *) data;
 
-        /* Allocation mémoire */
+        /* Allocation mÃ©moire */
         current_filepath = (struct file_path *) calloc(1,sizeof(struct file_path));
         if(current_filepath == NULL)
           return;
@@ -298,7 +298,7 @@ void my_Memory(int code, void *data, void *value)
             return;
           }
 
-        /* Ajoute à la fin de la liste */
+        /* Ajoute Ã  la fin de la liste */
         if(first_filepath == NULL)
           first_filepath = current_filepath;
         else
@@ -336,12 +336,12 @@ void my_Memory(int code, void *data, void *value)
         break;
 
       /***************************************/
-      /*  Liste chainée des structure error  */
+      /*  Liste chainÃ©e des structure error  */
       /***************************************/
       case MEMORY_ADD_ERROR :
         message = (char *) data;
 
-        /* Allocation mémoire */
+        /* Allocation mÃ©moire */
         current_error = (struct error *) calloc(1,sizeof(struct error));
         if(current_error == NULL)
           return;
@@ -352,7 +352,7 @@ void my_Memory(int code, void *data, void *value)
             return;
           }
 
-        /* Ajoute à la fin de la liste */
+        /* Ajoute Ã  la fin de la liste */
         if(first_error == NULL)
           first_error = current_error;
         else
@@ -398,7 +398,7 @@ void my_Memory(int code, void *data, void *value)
 
 
 /**********************************************************/
-/*  mem_free_param() :  Libération de la structure Param. */
+/*  mem_free_param() :  LibÃ©ration de la structure Param. */
 /**********************************************************/
 void mem_free_param(struct parameter *param)
 {

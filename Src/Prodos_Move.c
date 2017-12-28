@@ -27,7 +27,7 @@ static char *ChangeEntryPath(char *,char *,char *);
 
 
 /*********************************************************/
-/*  MoveProdosFile() :  Déplacement d'un fichier Prodos. */
+/*  MoveProdosFile() :  DÃ©placement d'un fichier Prodos. */
 /*********************************************************/
 void MoveProdosFile(struct prodos_image *current_image, char *prodos_file_path, char *target_folder_path)
 {
@@ -35,7 +35,7 @@ void MoveProdosFile(struct prodos_image *current_image, char *prodos_file_path, 
   struct file_descriptive_entry *current_entry;
   struct file_descriptive_entry *target_folder;
 
-  /* Recherche l'entrée Prodos */
+  /* Recherche l'entrÃ©e Prodos */
   current_entry = GetProdosFile(current_image,prodos_file_path);
   if(current_entry == NULL)
     {
@@ -43,12 +43,12 @@ void MoveProdosFile(struct prodos_image *current_image, char *prodos_file_path, 
       return;
     }
 
-  /** Recherche le dossier Prodos Cible où déplacer le fichier **/
+  /** Recherche le dossier Prodos Cible oÃ¹ dÃ©placer le fichier **/
   target_folder = BuildProdosFolderPath(current_image,target_folder_path,&is_volume_header,0);
   if(target_folder == NULL && is_volume_header == 0)
     return;
 
-  /** Déplace le fichier dans un Dossier existant ou à la Racine du volume **/
+  /** DÃ©place le fichier dans un Dossier existant ou Ã  la Racine du volume **/
   error = MoveProdosFileToFolder(current_image,target_folder,current_entry);
   if(error)
     return;
@@ -59,7 +59,7 @@ void MoveProdosFile(struct prodos_image *current_image, char *prodos_file_path, 
 
 
 /***********************************************************/
-/*  MoveProdosFolder() :  Déplacement d'un dossier Prodos. */
+/*  MoveProdosFolder() :  DÃ©placement d'un dossier Prodos. */
 /***********************************************************/
 void MoveProdosFolder(struct prodos_image *current_image, char *prodos_folder_path, char *target_folder_path)
 {
@@ -75,12 +75,12 @@ void MoveProdosFolder(struct prodos_image *current_image, char *prodos_folder_pa
       return;
     }
 
-  /** Recherche le dossier Prodos Cible où déplacer le dossier **/
+  /** Recherche le dossier Prodos Cible oÃ¹ dÃ©placer le dossier **/
   target_folder = BuildProdosFolderPath(current_image,target_folder_path,&is_volume_header,0);
   if(target_folder == NULL && is_volume_header == 0)
     return;
 
-  /** Déplace le dossier dans un Dossier existant ou à la Racine du volume **/
+  /** DÃ©place le dossier dans un Dossier existant ou Ã  la Racine du volume **/
   error = MoveProdosFolderToFolder(current_image,target_folder,current_entry);
   if(error)
     return;
@@ -91,7 +91,7 @@ void MoveProdosFolder(struct prodos_image *current_image, char *prodos_folder_pa
 
 
 /**************************************************************************************/
-/*  MoveProdosFileToFolder() :  Déplace un fichier dans un répertoire ou à la racine. */
+/*  MoveProdosFileToFolder() :  DÃ©place un fichier dans un rÃ©pertoire ou Ã  la racine. */
 /**************************************************************************************/
 int MoveProdosFileToFolder(struct prodos_image *current_image, struct file_descriptive_entry *target_folder, struct file_descriptive_entry *current_file)
 {
@@ -102,10 +102,10 @@ int MoveProdosFileToFolder(struct prodos_image *current_image, struct file_descr
   unsigned char directory_block[BLOCK_SIZE];
   unsigned char file_entry_block[BLOCK_SIZE];
 
-  /** Vérifie que ce nom de fichier ne correspond pas déjà à un nom de fichier/dossier **/
+  /** VÃ©rifie que ce nom de fichier ne correspond pas dÃ©jÃ  Ã  un nom de fichier/dossier **/
   if(target_folder == NULL)
     {
-      /* Vérification à la racine du Volume */
+      /* VÃ©rification Ã  la racine du Volume */
       for(i=0; i<current_image->nb_file; i++)
         if(!my_stricmp(current_file->file_name_case,current_image->tab_file[i]->file_name))
           {
@@ -121,7 +121,7 @@ int MoveProdosFileToFolder(struct prodos_image *current_image, struct file_descr
     }
   else
     {
-      /* Vérification dans le dossier */
+      /* VÃ©rification dans le dossier */
       for(i=0; i<target_folder->nb_file; i++)
         if(!my_stricmp(current_file->file_name_case,target_folder->tab_file[i]->file_name))
           {
@@ -136,56 +136,56 @@ int MoveProdosFileToFolder(struct prodos_image *current_image, struct file_descr
           }
     }
 
-  /** Recherche d'une entrée libre dans le répertoire **/
+  /** Recherche d'une entrÃ©e libre dans le rÃ©pertoire **/
   error = AllocateFolderEntry(current_image,target_folder,&directory_block_number,&directory_entry_number,&directory_header_pointer);
   if(error)
     return(2);
 
-  /*** Recopie les données de l'entrée du Fichier dans cette entrée ***/
+  /*** Recopie les donnÃ©es de l'entrÃ©e du Fichier dans cette entrÃ©e ***/
   entry_length = 0x27;
 
-  /* Récupère les données de l'entrée */
+  /* RÃ©cupÃ¨re les donnÃ©es de l'entrÃ©e */
   file_block_number = current_file->block_location;
   file_block_offset = current_file->entry_offset;
   GetBlockData(current_image,file_block_number,&file_entry_block[0]);
   file_header_pointer = GetWordValue(file_entry_block,file_block_offset+0x25);
 
-  /* Récupère les données du dossier cible */
+  /* RÃ©cupÃ¨re les donnÃ©es du dossier cible */
   target_offset = 4 + (directory_entry_number-1)*entry_length;
   GetBlockData(current_image,directory_block_number,&directory_block[0]);
   
-  /** Copie les données de l'entrée dans le nouveau dossier **/
+  /** Copie les donnÃ©es de l'entrÃ©e dans le nouveau dossier **/
   memcpy(&directory_block[target_offset],&file_entry_block[file_block_offset],entry_length);
   /* Modifie le Header Pointer */
   SetWordValue(directory_block,target_offset+0x25,directory_header_pointer);
-  /* Ecrit les données */
+  /* Ecrit les donnÃ©es */
   SetBlockData(current_image,directory_block_number,&directory_block[0]);
 
-  /** Efface l'entrée de l'ancien Dossier **/
+  /** Efface l'entrÃ©e de l'ancien Dossier **/
   memset(&file_entry_block[file_block_offset],0,entry_length);
   SetBlockData(current_image,file_block_number,&file_entry_block[0]);
 
-  /* Modifie le nombre d'entrées valides du Target Folder : +1 */
+  /* Modifie le nombre d'entrÃ©es valides du Target Folder : +1 */
   GetBlockData(current_image,directory_header_pointer,&directory_block[0]);
   file_count = GetWordValue(directory_block,0x25);
   SetWordValue(directory_block,0x25,(WORD)(file_count+1));
   SetBlockData(current_image,directory_header_pointer,&directory_block[0]);
 
-  /* Modifie le nombre d'entrées valides de l'ancien Folder : -1 */
+  /* Modifie le nombre d'entrÃ©es valides de l'ancien Folder : -1 */
   GetBlockData(current_image,file_header_pointer,&directory_block[0]);
   file_count = GetWordValue(directory_block,0x25);
   SetWordValue(directory_block,0x25,(WORD)(file_count-1));
   SetBlockData(current_image,file_header_pointer,&directory_block[0]);
 
   /***************************************/
-  /*** Met à jour la structure mémoire ***/
-  /** Met à jour le Dossier source (-1 fichier) **/
+  /*** Met Ã  jour la structure mÃ©moire ***/
+  /** Met Ã  jour le Dossier source (-1 fichier) **/
   if(current_file->parent_directory == NULL)
     UpdateEntryTable(UPDATE_REMOVE,&current_image->nb_file,&current_image->tab_file,current_file);
   else
     UpdateEntryTable(UPDATE_REMOVE,&current_file->parent_directory->nb_file,&current_file->parent_directory->tab_file,current_file);
 
-  /** Met à jour le Dossier Cible (+1 fichier) **/
+  /** Met Ã  jour le Dossier Cible (+1 fichier) **/
   if(target_folder == NULL)
     error = UpdateEntryTable(UPDATE_ADD,&current_image->nb_file,&current_image->tab_file,current_file);
   else
@@ -196,7 +196,7 @@ int MoveProdosFileToFolder(struct prodos_image *current_image, struct file_descr
       return(1);
     }
 
-  /** Met à jour l'entrée en mémoire **/
+  /** Met Ã  jour l'entrÃ©e en mÃ©moire **/
   /* Nouveau Path */
   new_path = (char *) calloc((target_folder==NULL)?1+strlen(current_image->volume_header->volume_name_case)+1+strlen(current_file->file_name_case)+1:
                                                    strlen(target_folder->file_path)+1+strlen(current_file->file_name_case)+1,
@@ -233,7 +233,7 @@ int MoveProdosFileToFolder(struct prodos_image *current_image, struct file_descr
 
 
 /****************************************************************************************/
-/*  MoveProdosFolderToFolder() :  Déplace un dossier dans un répertoire ou à la racine. */
+/*  MoveProdosFolderToFolder() :  DÃ©place un dossier dans un rÃ©pertoire ou Ã  la racine. */
 /****************************************************************************************/
 int MoveProdosFolderToFolder(struct prodos_image *current_image, struct file_descriptive_entry *target_folder, struct file_descriptive_entry *current_folder)
 {
@@ -255,13 +255,13 @@ int MoveProdosFolderToFolder(struct prodos_image *current_image, struct file_des
   else
     sprintf(new_path,"%s/%s",target_folder->file_path,current_folder->file_name_case);
 
-  /* On ne peut pas déplacer un Dossier au même endroit */
+  /* On ne peut pas dÃ©placer un Dossier au mÃªme endroit */
   if(!my_stricmp(old_path,new_path))
     {
       printf("  Error : Invalid target location. The Folder is moved at the same location : '%s'.\n",target_folder->file_name_case);
       return(1);
     }
-  /* On ne peut pas déplacer un Dossier sous lui-même */
+  /* On ne peut pas dÃ©placer un Dossier sous lui-mÃªme */
   if(strlen(new_path) > strlen(old_path))
     if(!my_strnicmp(old_path,new_path,strlen(old_path)))
       {
@@ -269,10 +269,10 @@ int MoveProdosFolderToFolder(struct prodos_image *current_image, struct file_des
         return(1);
       }
 
-  /** Vérifie que ce nom de fichier ne correspond pas déjà à un nom de fichier/dossier **/
+  /** VÃ©rifie que ce nom de fichier ne correspond pas dÃ©jÃ  Ã  un nom de fichier/dossier **/
   if(target_folder == NULL)
     {
-      /* Vérification à la racine du Volume */
+      /* VÃ©rification Ã  la racine du Volume */
       for(i=0; i<current_image->nb_file; i++)
         if(!my_stricmp(current_folder->file_name_case,current_image->tab_file[i]->file_name))
           {
@@ -288,7 +288,7 @@ int MoveProdosFolderToFolder(struct prodos_image *current_image, struct file_des
     }
   else
     {
-      /* Vérification dans le dossier */
+      /* VÃ©rification dans le dossier */
       for(i=0; i<target_folder->nb_file; i++)
         if(!my_stricmp(current_folder->file_name_case,target_folder->tab_file[i]->file_name))
           {
@@ -303,62 +303,62 @@ int MoveProdosFolderToFolder(struct prodos_image *current_image, struct file_des
           }
     }
 
-  /** Recherche d'une entrée libre dans le répertoire **/
+  /** Recherche d'une entrÃ©e libre dans le rÃ©pertoire **/
   error = AllocateFolderEntry(current_image,target_folder,&directory_block_number,&directory_entry_number,&directory_header_pointer);
   if(error)
     return(2);
 
-  /*** Recopie les données de l'entrée du Fichier dans cette entrée ***/
+  /*** Recopie les donnÃ©es de l'entrÃ©e du Fichier dans cette entrÃ©e ***/
   entry_length = 0x27;
 
-  /* Récupère les données de l'entrée */
+  /* RÃ©cupÃ¨re les donnÃ©es de l'entrÃ©e */
   file_block_number = current_folder->block_location;
   file_block_offset = current_folder->entry_offset;
   GetBlockData(current_image,file_block_number,&file_entry_block[0]);
   file_header_pointer = GetWordValue(file_entry_block,file_block_offset+FILE_HEADERPOINTER_OFFSET);
 
-  /* Récupère les données du dossier cible */
+  /* RÃ©cupÃ¨re les donnÃ©es du dossier cible */
   target_offset = 4 + (directory_entry_number-1)*entry_length;
   GetBlockData(current_image,directory_block_number,&directory_block[0]);
   
-  /** Copie les données de l'entrée dans le nouveau dossier **/
+  /** Copie les donnÃ©es de l'entrÃ©e dans le nouveau dossier **/
   memcpy(&directory_block[target_offset],&file_entry_block[file_block_offset],entry_length);
   /* Modifie le Header Pointer */
   SetWordValue(directory_block,target_offset+FILE_HEADERPOINTER_OFFSET,directory_header_pointer);
-  /* Ecrit les données */
+  /* Ecrit les donnÃ©es */
   SetBlockData(current_image,directory_block_number,&directory_block[0]);
 
-  /** Efface l'entrée de l'ancien Dossier **/
+  /** Efface l'entrÃ©e de l'ancien Dossier **/
   memset(&file_entry_block[file_block_offset],0,entry_length);
   SetBlockData(current_image,file_block_number,&file_entry_block[0]);
 
-  /* Modifie le nombre d'entrées valides du Target Folder : +1 */
+  /* Modifie le nombre d'entrÃ©es valides du Target Folder : +1 */
   GetBlockData(current_image,directory_header_pointer,&directory_block[0]);
   file_count = GetWordValue(directory_block,DIRECTORY_FILECOUNT_OFFSET);
   SetWordValue(directory_block,DIRECTORY_FILECOUNT_OFFSET,(WORD)(file_count+1));
   SetBlockData(current_image,directory_header_pointer,&directory_block[0]);
 
-  /* Modifie le nombre d'entrées valides de l'ancien Folder : -1 */
+  /* Modifie le nombre d'entrÃ©es valides de l'ancien Folder : -1 */
   GetBlockData(current_image,file_header_pointer,&directory_block[0]);
   file_count = GetWordValue(directory_block,DIRECTORY_FILECOUNT_OFFSET);
   SetWordValue(directory_block,DIRECTORY_FILECOUNT_OFFSET,(WORD)(file_count-1));
   SetBlockData(current_image,file_header_pointer,&directory_block[0]);
 
-  /** Modifie le Parent Pointer Block et le Parent Entry du dossier que l'on déplace **/
+  /** Modifie le Parent Pointer Block et le Parent Entry du dossier que l'on dÃ©place **/
   GetBlockData(current_image,current_folder->key_pointer_block,&directory_block[0]);
   SetWordValue(directory_block,DIRECTORY_PARENTPOINTERBLOCK_OFFSET,(WORD)directory_block_number);
   directory_block[DIRECTORY_PARENTENTRY_OFFSET] = (BYTE) directory_entry_number;
   SetBlockData(current_image,current_folder->key_pointer_block,&directory_block[0]);
 
   /***************************************/
-  /*** Met à jour la structure mémoire ***/
-  /** Met à jour le Dossier source (-1 fichier) **/
+  /*** Met Ã  jour la structure mÃ©moire ***/
+  /** Met Ã  jour le Dossier source (-1 fichier) **/
   if(current_folder->parent_directory == NULL)
     UpdateEntryTable(UPDATE_REMOVE,&current_image->nb_file,&current_image->tab_file,current_folder);
   else
     UpdateEntryTable(UPDATE_REMOVE,&current_folder->parent_directory->nb_file,&current_folder->parent_directory->tab_file,current_folder);
 
-  /** Met à jour le Dossier Cible (+1 fichier) **/
+  /** Met Ã  jour le Dossier Cible (+1 fichier) **/
   if(target_folder == NULL)
     error = UpdateEntryTable(UPDATE_ADD,&current_image->nb_file,&current_image->tab_file,current_folder);
   else
@@ -369,7 +369,7 @@ int MoveProdosFolderToFolder(struct prodos_image *current_image, struct file_des
       return(1);
     }
 
-  /** Met à jour l'entrée en mémoire **/
+  /** Met Ã  jour l'entrÃ©e en mÃ©moire **/
 
   /* Nouveau Header Pointer Block */
   current_folder->header_pointer_block = directory_header_pointer;
@@ -381,7 +381,7 @@ int MoveProdosFolderToFolder(struct prodos_image *current_image, struct file_des
   /* Nouveau Parent Directory */
   current_folder->parent_directory = target_folder;
 
-  /** Modifie toutes les entrées de ce Répertoire **/
+  /** Modifie toutes les entrÃ©es de ce RÃ©pertoire **/
   /* Depth */
   ChangeDirectoryEntriesDepth(current_folder,depth_delta);
 
@@ -394,47 +394,47 @@ int MoveProdosFolderToFolder(struct prodos_image *current_image, struct file_des
 
 
 /*********************************************************************************/
-/*  ChangeDirectoryEntriesDepth() :  Change le niveau de profondeur des entrées. */
+/*  ChangeDirectoryEntriesDepth() :  Change le niveau de profondeur des entrÃ©es. */
 /*********************************************************************************/
 static void ChangeDirectoryEntriesDepth(struct file_descriptive_entry *current_folder, int depth_delta)
 {
   int i;
 
-  /* Le dossier lui même */
+  /* Le dossier lui mÃªme */
   current_folder->depth += depth_delta;
 
   /* Les File du dossier */
   for(i=0; i<current_folder->nb_file; i++)
     current_folder->tab_file[i]->depth += depth_delta;
 
-  /* Les Folder du dossier (récursivité) */
+  /* Les Folder du dossier (rÃ©cursivitÃ©) */
   for(i=0; i<current_folder->nb_directory; i++)
     ChangeDirectoryEntriesDepth(current_folder->tab_directory[i],depth_delta);
 }
 
 
 /******************************************************************/
-/*  ChangeDirectoryEntriesPath() :  Change le chemin des entrées. */
+/*  ChangeDirectoryEntriesPath() :  Change le chemin des entrÃ©es. */
 /******************************************************************/
 static void ChangeDirectoryEntriesPath(struct file_descriptive_entry *current_folder, char *old_path, char *new_path)
 {
   int i;
 
-  /* Le dossier lui même */
+  /* Le dossier lui mÃªme */
   current_folder->file_path = ChangeEntryPath(current_folder->file_path,old_path,new_path);
 
   /* Les File du dossier */
   for(i=0; i<current_folder->nb_file; i++)
     current_folder->tab_file[i]->file_path = ChangeEntryPath(current_folder->tab_file[i]->file_path,old_path,new_path);
 
-  /* Les Folder du dossier (récursivité) */
+  /* Les Folder du dossier (rÃ©cursivitÃ©) */
   for(i=0; i<current_folder->nb_directory; i++)
     ChangeDirectoryEntriesPath(current_folder->tab_directory[i],old_path,new_path);
 }
 
 
 /*****************************************************/
-/*  ChangeEntryPath() :  Création du nouveau chemin. */
+/*  ChangeEntryPath() :  CrÃ©ation du nouveau chemin. */
 /*****************************************************/
 static char *ChangeEntryPath(char *current_file_path, char *old_path, char *new_path)
 {
@@ -444,7 +444,7 @@ static char *ChangeEntryPath(char *current_file_path, char *old_path, char *new_
   /* Taille du chemin */
   length = strlen(new_path) + strlen(&current_file_path[strlen(old_path)]);
 
-  /* Allocation mémoire */
+  /* Allocation mÃ©moire */
   new_file_path = (char *) calloc(length+1,sizeof(char));
   if(new_file_path == NULL)
     {
@@ -456,7 +456,7 @@ static char *ChangeEntryPath(char *current_file_path, char *old_path, char *new_
   strcpy(new_file_path,new_path);
   strcat(new_file_path,&current_file_path[strlen(old_path)]);
 
-  /* Libératioon mémoire ancien chemin */
+  /* LibÃ©ratioon mÃ©moire ancien chemin */
   free(current_file_path);
 
   /* Renvoi le chemin */

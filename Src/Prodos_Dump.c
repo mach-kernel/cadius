@@ -61,10 +61,10 @@ void DumpProdosImage(struct prodos_image *current_image, int dump_structure)
   /** Volume Footer **/
   DumpVolumeFooter(current_image,max_depth);
 
-  /*** On Dump la structure interne des entrées ***/
+  /*** On Dump la structure interne des entrÃ©es ***/
   if(dump_structure == 1)
     {
-      /* Début */
+      /* DÃ©but */
       printf("----------------------------------------------------------------------\n");
 
       /** All Entries **/
@@ -79,7 +79,7 @@ void DumpProdosImage(struct prodos_image *current_image, int dump_structure)
 
 
 /***********************************************************************/
-/*  DumpOneDirectory() :  Dump les infomations d'une entrée Directory. */
+/*  DumpOneDirectory() :  Dump les infomations d'une entrÃ©e Directory. */
 /***********************************************************************/
 static void DumpOneDirectory(struct file_descriptive_entry *current_file, int max_depth)
 {
@@ -103,7 +103,7 @@ static void DumpOneDirectory(struct file_descriptive_entry *current_file, int ma
 
 
 /*************************************************************/
-/*  DumpOneFile() :  Dump les infomations d'une entrée File. */
+/*  DumpOneFile() :  Dump les infomations d'une entrÃ©e File. */
 /*************************************************************/
 static void DumpOneFile(struct file_descriptive_entry *current_file, int max_depth)
 {
@@ -183,7 +183,7 @@ static void DumpVolumeFooter(struct prodos_image *current_image, int max_depth)
 
 
 /********************************************************************************/
-/*  DumpDirectoryEntries() :  Dump les infomations des entrées d'un répertoire. */
+/*  DumpDirectoryEntries() :  Dump les infomations des entrÃ©es d'un rÃ©pertoire. */
 /********************************************************************************/
 static void DumpDirectoryEntries(struct prodos_image *current_image, struct file_descriptive_entry *current_file)
 {
@@ -203,14 +203,14 @@ static void DumpDirectoryEntries(struct prodos_image *current_image, struct file
 
 
 /*********************************************************/
-/*  DumpOneEntry() :  Dump les infomations d'une entrée. */
+/*  DumpOneEntry() :  Dump les infomations d'une entrÃ©e. */
 /*********************************************************/
 static void DumpOneEntry(struct prodos_image *current_image, struct file_descriptive_entry *current_file)
 {
   int i;
   char prefix[1024];
 
-  /** On utilise la profondeur du fichier comme décalage **/
+  /** On utilise la profondeur du fichier comme dÃ©calage **/
   for(i=0; i<2*current_file->depth; i++)
     prefix[i] = ' ';
   prefix[2*current_file->depth] = '\0';
@@ -235,7 +235,7 @@ static void DumpOneEntry(struct prodos_image *current_image, struct file_descrip
   printf("%sFile Type Ascii            : %s\n",prefix,current_file->file_type_ascii);
   printf("-----\n");
 
-  /* Création / Modification Date + Version */
+  /* CrÃ©ation / Modification Date + Version */
   printf("%sFile Creation Date         : %s\n",prefix,current_file->file_creation_date.ascii);
   printf("%sFile Creation Time         : %s\n",prefix,current_file->file_creation_time.ascii);
   printf("%sFile Modification Date     : %s\n",prefix,current_file->file_modification_date.ascii);

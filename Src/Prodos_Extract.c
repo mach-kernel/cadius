@@ -28,12 +28,12 @@ void ExtractOneFile(struct prodos_image *current_image, char *prodos_file_path, 
   struct file_descriptive_entry *current_entry;
   struct prodos_file *current_file;
 
-  /** Recherche l'entrée du fichier **/
+  /** Recherche l'entrÃ©e du fichier **/
   current_entry = GetProdosFile(current_image,prodos_file_path);
   if(current_entry == NULL)
     return;
 
-  /** Allocation mémoire **/
+  /** Allocation mÃ©moire **/
   current_file = (struct prodos_file *) calloc(1,sizeof(struct prodos_file));
   if(current_file == NULL)
     {
@@ -42,7 +42,7 @@ void ExtractOneFile(struct prodos_image *current_image, char *prodos_file_path, 
     }
   current_file->entry = current_entry;
 
-  /** Récupère les data de ce fichier **/
+  /** RÃ©cupÃ¨re les data de ce fichier **/
   error = GetDataFile(current_image,current_entry,current_file);
   if(error)
     {
@@ -51,16 +51,16 @@ void ExtractOneFile(struct prodos_image *current_image, char *prodos_file_path, 
       return;
     }
 
-  /** Création du fichier sur disque **/
+  /** CrÃ©ation du fichier sur disque **/
   error = CreateOutputFile(current_file,output_directory_path);
 
-  /* Libération mémoire */
+  /* LibÃ©ration mÃ©moire */
   mem_free_file(current_file);
 }
 
 
 /************************************************************************/
-/*  ExtractFolderFiles() :  Fonction récursive d'extraction de fichier. */
+/*  ExtractFolderFiles() :  Fonction rÃ©cursive d'extraction de fichier. */
 /************************************************************************/
 void ExtractFolderFiles(struct prodos_image *current_image, struct file_descriptive_entry *folder_entry, char *output_directory_path)
 {
@@ -69,7 +69,7 @@ void ExtractFolderFiles(struct prodos_image *current_image, struct file_descript
   struct file_descriptive_entry *current_entry;
   struct prodos_file *current_file;
 
-  /** Création du dossier sur disque **/
+  /** CrÃ©ation du dossier sur disque **/
   /* Chemin du dossier */
   windows_folder_path = (char *) calloc(strlen(output_directory_path) + strlen(folder_entry->file_name_case) + 256,sizeof(char));
   if(windows_folder_path == NULL)
@@ -85,7 +85,7 @@ void ExtractFolderFiles(struct prodos_image *current_image, struct file_descript
   strcat(windows_folder_path,folder_entry->file_name_case);
   strcat(windows_folder_path,FOLDER_CHARACTER);
 
-  /* Création du dossier */
+  /* CrÃ©ation du dossier */
   error = my_CreateDirectory(windows_folder_path);
   if(error)
     {
@@ -97,16 +97,16 @@ void ExtractFolderFiles(struct prodos_image *current_image, struct file_descript
   current_image->nb_extract_folder++;
 
   /*****************************************************/
-  /**  Traitement de tous les fichiers du répertoire  **/
+  /**  Traitement de tous les fichiers du rÃ©pertoire  **/
   for(i=0; i<folder_entry->nb_file; i++)
     {
-      /* Entrée du fichier */
+      /* EntrÃ©e du fichier */
       current_entry = folder_entry->tab_file[i];
 
       /* Information */
       printf("      o Extract File   : %s\n",current_entry->file_path);
 
-      /** Allocation mémoire **/
+      /** Allocation mÃ©moire **/
       current_file = (struct prodos_file *) calloc(1,sizeof(struct prodos_file));
       if(current_file == NULL)
         {
@@ -116,7 +116,7 @@ void ExtractFolderFiles(struct prodos_image *current_image, struct file_descript
         }
       current_file->entry = current_entry;
 
-      /** Récupère les data de ce fichier **/
+      /** RÃ©cupÃ¨re les data de ce fichier **/
       error = GetDataFile(current_image,current_entry,current_file);
       if(error)
         {
@@ -126,10 +126,10 @@ void ExtractFolderFiles(struct prodos_image *current_image, struct file_descript
           continue;
         }
 
-      /** Création du fichier sur disque **/
+      /** CrÃ©ation du fichier sur disque **/
       error = CreateOutputFile(current_file,windows_folder_path);
 
-      /* Libération mémoire */
+      /* LibÃ©ration mÃ©moire */
       mem_free_file(current_file);
 
       /* Stat */
@@ -140,20 +140,20 @@ void ExtractFolderFiles(struct prodos_image *current_image, struct file_descript
     }
 
   /*****************************************************/
-  /**  Traitement de tous les dossiers du répertoire  **/
+  /**  Traitement de tous les dossiers du rÃ©pertoire  **/
   for(i=0; i<folder_entry->nb_directory; i++)
     {
-      /* Entrée du fichier */
+      /* EntrÃ©e du fichier */
       current_entry = folder_entry->tab_directory[i];
 
       /* Information */
       printf("      + Extract Folder : %s\n",current_entry->file_path);
 
-      /** Récursivité **/
+      /** RÃ©cursivitÃ© **/
       ExtractFolderFiles(current_image,current_entry,windows_folder_path);
     }
 
-  /** Libération mémoire **/
+  /** LibÃ©ration mÃ©moire **/
   free(windows_folder_path);
 }
 
@@ -168,7 +168,7 @@ void ExtractVolumeFiles(struct prodos_image *current_image, char *output_directo
   struct file_descriptive_entry *current_entry;
   struct prodos_file *current_file;
 
-  /** Création du dossier sur disque **/
+  /** CrÃ©ation du dossier sur disque **/
   /* Chemin du dossier */
   windows_folder_path = (char *) calloc(strlen(output_directory_path) + strlen(current_image->volume_header->volume_name_case) + 256,sizeof(char));
   if(windows_folder_path == NULL)
@@ -184,7 +184,7 @@ void ExtractVolumeFiles(struct prodos_image *current_image, char *output_directo
   strcat(windows_folder_path,current_image->volume_header->volume_name_case);
   strcat(windows_folder_path,FOLDER_CHARACTER);
 
-  /* Création du dossier */
+  /* CrÃ©ation du dossier */
   error = my_CreateDirectory(windows_folder_path);
   if(error)
     {
@@ -198,13 +198,13 @@ void ExtractVolumeFiles(struct prodos_image *current_image, char *output_directo
   /**  Traitement de tous les fichiers de la racine  **/
   for(i=0; i<current_image->nb_file; i++)
     {
-      /* Entrée du fichier */
+      /* EntrÃ©e du fichier */
       current_entry = current_image->tab_file[i];
 
       /* Information */
       printf("      o Extract File   : %s\n",current_entry->file_path);
 
-      /** Allocation mémoire **/
+      /** Allocation mÃ©moire **/
       current_file = (struct prodos_file *) calloc(1,sizeof(struct prodos_file));
       if(current_file == NULL)
         {
@@ -214,7 +214,7 @@ void ExtractVolumeFiles(struct prodos_image *current_image, char *output_directo
         }
       current_file->entry = current_entry;
 
-      /** Récupère les data de ce fichier **/
+      /** RÃ©cupÃ¨re les data de ce fichier **/
       error = GetDataFile(current_image,current_entry,current_file);
       if(error)
         {
@@ -224,10 +224,10 @@ void ExtractVolumeFiles(struct prodos_image *current_image, char *output_directo
           continue;
         }
 
-      /** Création du fichier sur disque **/
+      /** CrÃ©ation du fichier sur disque **/
       error = CreateOutputFile(current_file,windows_folder_path);
 
-      /* Libération mémoire */
+      /* LibÃ©ration mÃ©moire */
       mem_free_file(current_file);
 
       /* Stat */
@@ -241,23 +241,23 @@ void ExtractVolumeFiles(struct prodos_image *current_image, char *output_directo
   /**  Traitement de tous les dossiers de la racine  **/
   for(i=0; i<current_image->nb_directory; i++)
     {
-      /* Entrée du fichier */
+      /* EntrÃ©e du fichier */
       current_entry = current_image->tab_directory[i];
 
       /* Information */
       printf("      + Extract Folder : %s\n",current_entry->file_path);
 
-      /** Récursivité **/
+      /** RÃ©cursivitÃ© **/
       ExtractFolderFiles(current_image,current_entry,windows_folder_path);
     }
 
-  /** Libération mémoire **/
+  /** LibÃ©ration mÃ©moire **/
   free(windows_folder_path);
 }
 
 
 /************************************************************/
-/*  CreateOutputFile() :  Création d'un fichier sur disque. */
+/*  CreateOutputFile() :  CrÃ©ation d'un fichier sur disque. */
 /************************************************************/
 static int CreateOutputFile(struct prodos_file *current_file, char *output_directory_path)
 {
@@ -267,7 +267,7 @@ static int CreateOutputFile(struct prodos_file *current_file, char *output_direc
   char file_resource_path[1024];
   char file_information_path[1024];
 
-  /* Création du répertoire de base */
+  /* CrÃ©ation du rÃ©pertoire de base */
   error = my_CreateDirectory(output_directory_path);
   if(error)
     {
@@ -288,7 +288,7 @@ static int CreateOutputFile(struct prodos_file *current_file, char *output_direc
   strcat(file_resource_path,"_ResourceFork.bin");
 
   /**********************************/
-  /**  Création du Fichier : Data  **/
+  /**  CrÃ©ation du Fichier : Data  **/
   /**********************************/
   error = CreateBinaryFile(file_data_path,current_file->data,current_file->data_length);
   if(error)
@@ -300,7 +300,7 @@ static int CreateOutputFile(struct prodos_file *current_file, char *output_direc
   /** Ajustement des Dates **/
   my_SetFileCreationModificationDate(file_data_path,current_file->entry);
 
-  /** Change la visibilité du fichier **/
+  /** Change la visibilitÃ© du fichier **/
   my_SetFileAttribute(file_data_path,((current_file->entry->access&0x04)==0x04)?SET_FILE_HIDDEN:SET_FILE_VISIBLE);
 
   /** Ajoute des informations du fichier dans le fichier FileInformation.txt **/
@@ -309,7 +309,7 @@ static int CreateOutputFile(struct prodos_file *current_file, char *output_direc
   SetFileInformation(file_information_path,current_file);
 
   /**************************************/
-  /**  Création du Fichier : Resource  **/
+  /**  CrÃ©ation du Fichier : Resource  **/
   /**************************************/
   if(current_file->resource_length > 0)
     {
@@ -323,7 +323,7 @@ static int CreateOutputFile(struct prodos_file *current_file, char *output_direc
       /** Ajustement des Dates **/
       my_SetFileCreationModificationDate(file_resource_path,current_file->entry);
 
-      /** Change la visibilité du fichier **/
+      /** Change la visibilitÃ© du fichier **/
       my_SetFileAttribute(file_resource_path,((current_file->entry->access&0x04)==0x04)?SET_FILE_HIDDEN:SET_FILE_VISIBLE);
     }
 
@@ -353,16 +353,16 @@ static void SetFileInformation(char *file_information_path, struct prodos_file *
       sprintf(&folder_info2[2*i],"%02X",current_file->resource_finderinfo_2[i]);
     }
 
-  /** Prépare la ligne du fichier **/
+  /** PrÃ©pare la ligne du fichier **/
   sprintf(local_buffer,"%s=Type(%02X),AuxType(%04X),VersionCreate(%02X),MinVersion(%02X),Access(%02X),FolderInfo1(%s),FolderInfo2(%s)",current_file->entry->file_name_case,
           current_file->entry->file_type,current_file->entry->file_aux_type,current_file->entry->version_created,current_file->entry->min_version,
           current_file->entry->access,folder_info1,folder_info2);
 
-  /** Charge en mémoire le fichier **/
+  /** Charge en mÃ©moire le fichier **/
   line_tab = BuildUniqueListFromFile(file_information_path,&nb_line);
   if(line_tab == NULL)
     {
-      /* Créer le fichier FileInformation */
+      /* CrÃ©er le fichier FileInformation */
       CreateBinaryFile(file_information_path,(unsigned char *)local_buffer,(int)strlen(local_buffer));
 
       /* Rendre le fichier invisible */
@@ -373,7 +373,7 @@ static void SetFileInformation(char *file_information_path, struct prodos_file *
   /* Rendre le fichier visible */
   my_SetFileAttribute(file_information_path,SET_FILE_VISIBLE);
 
-  /** Création du fichier **/
+  /** CrÃ©ation du fichier **/
   fd = fopen(file_information_path,"w");
   if(fd == NULL)
     {
@@ -404,7 +404,7 @@ static void SetFileInformation(char *file_information_path, struct prodos_file *
   /* Fermeture */
   fclose(fd);
 
-  /* Libération mémoire */
+  /* LibÃ©ration mÃ©moire */
   mem_free_list(nb_line,line_tab);
 
   /* Rendre le fichier invisible */

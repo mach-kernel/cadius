@@ -1,6 +1,6 @@
 /**********************************************************************/
 /*                                                                    */
-/*  Dc_Prodos.c : Module pour la bibliothËque de gestion du Prodos.   */
+/*  Dc_Prodos.c : Module pour la biblioth√®que de gestion du Prodos.   */
 /*                                                                    */
 /**********************************************************************/
 /*  Auteur : Olivier ZARDINI  *  Brutal Deluxe Software  *  Dec 2011  */
@@ -42,7 +42,7 @@ struct prodos_image *LoadProdosImage(char *file_path)
   struct prodos_image *current_image;
   unsigned char one_block[BLOCK_SIZE];
 
-  /* Allocation mÈmoire */
+  /* Allocation m√©moire */
   current_image = (struct prodos_image *) calloc(1,sizeof(struct prodos_image));
   if(current_image == NULL)
     {
@@ -86,7 +86,7 @@ struct prodos_image *LoadProdosImage(char *file_path)
       return(NULL);
     }
 
-  /** Chargement du fichier image en mÈmoire **/
+  /** Chargement du fichier image en m√©moire **/
   data_file = LoadBinaryFile(file_path,&data_length);
   if(data_file == NULL)
     {
@@ -99,7 +99,7 @@ struct prodos_image *LoadProdosImage(char *file_path)
   data_file += current_image->image_header_size;
   data_length -= current_image->image_header_size;
 
-  /* On Èlimine les derniers octets parasites */
+  /* On √©limine les derniers octets parasites */
   nb_block = data_length / BLOCK_SIZE;
   data_length = nb_block*BLOCK_SIZE;
 
@@ -115,7 +115,7 @@ struct prodos_image *LoadProdosImage(char *file_path)
       return(NULL);
     }
 
-  /* Tableau des blocks modifiÈs */
+  /* Tableau des blocks modifi√©s */
   current_image->block_modified = (unsigned char *) calloc(current_image->nb_block,sizeof(unsigned char));
   if(current_image->block_modified == NULL)
     {
@@ -140,7 +140,7 @@ struct prodos_image *LoadProdosImage(char *file_path)
       return(NULL);
     }
 
-  /** DÈcodage du Volume Header (Block 2) **/
+  /** D√©codage du Volume Header (Block 2) **/
   GetBlockData(current_image,2,one_block);
   current_image->volume_header = ODSReadVolumeDirectoryHeader(one_block);
   if(current_image->volume_header == NULL)
@@ -150,10 +150,10 @@ struct prodos_image *LoadProdosImage(char *file_path)
     }
 
   /**************************************************************/
-  /** DÈcodage des entrÈes du Volume Directory + Sub Directory **/
+  /** D√©codage des entr√©es du Volume Directory + Sub Directory **/
   GetAllDirectoryFile(current_image);
 
-  /** DÈcodage du Block Allocation Table **/
+  /** D√©codage du Block Allocation Table **/
   DecodeExpandBitmapBlock(current_image);
 
   /* Renvoi */
@@ -169,7 +169,7 @@ int UpdateProdosImage(struct prodos_image *current_image)
   int i, nb_write;
   FILE *fd;
 
-  /* Ouverture du fichier en Ècriture */
+  /* Ouverture du fichier en √©criture */
   fd = fopen(current_image->image_file_path,"r+b");
   if(fd == NULL)
     {
@@ -177,7 +177,7 @@ int UpdateProdosImage(struct prodos_image *current_image)
       return(1);
     }
 
-  /** On va re-Ècrire tous les blocks mis ‡ jour **/
+  /** On va re-√©crire tous les blocks mis √† jour **/
   for(i=0; i<current_image->nb_block; i++)
     if(current_image->block_modified[i] == 1)
       {
@@ -191,7 +191,7 @@ int UpdateProdosImage(struct prodos_image *current_image)
         current_image->block_modified[i] = 0;
       }
 
-  /* On se place ‡ la fin */
+  /* On se place √† la fin */
   fseek(fd,0L,SEEK_END);
 
   /* Fermeture du fichier */
@@ -203,7 +203,7 @@ int UpdateProdosImage(struct prodos_image *current_image)
 
 
 /****************************************************************************************/
-/*  ODSReadVolumeDirectoryHeader() :  DÈcodage d'une structure volume_directory_header. */
+/*  ODSReadVolumeDirectoryHeader() :  D√©codage d'une structure volume_directory_header. */
 /****************************************************************************************/
 static struct volume_directory_header *ODSReadVolumeDirectoryHeader(unsigned char *block_data)
 {
@@ -211,7 +211,7 @@ static struct volume_directory_header *ODSReadVolumeDirectoryHeader(unsigned cha
   WORD date_word, time_word;
   struct volume_directory_header *volume_header;
 
-  /* Allocation mÈmoire */
+  /* Allocation m√©moire */
   volume_header = (struct volume_directory_header *) calloc(1,sizeof(struct volume_directory_header));
   if(volume_header == NULL)
     {
@@ -220,7 +220,7 @@ static struct volume_directory_header *ODSReadVolumeDirectoryHeader(unsigned cha
     }
   offset = 0;
 
-  /** DÈcodage de la structure **/
+  /** D√©codage de la structure **/
   volume_header->previous_block = GetWordValue(block_data,offset);
   offset += 2;
   volume_header->next_block = GetWordValue(block_data,offset);
@@ -279,7 +279,7 @@ static struct volume_directory_header *ODSReadVolumeDirectoryHeader(unsigned cha
 
 
 /**********************************************************************************/
-/*  ODSReadSubDirectoryHeader() :  DÈcodage d'une structure sub_directory_header. */
+/*  ODSReadSubDirectoryHeader() :  D√©codage d'une structure sub_directory_header. */
 /**********************************************************************************/
 static struct sub_directory_header *ODSReadSubDirectoryHeader(unsigned char *block_data)
 {
@@ -287,7 +287,7 @@ static struct sub_directory_header *ODSReadSubDirectoryHeader(unsigned char *blo
   WORD date_word, time_word;
   struct sub_directory_header *directory_header;
 
-  /* Allocation mÈmoire */
+  /* Allocation m√©moire */
   directory_header = (struct sub_directory_header *) calloc(1,sizeof(struct sub_directory_header));
   if(directory_header == NULL)
     {
@@ -296,7 +296,7 @@ static struct sub_directory_header *ODSReadSubDirectoryHeader(unsigned char *blo
     }
   offset = 0;
 
-  /** DÈcodage de la structure **/
+  /** D√©codage de la structure **/
   directory_header->previous_block = GetWordValue(block_data,offset);
   offset += 2;
   directory_header->next_block = GetWordValue(block_data,offset);
@@ -351,7 +351,7 @@ static struct sub_directory_header *ODSReadSubDirectoryHeader(unsigned char *blo
 
 
 /**************************************************************************************/
-/*  ODSReadFileDescriptiveEntry() :  DÈcodage d'une structure file_descriptive_entry. */
+/*  ODSReadFileDescriptiveEntry() :  D√©codage d'une structure file_descriptive_entry. */
 /**************************************************************************************/
 struct file_descriptive_entry *ODSReadFileDescriptiveEntry(struct prodos_image *current_image, char *folder_path, unsigned char *block_data)
 {
@@ -359,7 +359,7 @@ struct file_descriptive_entry *ODSReadFileDescriptiveEntry(struct prodos_image *
   WORD date_word, time_word;
   struct file_descriptive_entry *file_entry;
 
-  /* Allocation mÈmoire */
+  /* Allocation m√©moire */
   file_entry = (struct file_descriptive_entry *) calloc(1,sizeof(struct file_descriptive_entry));
   if(file_entry == NULL)
     {
@@ -368,7 +368,7 @@ struct file_descriptive_entry *ODSReadFileDescriptiveEntry(struct prodos_image *
     }
   offset = 0;
 
-  /** DÈcodage de la structure **/
+  /** D√©codage de la structure **/
   file_entry->storage_type = ((block_data[offset] & 0xF0) >> 4);
   file_entry->name_length = (int) (block_data[offset] & 0x0F);
   offset++;
@@ -428,7 +428,7 @@ struct file_descriptive_entry *ODSReadFileDescriptiveEntry(struct prodos_image *
     }
   sprintf(file_entry->file_path,"%s/%s",folder_path,file_entry->file_name_case);
 
-  /** Taille des donnÈes + Liste des blocs utilisÈs **/
+  /** Taille des donn√©es + Liste des blocs utilis√©s **/
   error = GetFileDataResourceSize(current_image,file_entry);
   if(error)
     {
@@ -469,27 +469,27 @@ static void GetAllDirectoryFile(struct prodos_image *current_image)
   offset = current_image->volume_header->struct_size;
   while(block_number)
     {
-      /* On analyse toutes les entrÈes de ce block */
+      /* On analyse toutes les entr√©es de ce block */
       for(i=0; i<current_image->volume_header->entries_per_block-first_time; i++, offset += current_image->volume_header->entry_length)
         {
-          /* RÈcupËre l'entrÈe */
+          /* R√©cup√®re l'entr√©e */
           current_entry = ODSReadFileDescriptiveEntry(current_image,volume_path,&one_block[offset]);
           if(current_entry == NULL)
             continue;
           current_entry->depth = 1;
           current_entry->parent_directory = NULL;
-          /* Positionnement de cette entrÈe dans l'image */
+          /* Positionnement de cette entr√©e dans l'image */
           current_entry->block_location = block_number;
           current_entry->entry_offset = offset;
 
-          /* On ne va pas enregistrer les entrÈes Deleted */
+          /* On ne va pas enregistrer les entr√©es Deleted */
           if((current_entry->storage_type & 0x0F) == 0x00)
             {
               mem_free_entry(current_entry);
               continue;
             }
 
-          /* Enregistre cette entrÈe */
+          /* Enregistre cette entr√©e */
           if((current_entry->storage_type & 0x0F) == 0x0D)
             {
               my_Memory(MEMORY_ADD_DIRECTORY,current_entry,NULL);
@@ -515,7 +515,7 @@ static void GetAllDirectoryFile(struct prodos_image *current_image)
       offset = 4;   /* Pointeur Prev + Pointeur Next */
     }
 
-  /** Allocation des tableaux pointant vers les entrÈes **/
+  /** Allocation des tableaux pointant vers les entr√©es **/
   current_image->nb_file = nb_file;
   if(current_image->nb_file > 0)
     {
@@ -543,11 +543,11 @@ static void GetAllDirectoryFile(struct prodos_image *current_image)
       my_Memory(MEMORY_GET_DIRECTORY,&i,&current_directory);
       if(current_directory->processed == 0)
         {
-          /** Traite les entrÈes de ce SubDirectory **/
+          /** Traite les entr√©es de ce SubDirectory **/
           GetOneSubDirectoryFile(current_image,current_directory->file_path,current_directory);
           current_directory->processed = 1;
 
-          /* Si de nouveaux SubDir ont ÈtÈ ajoutÈs */
+          /* Si de nouveaux SubDir ont √©t√© ajout√©s */
           my_Memory(MEMORY_GET_DIRECTORY_NB,&nb_directory,NULL);
         }
     }
@@ -559,7 +559,7 @@ static void GetAllDirectoryFile(struct prodos_image *current_image)
 
 
 /************************************************************************/
-/*  GetOneSubDirectoryFile() :  RÈcupËre les entrÈes d'un SubDirectory. */
+/*  GetOneSubDirectoryFile() :  R√©cup√®re les entr√©es d'un SubDirectory. */
 /************************************************************************/
 static void GetOneSubDirectoryFile(struct prodos_image *current_image, char *folder_path, struct file_descriptive_entry *current_directory)
 {
@@ -585,27 +585,27 @@ static void GetOneSubDirectoryFile(struct prodos_image *current_image, char *fol
   offset = directory_header->struct_size;
   while(block_number)
     {
-      /* On analyse toutes les entrÈes de ce block */
+      /* On analyse toutes les entr√©es de ce block */
       for(i=0; i<directory_header->entries_per_block-first_time; i++, offset += directory_header->entry_length)
         {
-          /* RÈcupËre l'entrÈe */
+          /* R√©cup√®re l'entr√©e */
           current_entry = ODSReadFileDescriptiveEntry(current_image,folder_path,&one_block[offset]);
           if(current_entry == NULL)
             continue;
           current_entry->depth = depth;
           current_entry->parent_directory = current_directory;
-          /* Positionnement de cette entrÈe dans l'image */
+          /* Positionnement de cette entr√©e dans l'image */
           current_entry->block_location = block_number;
           current_entry->entry_offset = offset;
 
-          /* On ne va pas enregistrer les entrÈes Deleted */
+          /* On ne va pas enregistrer les entr√©es Deleted */
           if((current_entry->storage_type & 0x0F) == 0x00)
             {
               mem_free_entry(current_entry);
               continue;
             }
 
-          /* Enregistre cette entrÈe */
+          /* Enregistre cette entr√©e */
           if((current_entry->storage_type & 0x0F) == 0x0D)
             {
               my_Memory(MEMORY_ADD_DIRECTORY,current_entry,NULL);
@@ -631,7 +631,7 @@ static void GetOneSubDirectoryFile(struct prodos_image *current_image, char *fol
       offset = 4;   /* Pointeur Prev + Pointeur Next */
     }
 
-  /** Allocation des tableaux pointant vers les entrÈes **/
+  /** Allocation des tableaux pointant vers les entr√©es **/
   current_directory->nb_file = nb_file;
   if(current_directory->nb_file > 0)
     {
@@ -651,53 +651,53 @@ static void GetOneSubDirectoryFile(struct prodos_image *current_image, char *fol
       qsort(current_directory->tab_directory,nb_directory,sizeof(struct file_descriptive_entry *),compare_entry);
     }
 
-  /* LibÈration du SubDirectory Header */
+  /* Lib√©ration du SubDirectory Header */
   mem_free_subdirectory(directory_header);
 }
 
 
 /******************************************************************/
-/*  GetBlockData() :  RÈcupËre les donnÈes d'un block de l'image. */
+/*  GetBlockData() :  R√©cup√®re les donn√©es d'un block de l'image. */
 /******************************************************************/
 void GetBlockData(struct prodos_image *current_image, int block_number, unsigned char *block_data_rtn)
 {
-  /* VÈrifie les limites */
+  /* V√©rifie les limites */
   if(block_number >= current_image->nb_block)
     {
       memset(block_data_rtn,0,BLOCK_SIZE);
       return;
     }
 
-  /* RÈcupËre les data */
+  /* R√©cup√®re les data */
   memcpy(block_data_rtn,&current_image->image_data[block_number*BLOCK_SIZE],BLOCK_SIZE);
 }
 
 
 /***************************************************************/
-/*  SetBlockData() :  Ecrit les donnÈes d'un block de l'image. */
+/*  SetBlockData() :  Ecrit les donn√©es d'un block de l'image. */
 /***************************************************************/
 void SetBlockData(struct prodos_image *current_image, int block_number, unsigned char *block_data)
 {
-  /* VÈrifie les limites */
+  /* V√©rifie les limites */
   if(block_number >= current_image->nb_block)
     return;
 
   /* Ecrit les data */
   memcpy(&current_image->image_data[block_number*BLOCK_SIZE],block_data,BLOCK_SIZE);
 
-  /* Marque le block comme ayant ÈtÈ modifiÈ */
+  /* Marque le block comme ayant √©t√© modifi√© */
   current_image->block_modified[block_number] = 1;
 }
 
 
 /*************************************************************/
-/*  GetProdosDate() :  DÈcodage d'une date au format Prodos. */
+/*  GetProdosDate() :  D√©codage d'une date au format Prodos. */
 /*************************************************************/
 void GetProdosDate(WORD date_word, struct prodos_date *date_rtn)
 {
   char *month_ascii[] = {"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec",NULL};
 
-  /* Valeurs numÈriques */
+  /* Valeurs num√©riques */
   date_rtn->year = (date_word & 0xFE00) >> 9;
   date_rtn->month = (date_word & 0x01E0) >> 5;
   date_rtn->day = (date_word & 0x001F);
@@ -708,11 +708,11 @@ void GetProdosDate(WORD date_word, struct prodos_date *date_rtn)
 
 
 /**************************************************************/
-/*  GetProdosTime() :  DÈcodage d'une heure au format Prodos. */
+/*  GetProdosTime() :  D√©codage d'une heure au format Prodos. */
 /**************************************************************/
 void GetProdosTime(WORD time_word, struct prodos_time *time_rtn)
 {
-  /* Valeurs numÈriques */
+  /* Valeurs num√©riques */
   time_rtn->hour = (time_word & 0x1F00) >> 8;
   time_rtn->minute = (time_word & 0x003F);
 
@@ -729,7 +729,7 @@ WORD BuildProdosDate(int day, int month, int year)
   WORD prodos_date;
   int prodos_year;
   
-  /* CrÈation de la Date */
+  /* Cr√©ation de la Date */
   prodos_year = year - 1900;
   if(prodos_year > 100)
     prodos_year -= 100;
@@ -747,7 +747,7 @@ WORD BuildProdosTime(int minute, int hour)
 {
   WORD prodos_time;
 
-  /* CrÈation de l'Heure */
+  /* Cr√©ation de l'Heure */
   prodos_time = ((hour << 8) & 0x1F00) | (minute & 0x003F);
 
   /* Renvoie l'heure */
@@ -765,7 +765,7 @@ static void BuildLowerCase(char *file_name, WORD lowercase, char *file_name_case
   /* Init */
   strcpy(file_name_case_rtn,file_name);
   
-  /* VÈrifie la prÈsence du 0x8000 */
+  /* V√©rifie la pr√©sence du 0x8000 */
   if((lowercase & 0x8000) == 0x0000)
     return;
 
@@ -974,7 +974,7 @@ static void BuildAccessAscii(BYTE access, char *ascii_rtn)
 
 
 /****************************************************************************/
-/*  GetFileDataResourceSize() :  RÈcupËre la taille occupÈe par le fichier. */
+/*  GetFileDataResourceSize() :  R√©cup√®re la taille occup√©e par le fichier. */
 /****************************************************************************/
 static int GetFileDataResourceSize(struct prodos_image *current_image, struct file_descriptive_entry *file_entry)
 {
@@ -989,7 +989,7 @@ static int GetFileDataResourceSize(struct prodos_image *current_image, struct fi
 
   if((file_entry->storage_type & 0x0F) == 0x00)
     {
-      /* Fichier effacÈ */
+      /* Fichier effac√© */
       file_entry->data_block = 0;
       file_entry->data_size = 0;
       file_entry->resource_block = 0;
@@ -1007,7 +1007,7 @@ static int GetFileDataResourceSize(struct prodos_image *current_image, struct fi
       file_entry->resource_block = 0;
       file_entry->resource_size = 0;
 
-      /** Table des blocs utilisÈs **/
+      /** Table des blocs utilis√©s **/
       file_entry->tab_used_block = BuildDirectoryUsedBlockTable(current_image,file_entry,&file_entry->nb_used_block);
       if(file_entry->tab_used_block == NULL)
         {
@@ -1023,12 +1023,12 @@ static int GetFileDataResourceSize(struct prodos_image *current_image, struct fi
       /*** Seedling (1 data block) / Sapling (2-256 data blocks) / Tree (257-32768 data blocks) ***/
       if((file_entry->storage_type & 0x0F) == 0x01 || (file_entry->storage_type & 0x0F) == 0x02 || (file_entry->storage_type & 0x0F) == 0x03)
         {
-          /** Tailles occupÈe **/
+          /** Tailles occup√©e **/
           file_entry->data_size = file_entry->eof_location;
           file_entry->resource_size = 0;
           file_entry->resource_block = 0;
 
-          /* Nombre Total de Data Block nÈcessaire pour les donnÈes ce fichier */
+          /* Nombre Total de Data Block n√©cessaire pour les donn√©es ce fichier */
           nb_data_block = GetContainerNumber(file_entry->eof_location,BLOCK_SIZE);
 
           /*** Recherche de fichiers Sparse dans la partie Data ***/
@@ -1078,12 +1078,12 @@ static int GetFileDataResourceSize(struct prodos_image *current_image, struct fi
                 }
             }
 
-          /* On compte tous les blocs ‡ 0 = Sparse */
+          /* On compte tous les blocs √† 0 = Sparse */
           for(i=0; i<nb_block; i++)
             if(tab_block[i] == 0)
               file_entry->nb_sparse++;
 
-          /* Table des blocs utilisÈs */
+          /* Table des blocs utilis√©s */
           file_entry->tab_used_block = BuildUsedBlockTable(nb_block,tab_block,nb_index_block,tab_index_block,&file_entry->nb_used_block);
           if(file_entry->tab_used_block == NULL)
             {
@@ -1092,7 +1092,7 @@ static int GetFileDataResourceSize(struct prodos_image *current_image, struct fi
               return(1);
             }
 
-          /* LibÈration mÈmoire */
+          /* Lib√©ration m√©moire */
           free(tab_block);
           free(tab_index_block);
         }
@@ -1107,7 +1107,7 @@ static int GetFileDataResourceSize(struct prodos_image *current_image, struct fi
           file_entry->resource_size = extended_block[256+5] + 256*extended_block[256+5+1] + 65536*extended_block[256+5+2];
           resource_block_used = GetWordValue(extended_block,256+3);
 
-          /* Nombre Total de Data+Resource Block nÈcessaire pour les donnÈes ce fichier */
+          /* Nombre Total de Data+Resource Block n√©cessaire pour les donn√©es ce fichier */
           nb_data_block = GetContainerNumber(file_entry->data_size,BLOCK_SIZE);
           nb_resource_block = GetContainerNumber(file_entry->resource_size,BLOCK_SIZE);
 
@@ -1163,12 +1163,12 @@ static int GetFileDataResourceSize(struct prodos_image *current_image, struct fi
             }
           file_entry->index_block += index_block;
 
-          /* Comptabilise les blocs ‡ 0 = Sparse */
+          /* Comptabilise les blocs √† 0 = Sparse */
           for(i=0; i<nb_block; i++)
             if(tab_block[i] == 0)
               file_entry->nb_sparse++;
 
-          /* Table des blocs utilisÈs (Data) */
+          /* Table des blocs utilis√©s (Data) */
           tab_used_block_data = BuildUsedBlockTable(nb_block,tab_block,nb_index_block,tab_index_block,&nb_used_block_data);
           if(tab_used_block_data == NULL)
             {
@@ -1177,7 +1177,7 @@ static int GetFileDataResourceSize(struct prodos_image *current_image, struct fi
               return(1);
             }
 
-          /* LibÈration mÈmoire */
+          /* Lib√©ration m√©moire */
           free(tab_block);
           free(tab_index_block);
 
@@ -1233,12 +1233,12 @@ static int GetFileDataResourceSize(struct prodos_image *current_image, struct fi
             }
           file_entry->index_block += index_block;
 
-          /* Un des blocs est ‡ 0 */
+          /* Un des blocs est √† 0 */
           for(i=0; i<nb_block; i++)
             if(tab_block[i] == 0)
               file_entry->nb_sparse++;
 
-          /* Table des blocs utilisÈs (Resource) */
+          /* Table des blocs utilis√©s (Resource) */
           tab_used_block_resource = BuildUsedBlockTable(nb_block,tab_block,nb_index_block,tab_index_block,&nb_used_block_resource);
           if(tab_used_block_resource == NULL)
             {
@@ -1248,11 +1248,11 @@ static int GetFileDataResourceSize(struct prodos_image *current_image, struct fi
               return(1);
             }
 
-          /* LibÈration mÈmoire */
+          /* Lib√©ration m√©moire */
           free(tab_block);
           free(tab_index_block);
 
-          /** Table des blocs utilisÈs (Data+Resource+Index) **/
+          /** Table des blocs utilis√©s (Data+Resource+Index) **/
           file_entry->nb_used_block = 0;
           file_entry->tab_used_block = (int *) calloc(1+nb_used_block_data+nb_used_block_resource,sizeof(int));
           if(file_entry->tab_used_block == NULL)
@@ -1272,7 +1272,7 @@ static int GetFileDataResourceSize(struct prodos_image *current_image, struct fi
           for(i=0; i<nb_used_block_resource; i++)
             file_entry->tab_used_block[file_entry->nb_used_block++] = tab_used_block_resource[i];
 
-          /* LibÈration mÈmoire */
+          /* Lib√©ration m√©moire */
           free(tab_used_block_data);
           free(tab_used_block_resource);
         }
@@ -1284,7 +1284,7 @@ static int GetFileDataResourceSize(struct prodos_image *current_image, struct fi
 
 
 /*************************************************************************************/
-/*  BuildUsedBlockTable() :  CrÈation de la table des blocs utilisÈs par un fichier. */
+/*  BuildUsedBlockTable() :  Cr√©ation de la table des blocs utilis√©s par un fichier. */
 /*************************************************************************************/
 static int *BuildUsedBlockTable(int nb_data_block, int *tab_data_block, int nb_index_block, int *tab_index_block, int *nb_used_block_rtn)
 {
@@ -1323,7 +1323,7 @@ static int *BuildUsedBlockTable(int nb_data_block, int *tab_data_block, int nb_i
 
 
 /********************************************************************************************/
-/*  BuildDirectoryUsedBlockTable() :  Construit la liste des blocs utilisÈs par un dossier. */
+/*  BuildDirectoryUsedBlockTable() :  Construit la liste des blocs utilis√©s par un dossier. */
 /********************************************************************************************/
 static int *BuildDirectoryUsedBlockTable(struct prodos_image *current_image, struct file_descriptive_entry *file_entry, int *nb_used_block_rtn)
 {
@@ -1331,10 +1331,10 @@ static int *BuildDirectoryUsedBlockTable(struct prodos_image *current_image, str
   int *tab_used_block;
   unsigned char block_data[BLOCK_SIZE];
 
-  /* DÈtermine le nombre de bloc */
+  /* D√©termine le nombre de bloc */
   nb_used_block = file_entry->blocks_used;
 
-  /* Allocation mÈmoire */
+  /* Allocation m√©moire */
   tab_used_block = (int *) calloc(nb_used_block,sizeof(int *));
   if(tab_used_block == NULL)
     {
@@ -1351,7 +1351,7 @@ static int *BuildDirectoryUsedBlockTable(struct prodos_image *current_image, str
         break;
       GetBlockData(current_image,block_number,block_data);
 
-      /* On conserve le numÈro de block */
+      /* On conserve le num√©ro de block */
       tab_used_block[i] = block_number;
 
       /* Block suivant */
@@ -1365,7 +1365,7 @@ static int *BuildDirectoryUsedBlockTable(struct prodos_image *current_image, str
 
 
 /**********************************************************************/
-/*  DecodeExpandBitmapBlock() :  DÈcode la zone 1-bitmap => 8-bitmap. */
+/*  DecodeExpandBitmapBlock() :  D√©code la zone 1-bitmap => 8-bitmap. */
 /**********************************************************************/
 static void DecodeExpandBitmapBlock(struct prodos_image *current_image)
 {
@@ -1375,10 +1375,10 @@ static void DecodeExpandBitmapBlock(struct prodos_image *current_image)
   /* Init */
   nb_free_block = 0;
 
-  /* Nombre de block nÈcessaires pour stocker la table */
+  /* Nombre de block n√©cessaires pour stocker la table */
   nb_block = GetContainerNumber(current_image->nb_block,BLOCK_SIZE*8);
 
-  /* Nombre d'octets nÈcessaires dans le dernier block */
+  /* Nombre d'octets n√©cessaires dans le dernier block */
   if((nb_block*BLOCK_SIZE*8) != current_image->nb_block)
     {
       nb_byte = (current_image->nb_block - ((nb_block-1)*BLOCK_SIZE*8)) / 8;
@@ -1394,12 +1394,12 @@ static void DecodeExpandBitmapBlock(struct prodos_image *current_image)
       /* Lecture du block */
       GetBlockData(current_image,current_image->volume_header->bitmap_block+i,block_data);
 
-      /* DÈcodage */
+      /* D√©codage */
       for(j=0; j<((i == nb_block-1)?nb_byte:BLOCK_SIZE); j++)
 	    {
           for(k=7; k>=0; k--)
 		    {
-              /* DÈcode les block libres / occupÈs */
+              /* D√©code les block libres / occup√©s */
               current_image->block_allocation_table[l] = (block_data[j] >> k) & 0x01;
               nb_free_block += current_image->block_allocation_table[l];
               l++;
@@ -1428,7 +1428,7 @@ int compare_entry(const void *data_1, const void *data_2)
   struct file_descriptive_entry *entry_1;
   struct file_descriptive_entry *entry_2;
 
-  /* RÈcupÈration des paramËtres */
+  /* R√©cup√©ration des param√®tres */
   entry_1 = *((struct file_descriptive_entry **) data_1);
   entry_2 = *((struct file_descriptive_entry **) data_2);
 
@@ -1438,7 +1438,7 @@ int compare_entry(const void *data_1, const void *data_2)
 
 
 /***************************************************************/
-/*  GetProdosFile() :  Recherche l'entrÈe d'un fichier Prodos. */
+/*  GetProdosFile() :  Recherche l'entr√©e d'un fichier Prodos. */
 /***************************************************************/
 struct file_descriptive_entry *GetProdosFile(struct prodos_image *current_image, char *prodos_file_path)
 {
@@ -1478,7 +1478,7 @@ struct file_descriptive_entry *GetProdosFile(struct prodos_image *current_image,
       /* Recherche ce nom */
       if(is_volume_name == 1)
         {
-          /* PremiËre partie : Volume Name */
+          /* Premi√®re partie : Volume Name */
           if(my_stricmp(name,current_image->volume_header->volume_name))
             {
               printf("  Error : Can't get file from Image, Wrong volume name.\n");
@@ -1489,7 +1489,7 @@ struct file_descriptive_entry *GetProdosFile(struct prodos_image *current_image,
         }
       else if(is_root_name == 1)
         {
-          /* Nom du Dossier ‡ la racine */ 
+          /* Nom du Dossier √† la racine */ 
           if(begin != NULL)
             {
               for(i=0; i<current_image->nb_directory; i++)
@@ -1501,7 +1501,7 @@ struct file_descriptive_entry *GetProdosFile(struct prodos_image *current_image,
             }
           else
             {
-              /* Nom du Fichier ‡ la racine */
+              /* Nom du Fichier √† la racine */
               for(i=0; i<current_image->nb_file; i++)
                 if(!my_stricmp(current_image->tab_file[i]->file_name,name))
                   {
@@ -1510,7 +1510,7 @@ struct file_descriptive_entry *GetProdosFile(struct prodos_image *current_image,
                   }
             }
 
-          /* Rien trouvÈ : Erreur */
+          /* Rien trouv√© : Erreur */
           if(current_entry == NULL)
             {
               printf("  Error : Can't get file from Image, File not found.\n");
@@ -1545,7 +1545,7 @@ struct file_descriptive_entry *GetProdosFile(struct prodos_image *current_image,
                   }
             }
 
-          /* Rien trouvÈ : Erreur */
+          /* Rien trouv√© : Erreur */
           if(current_entry == NULL)
             {
               printf("  Error : Can't get file from Image.\n");
@@ -1554,14 +1554,14 @@ struct file_descriptive_entry *GetProdosFile(struct prodos_image *current_image,
         }
     }
 
-  /* Rien trouvÈ */
+  /* Rien trouv√© */
   if(current_entry == NULL)
     {
       printf("  Error : Can't get file from Image.\n");
       return(NULL);
     }
 
-  /* Le fichier est un rÈpertoire */
+  /* Le fichier est un r√©pertoire */
   if((current_entry->storage_type & 0x0F) == 0x0D)
     {
       printf("  Error : Can't get file from Image : Directory name.\n");
@@ -1574,7 +1574,7 @@ struct file_descriptive_entry *GetProdosFile(struct prodos_image *current_image,
 
 
 /*****************************************************************/
-/*  GetProdosFolder() :  Recherche l'entrÈe d'un dossier Prodos. */
+/*  GetProdosFolder() :  Recherche l'entr√©e d'un dossier Prodos. */
 /*****************************************************************/
 struct file_descriptive_entry *GetProdosFolder(struct prodos_image *current_image, char *prodos_folder_path, int show_error)
 {
@@ -1614,7 +1614,7 @@ struct file_descriptive_entry *GetProdosFolder(struct prodos_image *current_imag
       /* Recherche ce nom */
       if(is_volume_name == 1)
         {
-          /* PremiËre partie : Volume Name */
+          /* Premi√®re partie : Volume Name */
           if(my_stricmp(name,current_image->volume_header->volume_name))
             {
               if(show_error == 1)
@@ -1626,7 +1626,7 @@ struct file_descriptive_entry *GetProdosFolder(struct prodos_image *current_imag
         }
       else if(is_root_name == 1)
         {
-          /* Nom du Dossier ‡ la racine */ 
+          /* Nom du Dossier √† la racine */ 
           for(i=0; i<current_image->nb_directory; i++)
             if(!my_stricmp(current_image->tab_directory[i]->file_name,name))
               {
@@ -1634,7 +1634,7 @@ struct file_descriptive_entry *GetProdosFolder(struct prodos_image *current_imag
                 break;
               }
 
-          /* Rien trouvÈ : Erreur */
+          /* Rien trouv√© : Erreur */
           if(current_entry == NULL)
             {
               if(show_error == 1)
@@ -1657,7 +1657,7 @@ struct file_descriptive_entry *GetProdosFolder(struct prodos_image *current_imag
                 break;
               }
 
-          /* Rien trouvÈ : Erreur */
+          /* Rien trouv√© : Erreur */
           if(current_entry == NULL)
             {
               if(show_error == 1)
@@ -1667,7 +1667,7 @@ struct file_descriptive_entry *GetProdosFolder(struct prodos_image *current_imag
         }
     }
 
-  /* Rien trouvÈ */
+  /* Rien trouv√© */
   if(current_entry == NULL)
     {
       if(show_error == 1)
@@ -1675,7 +1675,7 @@ struct file_descriptive_entry *GetProdosFolder(struct prodos_image *current_imag
       return(NULL);
     }
 
-  /* Le fichier n'est pas un rÈpertoire */
+  /* Le fichier n'est pas un r√©pertoire */
   if((current_entry->storage_type & 0x0F) != 0x0D)
     {
       if(show_error == 1)
@@ -1690,7 +1690,7 @@ struct file_descriptive_entry *GetProdosFolder(struct prodos_image *current_imag
 
 
 /***************************************************************/
-/*  GetDataFile() :  RÈcupËre les donnÈes d'un fichier Prodos. */
+/*  GetDataFile() :  R√©cup√®re les donn√©es d'un fichier Prodos. */
 /***************************************************************/
 int GetDataFile(struct prodos_image *current_image, struct file_descriptive_entry *current_entry, struct prodos_file *current_file)
 {
@@ -1701,7 +1701,7 @@ int GetDataFile(struct prodos_image *current_image, struct file_descriptive_entr
   /*** Seedling (1 data block) ***/
   if((current_entry->storage_type & 0x0F) == 0x01)
     {
-      /* RÈcupÈration des Data */
+      /* R√©cup√©ration des Data */
       current_file->data = GetEntryData(current_image,TYPE_ENTRY_SEEDLING,current_entry->key_pointer_block,current_entry->eof_location);
       if(current_file->data == NULL)
         return(1);
@@ -1712,7 +1712,7 @@ int GetDataFile(struct prodos_image *current_image, struct file_descriptive_entr
   /*** Sapling (2-256 data blocks) ***/
   else if((current_entry->storage_type & 0x0F) == 0x02)
     {
-      /* RÈcupÈration des Data */
+      /* R√©cup√©ration des Data */
       current_file->data = GetEntryData(current_image,TYPE_ENTRY_SAPLING,current_entry->key_pointer_block,current_entry->eof_location);
       if(current_file->data == NULL)
         return(1);
@@ -1723,7 +1723,7 @@ int GetDataFile(struct prodos_image *current_image, struct file_descriptive_entr
   /*** Tree (257-32768 data blocks) ***/
   else if((current_entry->storage_type & 0x0F) == 0x03)
     {
-      /* RÈcupÈration des Data */
+      /* R√©cup√©ration des Data */
       current_file->data = GetEntryData(current_image,TYPE_ENTRY_TREE,current_entry->key_pointer_block,current_entry->eof_location);
       if(current_file->data == NULL)
         return(1);
@@ -1743,7 +1743,7 @@ int GetDataFile(struct prodos_image *current_image, struct file_descriptive_entr
       data_blocks_used = GetWordValue(extended_block,3);
       data_eof = extended_block[5] + 256*extended_block[5+1] + 65536*extended_block[5+2];
 
-      /** RÈcupÈration des Data **/
+      /** R√©cup√©ration des Data **/
       if(data_eof > 0)
         {
           current_file->data_length = data_eof;
@@ -1767,7 +1767,7 @@ int GetDataFile(struct prodos_image *current_image, struct file_descriptive_entr
       memcpy(current_file->resource_finderinfo_1,&extended_block[8],18);
       memcpy(current_file->resource_finderinfo_2,&extended_block[26],18);
 
-      /** RÈcupÈration des Resource **/
+      /** R√©cup√©ration des Resource **/
       if(resource_eof > 0)
         {
           current_file->resource_length = resource_eof;
@@ -1788,7 +1788,7 @@ int GetDataFile(struct prodos_image *current_image, struct file_descriptive_entr
 
 
 /*******************************************************************/
-/*  GetEntryData() :  RÈcupËre les Data d'une partie d'un fichier. */
+/*  GetEntryData() :  R√©cup√®re les Data d'une partie d'un fichier. */
 /*******************************************************************/
 static unsigned char *GetEntryData(struct prodos_image *current_image, int type_entry, int key_block, int total_data_size)
 {
@@ -1808,10 +1808,10 @@ static unsigned char *GetEntryData(struct prodos_image *current_image, int type_
   if(tab_data_block == NULL)
     return(NULL);
 
-  /** RÈcupÈration des donnÈes **/
+  /** R√©cup√©ration des donn√©es **/
   for(i=0, offset=0; i<nb_data_block; i++)
     {
-      /* RÈcupÈration des donnÈes du block (vide si le block = 0) */
+      /* R√©cup√©ration des donn√©es du block (vide si le block = 0) */
       if(tab_data_block[i] == 0)
         memset(&data_block[0],0,512);
       else
@@ -1822,12 +1822,12 @@ static unsigned char *GetEntryData(struct prodos_image *current_image, int type_
       if(data_size > BLOCK_SIZE)
         data_size = BLOCK_SIZE;
 
-      /* Place les donnÈes dans la structure */
+      /* Place les donn√©es dans la structure */
       memcpy(&data[offset],data_block,data_size);
       offset += data_size;
     }
 
-  /* LibÈration mÈmoire */
+  /* Lib√©ration m√©moire */
   free(tab_data_block);
   if(tab_index_block)
     free(tab_index_block);
@@ -1854,12 +1854,12 @@ int *GetEntryBlock(struct prodos_image *current_image, int type_entry, int key_b
   *nb_index_block_rtn = 0;
   nb_index_block = 0;
 
-  /* Nombre de block thÈorique (Taille fichier / BLOCK_SIZE) */
+  /* Nombre de block th√©orique (Taille fichier / BLOCK_SIZE) */
   nb_data_block = GetContainerNumber(total_data_size,BLOCK_SIZE);
   if(nb_data_block == 0 && key_block !=0 && type_entry == TYPE_ENTRY_SEEDLING)
     nb_data_block = 1;
 
-  /* Allocation mÈmoire : Nombre de block Index */
+  /* Allocation m√©moire : Nombre de block Index */
   tab_index_block = (int *) calloc(256+1,sizeof(int));
   if(tab_index_block == NULL)
     {
@@ -1867,7 +1867,7 @@ int *GetEntryBlock(struct prodos_image *current_image, int type_entry, int key_b
       return(NULL);
     }
 
-  /* Allocation mÈmoire : Nombre de block Data */
+  /* Allocation m√©moire : Nombre de block Data */
   tab_data_block = (int *) calloc(nb_data_block+1,sizeof(int));
   if(tab_data_block == NULL)
     {
@@ -1881,7 +1881,7 @@ int *GetEntryBlock(struct prodos_image *current_image, int type_entry, int key_b
       return(tab_data_block);
     }
 
-  /*** RÈcupËre les numero de Block valides ***/
+  /*** R√©cup√®re les numero de Block valides ***/
   if(type_entry == TYPE_ENTRY_SEEDLING)
     tab_data_block[0] = key_block;
   else if(type_entry == TYPE_ENTRY_SAPLING)
@@ -1890,7 +1890,7 @@ int *GetEntryBlock(struct prodos_image *current_image, int type_entry, int key_b
       GetBlockData(current_image,key_block,&index_block[0]);
       tab_index_block[nb_index_block++] = key_block;
 
-      /** Extrait les numÈros de Block **/
+      /** Extrait les num√©ros de Block **/
       for(i=0,k=0; i<((nb_data_block>256)?256:nb_data_block); i++)
         tab_data_block[k++] = index_block[i] + 256*index_block[BLOCK_SIZE/2+i];
     }
@@ -1903,7 +1903,7 @@ int *GetEntryBlock(struct prodos_image *current_image, int type_entry, int key_b
       /* Nombre de Index Block pour ce fichier */
       nb_index = GetContainerNumber(nb_data_block,INDEX_PER_BLOCK);
 
-      /** RÈcupËre les numÈros de Block **/
+      /** R√©cup√®re les num√©ros de Block **/
       for(j=0,k=0; j<nb_index; j++)
         {
           /** Index Block **/
@@ -1953,7 +1953,7 @@ int *AllocateImageBlock(struct prodos_image *current_image, int nb_block)
       return(NULL);
     }
 
-  /* Allocation mÈmoire */
+  /* Allocation m√©moire */
   tab_block = (int *) calloc(nb_block,sizeof(int));
   if(tab_block == NULL)
     {
@@ -1961,7 +1961,7 @@ int *AllocateImageBlock(struct prodos_image *current_image, int nb_block)
       return(NULL);
     }
 
-  /** 1Ëre passe, on recherche les X blocs consÈcutifs **/
+  /** 1√®re passe, on recherche les X blocs cons√©cutifs **/
   for(i=0,nb_free_block=0; i<current_image->nb_block-nb_block; i++)
     {
       if(current_image->block_allocation_table[i] == 1)
@@ -1979,10 +1979,10 @@ int *AllocateImageBlock(struct prodos_image *current_image, int nb_block)
         }
     }
 
-  /* On a trouvÈ ! */
+  /* On a trouv√© ! */
   if(first_free_block != 0)
     {
-      /* Blocs sÈquentiels */
+      /* Blocs s√©quentiels */
       for(i=0; i<nb_block; i++)
         tab_block[i] = first_free_block + i;
     }
@@ -1999,13 +1999,13 @@ int *AllocateImageBlock(struct prodos_image *current_image, int nb_block)
     }
 
   /**********************************************/
-  /** On modifie la Table d'allocation mÈmoire **/
+  /** On modifie la Table d'allocation m√©moire **/
   for(i=0; i<nb_block; i++)
     current_image->block_allocation_table[tab_block[i]] = 0;
   current_image->nb_free_block -= nb_block;
 
   /****************************************************/
-  /** Marque les blocs occupÈs dans la BitMap disque **/
+  /** Marque les blocs occup√©s dans la BitMap disque **/
   nb_bitmap_block = GetContainerNumber(current_image->nb_block,BLOCK_SIZE*8);
   total_modified = 0;
   for(i=0; i<nb_bitmap_block; i++)
@@ -2014,7 +2014,7 @@ int *AllocateImageBlock(struct prodos_image *current_image, int nb_block)
       GetBlockData(current_image,current_image->volume_header->bitmap_block+i,&bitmap_block[0]);
       modified = 0;
 
-      /** Passe en revue les blocs utilisÈs **/
+      /** Passe en revue les blocs utilis√©s **/
       for(j=0; j<nb_block; j++)
         if((tab_block[j] >= i*8*BLOCK_SIZE) && (tab_block[j] < (i+1)*8*BLOCK_SIZE))
           {
@@ -2022,7 +2022,7 @@ int *AllocateImageBlock(struct prodos_image *current_image, int nb_block)
             mask = (0x01 << (7-(offset%8)));
             if((bitmap_block[offset/8] | mask) == bitmap_block[offset/8])
               {
-                bitmap_block[offset/8] -= mask;    /* 0 : OccupÈ */
+                bitmap_block[offset/8] -= mask;    /* 0 : Occup√© */
                 modified = 1;
                 total_modified++;
               }
@@ -2047,7 +2047,7 @@ int *AllocateImageBlock(struct prodos_image *current_image, int nb_block)
 
 
 /******************************************************************************************************/
-/*  AllocateFolderEntry() :  Recherche/CrÈe une entrÈe vide dans un dossier ou ‡ la racine du volume. */
+/*  AllocateFolderEntry() :  Recherche/Cr√©e une entr√©e vide dans un dossier ou √† la racine du volume. */
 /******************************************************************************************************/
 int AllocateFolderEntry(struct prodos_image *current_image, struct file_descriptive_entry *folder_entry, WORD *directory_block_number_rtn, BYTE *directory_entry_number_rtn, WORD *header_block_number_rtn)
 {
@@ -2064,30 +2064,30 @@ int AllocateFolderEntry(struct prodos_image *current_image, struct file_descript
   /* Lecture du 1er block de ce Directory ou du volume */
   GetBlockData(current_image,current_block_number,&directory_block[0]);
 
-  /* Nombre d'entrÈes */
+  /* Nombre d'entr√©es */
   entry_length = (int) directory_block[(folder_entry == NULL) ? VOLUME_ENTRYLENGTH_OFFSET : DIRECTORY_ENTRYLENGTH_OFFSET];       /* 0x27 */
   nb_entry = (int) directory_block[(folder_entry == NULL) ? VOLUME_ENTRIESPERBLOCK_OFFSET : DIRECTORY_ENTRIESPERBLOCK_OFFSET];   /* 0x0D */
 
   /** On va passer en revue tous les block de ce Directory **/
   for(i=0; current_block_number != 0; i++)
     {
-      /* RÈcupËre les donnÈes du bloc */
+      /* R√©cup√®re les donn√©es du bloc */
       if(i > 0)
-        GetBlockData(current_image,current_block_number,&directory_block[0]); /* Le 1er bloc a dÈj‡ ÈtÈ rÈcupÈrÈ */
+        GetBlockData(current_image,current_block_number,&directory_block[0]); /* Le 1er bloc a d√©j√† √©t√© r√©cup√©r√© */
       previous_block_number = GetWordValue(directory_block,0);
       next_block_number = GetWordValue(directory_block,2);
 
-      /* Recherche une entrÈe effacÈe */
+      /* Recherche une entr√©e effac√©e */
       for(j=0; j<nb_entry; j++)
         {
           /* Header */
           if(j == 0 && i == 0)
             continue;
 
-          /* DÈbut de l'entrÈe */
+          /* D√©but de l'entr√©e */
           offset = 4 + j*entry_length;
 
-          /* EntrÈe vide ? */
+          /* Entr√©e vide ? */
           storage_type = directory_block[offset+FILE_STORAGETYPE_OFFSET];
           if(storage_type == 0x00)
             {
@@ -2102,8 +2102,8 @@ int AllocateFolderEntry(struct prodos_image *current_image, struct file_descript
       current_block_number = next_block_number;
     }
 
-  /*** On va allouer un bloc de plus ‡ ce Dossier ***/
-  /* Si on est sur le Volume Directory, on ne peut plus allouer de bloc supplÈmentaire */
+  /*** On va allouer un bloc de plus √† ce Dossier ***/
+  /* Si on est sur le Volume Directory, on ne peut plus allouer de bloc suppl√©mentaire */
   if(folder_entry == NULL)
     {
       printf("  Error : Volume Directory is full.\n");
@@ -2117,7 +2117,7 @@ int AllocateFolderEntry(struct prodos_image *current_image, struct file_descript
   new_block_number = tab_block[0];
   free(tab_block);
 
-  /** Next : Modifie le bloc prÈcÈdent **/
+  /** Next : Modifie le bloc pr√©c√©dent **/
   SetWordValue(&directory_block[0],0x02,(WORD)new_block_number);     /* current->next = new */
   SetBlockData(current_image,previous_block_number,&directory_block[0]);
 
@@ -2126,18 +2126,18 @@ int AllocateFolderEntry(struct prodos_image *current_image, struct file_descript
   SetWordValue(&directory_block[0],0x00,(WORD)previous_block_number); /* new->previous = current */
   SetBlockData(current_image,new_block_number,&directory_block[0]);
 
-  /** Met ‡ jour BlockUsed dans l'entrÈe dÈcrivant le Dossier **/
+  /** Met √† jour BlockUsed dans l'entr√©e d√©crivant le Dossier **/
   parent_directory_block_number = folder_entry->block_location;
   offset = folder_entry->entry_offset;
 
-  /* Charge le Directory Bloc contenant l'entrÈe dÈcrivant ce SubDirectory */
+  /* Charge le Directory Bloc contenant l'entr√©e d√©crivant ce SubDirectory */
   GetBlockData(current_image,parent_directory_block_number,&directory_block[0]);
 
-  /* Met ‡ jour BlockUsed (+1) */
+  /* Met √† jour BlockUsed (+1) */
   block_used = GetWordValue(&directory_block[0],offset+0x13) + 1;
   SetWordValue(&directory_block[0],offset+0x13,(WORD)block_used);
 
-  /* Met ‡ jour EOF (+BLOCK_SIZE) */
+  /* Met √† jour EOF (+BLOCK_SIZE) */
   eof = Get24bitValue(&directory_block[0],offset+0x15) + BLOCK_SIZE;
   Set24bitValue(&directory_block[0],offset+0x15,eof);
 
@@ -2152,7 +2152,7 @@ int AllocateFolderEntry(struct prodos_image *current_image, struct file_descript
 
 
 /**************************************************************/
-/*  CheckProdosName() :  VÈrifie si un nom Prodos est valide. */
+/*  CheckProdosName() :  V√©rifie si un nom Prodos est valide. */
 /**************************************************************/
 int CheckProdosName(char *name)
 {
@@ -2166,7 +2166,7 @@ int CheckProdosName(char *name)
   if(strlen(name) > 15)
     return(0);
 
-  /* VÈrifie la plage des caractËres */
+  /* V√©rifie la plage des caract√®res */
   for(i=0; i<(int)strlen(name); i++)
     if(!((name[i] >= 'a' && name[i] <= 'z') || (name[i] >= 'A' && name[i] <= 'Z') || (name[i] >= '0' && name[i] <= '9') || name[i] == '.'))
       return(0);
@@ -2181,7 +2181,7 @@ int CheckProdosName(char *name)
 
 
 /*********************************************************************/
-/*  GetCurrentDate() :  RÈcupËre la date courante sous forme Prodos. */
+/*  GetCurrentDate() :  R√©cup√®re la date courante sous forme Prodos. */
 /*********************************************************************/
 void GetCurrentDate(WORD *now_date_rtn, WORD *now_time_rtn)
 {
@@ -2191,7 +2191,7 @@ void GetCurrentDate(WORD *now_date_rtn, WORD *now_time_rtn)
   WORD year, month, day;
   WORD hour, minute;
 
-  /* RÈcupËre l'heure actuelle */
+  /* R√©cup√®re l'heure actuelle */
   time(&clock);
   p = localtime(&clock);
   year = (WORD) p->tm_year;
@@ -2215,7 +2215,7 @@ void GetCurrentDate(WORD *now_date_rtn, WORD *now_time_rtn)
 
 
 /***********************************************************/
-/*  UpdateEntryTable() :  Met ‡ jour la table des entrÈes. */
+/*  UpdateEntryTable() :  Met √† jour la table des entr√©es. */
 /***********************************************************/
 int UpdateEntryTable(int action, int *nb_entry_rtn, struct file_descriptive_entry ***tab_entry_rtn, struct file_descriptive_entry *current_entry)
 {
@@ -2227,10 +2227,10 @@ int UpdateEntryTable(int action, int *nb_entry_rtn, struct file_descriptive_entr
   nb_entry = *nb_entry_rtn;
   tab_entry = *tab_entry_rtn;
 
-  /** On ajoute une entrÈe de la table **/
+  /** On ajoute une entr√©e de la table **/
   if(action == UPDATE_ADD)
     {
-      /* Allocation mÈmoire de la nouvelle table */
+      /* Allocation m√©moire de la nouvelle table */
       tab_new = (struct file_descriptive_entry **) calloc(nb_entry+1,sizeof(struct file_descriptive_entry *));
       if(tab_new == NULL)
         return(1);
@@ -2243,7 +2243,7 @@ int UpdateEntryTable(int action, int *nb_entry_rtn, struct file_descriptive_entr
       /* Tri */
       qsort(tab_new,nb_entry+1,sizeof(struct file_descriptive_entry *),compare_entry);
 
-      /* LibÈration de l'ancienne table */
+      /* Lib√©ration de l'ancienne table */
       free(tab_entry);
 
       /* Renvoi la nouvelle */
@@ -2253,25 +2253,25 @@ int UpdateEntryTable(int action, int *nb_entry_rtn, struct file_descriptive_entr
     }
   else
     {
-      /** Suppression d'une entrÈe de la table **/
+      /** Suppression d'une entr√©e de la table **/
       if(nb_entry == 0)
         return(0);
       else if(nb_entry == 1 && current_entry == tab_entry[0])
         {
-          /* Une seule valeur, la 1Ëre */
+          /* Une seule valeur, la 1√®re */
           *nb_entry_rtn = 0;
           return(0);
         }
       else if(current_entry == tab_entry[0])
         {
-          /* 1Ëre valeur */
+          /* 1√®re valeur */
           memmove(&tab_entry[0],&tab_entry[1],(nb_entry-1)*sizeof(struct file_descriptive_entry *));
           *nb_entry_rtn = nb_entry - 1;
           return(0);
         }
       else if(current_entry == tab_entry[nb_entry-1])
         {
-          /* DerniËre */
+          /* Derni√®re */
           *nb_entry_rtn = nb_entry - 1;
           return(0);
         }
@@ -2294,7 +2294,7 @@ int UpdateEntryTable(int action, int *nb_entry_rtn, struct file_descriptive_entr
 
 
 /****************************************************************************************/
-/*  mem_free_subdirectory() :  LibÈration mÈmoire de la structure sub_directory_header. */
+/*  mem_free_subdirectory() :  Lib√©ration m√©moire de la structure sub_directory_header. */
 /****************************************************************************************/
 static void mem_free_subdirectory(struct sub_directory_header *directory_header)
 {
@@ -2306,7 +2306,7 @@ static void mem_free_subdirectory(struct sub_directory_header *directory_header)
 
 
 /*************************************************************************/
-/*  mem_free_image() :  LibÈration mÈmoire de la structure prodos_image. */
+/*  mem_free_image() :  Lib√©ration m√©moire de la structure prodos_image. */
 /*************************************************************************/
 void mem_free_image(struct prodos_image *current_image)
 {
@@ -2333,7 +2333,7 @@ void mem_free_image(struct prodos_image *current_image)
 
 
 /***********************************************************************************/
-/*  mem_free_entry() :  LibÈration mÈmoire de la structure file_descriptive_entry. */
+/*  mem_free_entry() :  Lib√©ration m√©moire de la structure file_descriptive_entry. */
 /***********************************************************************************/
 void mem_free_entry(struct file_descriptive_entry *current_entry)
 {
@@ -2357,7 +2357,7 @@ void mem_free_entry(struct file_descriptive_entry *current_entry)
 
 
 /***********************************************************************/
-/*  mem_free_file() :  LibÈration mÈmoire de la structure prodos_file. */
+/*  mem_free_file() :  Lib√©ration m√©moire de la structure prodos_file. */
 /***********************************************************************/
 void mem_free_file(struct prodos_file *current_file)
 {

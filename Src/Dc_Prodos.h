@@ -1,6 +1,6 @@
 /**********************************************************************/
 /*                                                                    */
-/*  Dc_Prodos.h : Header pour la bibliothèque de gestion du Prodos.   */
+/*  Dc_Prodos.h : Header pour la bibliothÃ¨que de gestion du Prodos.   */
 /*                                                                    */
 /**********************************************************************/
 /*  Auteur : Olivier ZARDINI  *  Brutal Deluxe Software  *  Dec 2011  */
@@ -43,7 +43,7 @@ struct prodos_time
   char ascii[20];
 };
 
-#define BLOCK_TYPE_EMPTY   0    /* Par défaut */
+#define BLOCK_TYPE_EMPTY   0    /* Par dÃ©faut */
 #define BLOCK_TYPE_BOOT    1
 #define BLOCK_TYPE_VOLUME  2
 #define BLOCK_TYPE_BITMAP  3
@@ -62,21 +62,21 @@ struct prodos_image
   int nb_block;
   int nb_free_block;
 
-  unsigned char *block_modified;     /* Tableau des blocks modifiés */
+  unsigned char *block_modified;     /* Tableau des blocks modifiÃ©s */
 
   struct volume_directory_header *volume_header;
 
   /* Version integer de la bitmap */
   int *block_allocation_table;  
 
-  int *block_usage_type;       /* Type de données de chaque bloc (pour le CHECK_VOLUME) */
-  void **block_usage_object;   /* Objet lié à chaque bloc (pour le CHECK_VOLUME) */
+  int *block_usage_type;       /* Type de donnÃ©es de chaque bloc (pour le CHECK_VOLUME) */
+  void **block_usage_object;   /* Objet liÃ© Ã  chaque bloc (pour le CHECK_VOLUME) */
 
-  /** Fichiers et répertoires attachés au Volume Directory **/
-  int nb_file;              /* Liste des fichiers de ce répertoire */
+  /** Fichiers et rÃ©pertoires attachÃ©s au Volume Directory **/
+  int nb_file;              /* Liste des fichiers de ce rÃ©pertoire */
   struct file_descriptive_entry **tab_file;
 
-  int nb_directory;         /* Liste des répertoires de ce répertoire */
+  int nb_directory;         /* Liste des rÃ©pertoires de ce rÃ©pertoire */
   struct file_descriptive_entry **tab_directory;
 
   /** Statistiques **/
@@ -100,7 +100,7 @@ struct prodos_image
 
 struct volume_directory_header
 {
-  int previous_block;    /* Tjs à zéro */
+  int previous_block;    /* Tjs Ã  zÃ©ro */
   int next_block;
 
   BYTE storage_type;
@@ -168,9 +168,9 @@ struct sub_directory_header
 
   int entry_length;         /* Constante : 27 */
   int entries_per_block;    /* Constante : 0D */
-  int file_count;           /* Nombre de fichiers non supprimés */
-  int parent_pointer_block; /* Block (Volume Header ou Sub Dir) contenant l'entrée de ce SubDir */
-  int parent_entry;         /* Indice 1->D de cette entrée dans le Dir Parent */
+  int file_count;           /* Nombre de fichiers non supprimÃ©s */
+  int parent_pointer_block; /* Block (Volume Header ou Sub Dir) contenant l'entrÃ©e de ce SubDir */
+  int parent_entry;         /* Indice 1->D de cette entrÃ©e dans le Dir Parent */
   int parent_entry_length;
 
   int struct_size;
@@ -198,7 +198,7 @@ struct file_descriptive_entry
   WORD file_aux_type;
   char file_type_ascii[50];
 
-  int key_pointer_block;   /* Block contenant les données */
+  int key_pointer_block;   /* Block contenant les donnÃ©es */
   int blocks_used;
   int eof_location;        /* Taille du fichier en Byte */
 
@@ -214,35 +214,35 @@ struct file_descriptive_entry
   BYTE access;
   char access_ascii[50];
 
-  /* Répartition des données du fichier */
+  /* RÃ©partition des donnÃ©es du fichier */
   int data_size;
   int data_block;
   int resource_size;
   int resource_block;
 
-  int index_block;  /* Nombre de bloc utilisés pour les index */
+  int index_block;  /* Nombre de bloc utilisÃ©s pour les index */
   int nb_sparse;    /* Nombre de bloc fantome */
 
-  int nb_used_block;      /* Nombre de blocs utilisés par le fichier (index+data+resource) */
-  int *tab_used_block;    /* Tableau des numéros de bloc */
+  int nb_used_block;      /* Nombre de blocs utilisÃ©s par le fichier (index+data+resource) */
+  int *tab_used_block;    /* Tableau des numÃ©ros de bloc */
 
-  int header_pointer_block; /* Block du SubDir décrivant cette entrée */
+  int header_pointer_block; /* Block du SubDir dÃ©crivant cette entrÃ©e */
 
   int struct_size;          /* Taille de la structure ODS */
-  int depth;                /* Profondeur de cette entrée dans l'arbre des fichiers : 1->N */
-  int block_location;       /* Numéro du block (d'un directory) où cette entrée est décrite */
-  int entry_offset;         /* Offset en byte par rapport au début du bloc de cette entrée File */
-  int processed;            /* Entrée déjà traitée */
+  int depth;                /* Profondeur de cette entrÃ©e dans l'arbre des fichiers : 1->N */
+  int block_location;       /* NumÃ©ro du block (d'un directory) oÃ¹ cette entrÃ©e est dÃ©crite */
+  int entry_offset;         /* Offset en byte par rapport au dÃ©but du bloc de cette entrÃ©e File */
+  int processed;            /* EntrÃ©e dÃ©jÃ  traitÃ©e */
 
-  struct file_descriptive_entry *parent_directory;  /* Entrée Parent Sub Directory */
+  struct file_descriptive_entry *parent_directory;  /* EntrÃ©e Parent Sub Directory */
 
-  int nb_file;              /* Liste des fichiers de ce répertoire */
+  int nb_file;              /* Liste des fichiers de ce rÃ©pertoire */
   struct file_descriptive_entry **tab_file;
 
-  int nb_directory;         /* Liste des répertoires de ce répertoire */
+  int nb_directory;         /* Liste des rÃ©pertoires de ce rÃ©pertoire */
   struct file_descriptive_entry **tab_directory;
 
-  int delete_folder_depth;  /* Ce répertoire doit être supprimé (niveau de profondeur) */
+  int delete_folder_depth;  /* Ce rÃ©pertoire doit Ãªtre supprimÃ© (niveau de profondeur) */
 
   struct file_descriptive_entry *next;
 };
@@ -251,28 +251,28 @@ struct file_descriptive_entry
 struct prodos_file
 {
   int entry_type;          /* Seedling, Sapling, Tree, Extended */
-  int entry_disk_block;    /* Nombre de blocks pour stocker cette entrée (data+resource+index) */
+  int entry_disk_block;    /* Nombre de blocks pour stocker cette entrÃ©e (data+resource+index) */
   int nb_data_block;
-  int *tab_data_block;     /* Liste des block alloués pour les data (permet une libération si pb) */
+  int *tab_data_block;     /* Liste des block allouÃ©s pour les data (permet une libÃ©ration si pb) */
   int nb_resource_block;
-  int *tab_resource_block; /* Liste des block alloués pour les resource (permet une libération si pb) */
+  int *tab_resource_block; /* Liste des block allouÃ©s pour les resource (permet une libÃ©ration si pb) */
 
   int data_length;
   unsigned char *data;
   int type_data;           /* Seedling, Sapling, Tree */
-  int block_data;          /* Nb de blocks utilisés pour stocker les data en mémoire */
-  int block_disk_data;     /* Nb de blocks utilisés sur le disk pour stocker les data */
-  int empty_data;          /* Tout est à zéro */
-  int index_data;          /* Nb de blocks utilisés sur le disk pour stocker les index des data */
+  int block_data;          /* Nb de blocks utilisÃ©s pour stocker les data en mÃ©moire */
+  int block_disk_data;     /* Nb de blocks utilisÃ©s sur le disk pour stocker les data */
+  int empty_data;          /* Tout est Ã  zÃ©ro */
+  int index_data;          /* Nb de blocks utilisÃ©s sur le disk pour stocker les index des data */
 
   int has_resource;
   int resource_length;
   unsigned char *resource;
   int type_resource;       /* Seedling, Sapling, Tree */
-  int block_resource;      /* Nb de blocks utilisés pour stocker les resources en mémoire */
-  int block_disk_resource; /* Nb de blocks utilisés sur le disk pour stocker les resources */
-  int empty_resource;      /* Tout est à zéro */
-  int index_resource;      /* Nb de blocks utilisés sur le disk pour stocker les index des resources */
+  int block_resource;      /* Nb de blocks utilisÃ©s pour stocker les resources en mÃ©moire */
+  int block_disk_resource; /* Nb de blocks utilisÃ©s sur le disk pour stocker les resources */
+  int empty_resource;      /* Tout est Ã  zÃ©ro */
+  int index_resource;      /* Nb de blocks utilisÃ©s sur le disk pour stocker les index des resources */
 
   unsigned char resource_finderinfo_1[18];
   unsigned char resource_finderinfo_2[18];

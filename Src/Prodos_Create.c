@@ -53,14 +53,14 @@ unsigned char bitmap_mask[8] =
 
 
 /***********************************************************/
-/*  CreateProdosVolume() :  CrÈation d'un nouveau Dossier. */
+/*  CreateProdosVolume() :  Cr√©ation d'un nouveau Dossier. */
 /***********************************************************/
 void CreateProdosFolder(struct prodos_image *current_image, char *prodos_folder_path)
 {
   int error, is_volume_header;
   struct file_descriptive_entry *new_folder;
 
-  /** CrÈation du Dossier **/
+  /** Cr√©ation du Dossier **/
   new_folder = BuildProdosFolderPath(current_image,prodos_folder_path,&is_volume_header,0);
   if(new_folder == NULL)
     return;
@@ -71,7 +71,7 @@ void CreateProdosFolder(struct prodos_image *current_image, char *prodos_folder_
 
 
 /********************************************************************/
-/*  CreateProdosVolume() :  CrÈation d'une image Prodos 2mg/hdv/po. */
+/*  CreateProdosVolume() :  Cr√©ation d'une image Prodos 2mg/hdv/po. */
 /********************************************************************/
 struct prodos_image *CreateProdosVolume(char *image_file_path, char *volume_name, int volume_size_kb)
 {
@@ -112,7 +112,7 @@ struct prodos_image *CreateProdosVolume(char *image_file_path, char *volume_name
       return(NULL);
     }
 
-  /* VÈrification du nouveau nom */
+  /* V√©rification du nouveau nom */
   is_valid = CheckProdosName(volume_name);
   if(is_valid == 0)
     {
@@ -125,7 +125,7 @@ struct prodos_image *CreateProdosVolume(char *image_file_path, char *volume_name
   for(i=0; i<(int)strlen(upper_case); i++)
     upper_case[i] = toupper(upper_case[i]);
 
-  /* 16 bit dÈcrivant la case */
+  /* 16 bit d√©crivant la case */
   name_case = BuildProdosCase(volume_name);
 
   /* Date actuelle */
@@ -134,7 +134,7 @@ struct prodos_image *CreateProdosVolume(char *image_file_path, char *volume_name
   /* Nombre de block de l'image */
   nb_image_block = 2*volume_size_kb;
 
-  /* Allocation mÈmoire */
+  /* Allocation m√©moire */
   image_data = (unsigned char *) calloc(1,1024*volume_size_kb + image_header_size);
   if(image_data == NULL)
     {
@@ -209,7 +209,7 @@ struct prodos_image *CreateProdosVolume(char *image_file_path, char *volume_name
   word_value = 0x0006;
   SetWordValue(image_data,image_header_size+2*BLOCK_SIZE+0x27,word_value);
 
-  /* Total Blocks (on ne dÈpasse pas 65535 !) */
+  /* Total Blocks (on ne d√©passe pas 65535 !) */
   word_value = (WORD) (nb_image_block == 65536 ? 65535 : nb_image_block);
   SetWordValue(image_data,image_header_size+2*BLOCK_SIZE+0x29,word_value);
 
@@ -229,14 +229,14 @@ struct prodos_image *CreateProdosVolume(char *image_file_path, char *volume_name
   SetWordValue(image_data,image_header_size+5*BLOCK_SIZE+0x02,next_block);
 
   /** Block 6+ : Bitmap **/
-  /* Nombre de blocs nÈcessaires pour stocker la table */
+  /* Nombre de blocs n√©cessaires pour stocker la table */
   nb_bitmap_block = GetContainerNumber(nb_image_block,BLOCK_SIZE*8);
 
   /* Indique les zones libres : Bloc 6+nb_bitmap_block+1 -> Nb Bloc */
   for(i=6+nb_bitmap_block; i<nb_image_block; i++)
     image_data[image_header_size+6*BLOCK_SIZE+i/8] |= (0x01<<(7-i%8));
 
-  /** CrÈation du fichier sur disque **/
+  /** Cr√©ation du fichier sur disque **/
   error = CreateBinaryFile(image_file_path,image_data,1024*volume_size_kb + image_header_size);
   if(error)
     {
@@ -245,7 +245,7 @@ struct prodos_image *CreateProdosVolume(char *image_file_path, char *volume_name
       return(NULL);
     }
 
-  /* LibÈration mmoire */
+  /* Lib√©ration mmoire */
   free(image_data);
 
   /** Chargement de l'image **/
@@ -256,7 +256,7 @@ struct prodos_image *CreateProdosVolume(char *image_file_path, char *volume_name
 
 
 /********************************************************************************************/
-/*  BuildProdosFolderPath() :  CrÈation des dossiers nÈcessaires pour y ajouter le fichier. */
+/*  BuildProdosFolderPath() :  Cr√©ation des dossiers n√©cessaires pour y ajouter le fichier. */
 /********************************************************************************************/
 struct file_descriptive_entry *BuildProdosFolderPath(struct prodos_image *current_image, char *target_folder_path_param, int *is_volume_header_rtn, int verbose)
 {
@@ -284,7 +284,7 @@ struct file_descriptive_entry *BuildProdosFolderPath(struct prodos_image *curren
   if(target_folder_path[strlen(target_folder_path)-1] != '/')
     strcat(target_folder_path,"/");
 
-  /** On vÈrifie que le nom de volume est correct **/
+  /** On v√©rifie que le nom de volume est correct **/
   next_sep = strchr(target_folder_path+1,'/');
   name_length = next_sep-(target_folder_path+1);
   memcpy(volume_name,target_folder_path+1,name_length);
@@ -295,7 +295,7 @@ struct file_descriptive_entry *BuildProdosFolderPath(struct prodos_image *curren
       return(NULL);
     }
 
-  /** On veut placer le fichier ‡ la racine du volume **/
+  /** On veut placer le fichier √† la racine du volume **/
   if(strlen(current_image->volume_header->volume_name) + 2 == strlen(target_folder_path))
     {
       *is_volume_header_rtn = 1;
@@ -318,7 +318,7 @@ struct file_descriptive_entry *BuildProdosFolderPath(struct prodos_image *curren
           continue;
         }
 
-      /* VÈrifie ce chemin */
+      /* V√©rifie ce chemin */
       next_folder = GetProdosFolder(current_image,folder_path,0);
       if(next_folder == NULL)
         break;
@@ -328,12 +328,12 @@ struct file_descriptive_entry *BuildProdosFolderPath(struct prodos_image *curren
       next_sep = strchr(next_sep+1,'/');
     }
 
-  /** CrÈation de tous les Dossiers **/
+  /** Cr√©ation de tous les Dossiers **/
   strcpy(folder_path,&target_folder_path[(current_folder == NULL) ? strlen(current_image->volume_header->volume_name)+2: strlen(current_folder->file_path)+1]);
   begin = folder_path;
   while(begin)
     {
-      /* Isole le nom du rÈpertoire */
+      /* Isole le nom du r√©pertoire */
       next_sep = strchr(begin,'/');
       if(next_sep)
         *next_sep = '\0';
@@ -342,12 +342,12 @@ struct file_descriptive_entry *BuildProdosFolderPath(struct prodos_image *curren
       if(strlen(begin) == 0)
         break;
 
-      /* CrÈation d'un rÈpertoire vide dans le Dossier ou ‡ la Racine du volume */
+      /* Cr√©ation d'un r√©pertoire vide dans le Dossier ou √† la Racine du volume */
       new_folder = CreateOneProdosFolder(current_image,current_folder,begin,verbose);
       if(new_folder == NULL)
         return(NULL);
 
-      /* RÈpertoire suivant */
+      /* R√©pertoire suivant */
       current_folder = new_folder;
       begin = (next_sep == NULL) ? NULL : next_sep+1;
     }
@@ -355,13 +355,13 @@ struct file_descriptive_entry *BuildProdosFolderPath(struct prodos_image *curren
   /** Tableaux de pointeurs **/
   my_Memory(MEMORY_BUILD_DIRECTORY_TAB,NULL,NULL);
 
-  /* Renvoi le dernier rÈpertoire */
+  /* Renvoi le dernier r√©pertoire */
   return(current_folder);
 }
 
 
 /******************************************************************************************************/
-/*  CreateOneProdosFolder() :  CrÈation d'un dossier vide dans un Directory ou ‡ la Racine du volume. */
+/*  CreateOneProdosFolder() :  Cr√©ation d'un dossier vide dans un Directory ou √† la Racine du volume. */
 /******************************************************************************************************/
 struct file_descriptive_entry *CreateOneProdosFolder(struct prodos_image *current_image, struct file_descriptive_entry *current_folder, char *folder_name, int verbose)
 {
@@ -378,7 +378,7 @@ struct file_descriptive_entry *CreateOneProdosFolder(struct prodos_image *curren
   unsigned char directory_block[BLOCK_SIZE];
   unsigned char subdirectory_block[BLOCK_SIZE];
 
-  /* VÈrifie le nom du Dossier */
+  /* V√©rifie le nom du Dossier */
   is_valid = CheckProdosName(folder_name);
   if(is_valid == 0)
     {
@@ -386,10 +386,10 @@ struct file_descriptive_entry *CreateOneProdosFolder(struct prodos_image *curren
       return(NULL);
     }
 
-  /** VÈrifie que ce nom de Dossier ne correspond pas dÈj‡ ‡ un nom de fichier **/
+  /** V√©rifie que ce nom de Dossier ne correspond pas d√©j√† √† un nom de fichier **/
   if(current_folder == NULL)
     {
-      /* VÈrification ‡ la racine du Volume */
+      /* V√©rification √† la racine du Volume */
       for(i=0; i<current_image->nb_file; i++)
         if(!my_stricmp(folder_name,current_image->tab_file[i]->file_name))
           {
@@ -399,7 +399,7 @@ struct file_descriptive_entry *CreateOneProdosFolder(struct prodos_image *curren
     }
   else
     {
-      /* VÈrification dans le dossier */
+      /* V√©rification dans le dossier */
       for(i=0; i<current_folder->nb_file; i++)
         if(!my_stricmp(folder_name,current_folder->tab_file[i]->file_name))
           {
@@ -413,7 +413,7 @@ struct file_descriptive_entry *CreateOneProdosFolder(struct prodos_image *curren
   for(i=0; i<(int)strlen(upper_case); i++)
     upper_case[i] = toupper(upper_case[i]);
 
-  /* 16 bit dÈcrivant la case */
+  /* 16 bit d√©crivant la case */
   name_case = BuildProdosCase(folder_name);
 
   /* Longueur du nom */
@@ -426,13 +426,13 @@ struct file_descriptive_entry *CreateOneProdosFolder(struct prodos_image *curren
   entry_length = 0x27;
 
   /*****************************************************/
-  /** Recherche d'une entrÈe libre dans le rÈpertoire **/
+  /** Recherche d'une entr√©e libre dans le r√©pertoire **/
   error = AllocateFolderEntry(current_image,current_folder,&directory_block_number,&directory_entry_number,&header_block_number);
   if(error)
     return(NULL);
 
   /*************************************/
-  /** CrÈation d'un SubDirectory Bloc **/
+  /** Cr√©ation d'un SubDirectory Bloc **/
   /* Init */
   memset(subdirectory_block,0,BLOCK_SIZE);
 
@@ -494,10 +494,10 @@ struct file_descriptive_entry *CreateOneProdosFolder(struct prodos_image *curren
 
   /***********************************************************/
   /*** Modification du Directory ou de la Racine du volume ***/
-  /* Lecture : Block contenant l'entrÈe */
+  /* Lecture : Block contenant l'entr√©e */
   GetBlockData(current_image,directory_block_number,&directory_block[0]);
 
-  /** CrÈation de l'entrÈe SubDirectory **/
+  /** Cr√©ation de l'entr√©e SubDirectory **/
   offset = 4 + (directory_entry_number-1)*entry_length;
 
   /* Storage Type / Name length */
@@ -539,17 +539,17 @@ struct file_descriptive_entry *CreateOneProdosFolder(struct prodos_image *curren
   /* Header Pointer */
   SetWordValue(directory_block,offset+0x25,(WORD)((current_folder == NULL) ? 2 : current_folder->key_pointer_block));
 
-  /* Ecriture : Block contenant l'entrÈe */
+  /* Ecriture : Block contenant l'entr√©e */
   SetBlockData(current_image,directory_block_number,&directory_block[0]);
 
   /*********************************************************/
-  /***  Allocation MÈmoire pour ce nouveau SubDirectory  ***/
-  /** Lecture de l'entrÈe **/
+  /***  Allocation M√©moire pour ce nouveau SubDirectory  ***/
+  /** Lecture de l'entr√©e **/
   sprintf(volume_path,"/%s",current_image->volume_header->volume_name_case);
   new_folder = ODSReadFileDescriptiveEntry(current_image,(current_folder==NULL)?volume_path:current_folder->file_path,&directory_block[offset]);
   if(new_folder == NULL)
     return(NULL);
-  /* ComplËte l'entrÈe */
+  /* Compl√®te l'entr√©e */
   new_folder->depth = (current_folder==NULL) ? 1 : current_folder->depth + 1;   /* ? */
   new_folder->parent_directory = current_folder;
   new_folder->block_location = directory_block_number;   /* ? */
@@ -573,8 +573,8 @@ struct file_descriptive_entry *CreateOneProdosFolder(struct prodos_image *curren
   SetBlockData(current_image,(current_folder == NULL) ? 2 : current_folder->key_pointer_block,&directory_block[0]);
 
   /***************************************************/
-  /*** Ajoute ce SubDirectory au Folder en mÈmoire ***/
-  /** CrÈation du nouveau Tableau des Dossiers **/
+  /*** Ajoute ce SubDirectory au Folder en m√©moire ***/
+  /** Cr√©ation du nouveau Tableau des Dossiers **/
   nb_directory = 1 + ((current_folder==NULL) ? current_image->nb_directory : current_folder->nb_directory);
   new_tab_directory = (struct file_descriptive_entry **) calloc(nb_directory,sizeof(struct file_descriptive_entry *));
   if(new_tab_directory == NULL)
@@ -587,10 +587,10 @@ struct file_descriptive_entry *CreateOneProdosFolder(struct prodos_image *curren
   new_tab_directory[nb_directory-1] = new_folder;
   qsort(new_tab_directory,nb_directory,sizeof(struct file_descriptive_entry *),compare_entry);
 
-  /** Met ‡ jour les informations mÈmoire du Dossier parent **/
+  /** Met √† jour les informations m√©moire du Dossier parent **/
   if(current_folder == NULL)
     {
-      /* Ajoute ce dossier ‡ la Racine du Volume */
+      /* Ajoute ce dossier √† la Racine du Volume */
       if(current_image->tab_directory)
         free(current_image->tab_directory);
       current_image->tab_directory = new_tab_directory;

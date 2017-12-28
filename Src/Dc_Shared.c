@@ -1,6 +1,6 @@
 /***********************************************************************/
 /*                                                                     */
-/*  Dc_Shared.c : Module pour la bibliothèque de fonctions génériques. */
+/*  Dc_Shared.c : Module pour la bibliothÃ¨que de fonctions gÃ©nÃ©riques. */
 /*                                                                     */
 /***********************************************************************/
 /*  Auteur : Olivier ZARDINI  *  Brutal Deluxe Software  *  Janv 2011  */
@@ -17,7 +17,7 @@
 #include "Dc_Memory.h"
 
 /***************************************************************/
-/*  LoadBinaryFile() :  Récupération des données d'un fichier. */
+/*  LoadBinaryFile() :  RÃ©cupÃ©ration des donnÃ©es d'un fichier. */
 /***************************************************************/
 unsigned char *LoadBinaryFile(char *file_path, int *data_length_rtn)
 {
@@ -38,7 +38,7 @@ unsigned char *LoadBinaryFile(char *file_path, int *data_length_rtn)
   file_size = ftell(fd);
   fseek(fd,0L,SEEK_SET);
    
-  /* Allocation mémoire */
+  /* Allocation mÃ©moire */
   data = (unsigned char *) calloc(1,file_size+1);
   if(data == NULL)
     {
@@ -46,7 +46,7 @@ unsigned char *LoadBinaryFile(char *file_path, int *data_length_rtn)
       return(NULL);
     }
 
-  /* Lecture des données */
+  /* Lecture des donnÃ©es */
   nb_read = fread(data,1,file_size,fd);
   if(nb_read != file_size)
     {
@@ -59,14 +59,14 @@ unsigned char *LoadBinaryFile(char *file_path, int *data_length_rtn)
   /* Fermeture du fichier */
   fclose(fd);
 
-  /* Renvoi les données et la taille */
+  /* Renvoi les donnÃ©es et la taille */
   *data_length_rtn = nb_read;
   return(data);
 }
 
 
 /*************************************************************/
-/*  LoadTextFile() :  Récupération des données d'un fichier. */
+/*  LoadTextFile() :  RÃ©cupÃ©ration des donnÃ©es d'un fichier. */
 /*************************************************************/
 unsigned char *LoadTextFile(char *file_path, int *data_length_rtn)
 {
@@ -84,7 +84,7 @@ unsigned char *LoadTextFile(char *file_path, int *data_length_rtn)
   file_size = ftell(fd);
   fseek(fd,0L,SEEK_SET);
    
-  /* Allocation mémoire */
+  /* Allocation mÃ©moire */
   data = (unsigned char *) calloc(1,file_size+10);
   if(data == NULL)
     {
@@ -92,7 +92,7 @@ unsigned char *LoadTextFile(char *file_path, int *data_length_rtn)
       return(NULL);
     }
 
-  /* Lecture des données */
+  /* Lecture des donnÃ©es */
   nb_read = fread(data,1,file_size,fd);
   if(nb_read < 0)
     {
@@ -105,14 +105,14 @@ unsigned char *LoadTextFile(char *file_path, int *data_length_rtn)
   /* Fermeture du fichier */
   fclose(fd);
 
-  /* Renvoi les données et la taille */
+  /* Renvoi les donnÃ©es et la taille */
   *data_length_rtn = nb_read;
   return(data);
 }
 
 
 /*************************************************************/
-/*  Get24bitValue() :  Décode une valeur codée sur 3 octets. */
+/*  Get24bitValue() :  DÃ©code une valeur codÃ©e sur 3 octets. */
 /*************************************************************/
 int Get24bitValue(unsigned char *data, int offset)
 {
@@ -121,7 +121,7 @@ int Get24bitValue(unsigned char *data, int offset)
 
 
 /************************************************************/
-/*  GetWordValue() :  Décode une valeur codée sur 2 octets. */
+/*  GetWordValue() :  DÃ©code une valeur codÃ©e sur 2 octets. */
 /************************************************************/
 int GetWordValue(unsigned char *data, int offset)
 {
@@ -130,7 +130,7 @@ int GetWordValue(unsigned char *data, int offset)
 
 
 /***********************************************************/
-/*  GetByteValue() :  Décode une valeur codée sur 1 octet. */
+/*  GetByteValue() :  DÃ©code une valeur codÃ©e sur 1 octet. */
 /***********************************************************/
 int GetByteValue(unsigned char *data, int offset)
 {
@@ -139,7 +139,7 @@ int GetByteValue(unsigned char *data, int offset)
 
 
 /***********************************************************/
-/*  SetWordValue() :  Place une valeur codée sur 2 octets. */
+/*  SetWordValue() :  Place une valeur codÃ©e sur 2 octets. */
 /***********************************************************/
 void SetWordValue(unsigned char *data, int offset, WORD value)
 {
@@ -149,7 +149,7 @@ void SetWordValue(unsigned char *data, int offset, WORD value)
 
 
 /************************************************************/
-/*  Set24bitValue() :  Place une valeur codée sur 3 octets. */
+/*  Set24bitValue() :  Place une valeur codÃ©e sur 3 octets. */
 /************************************************************/
 void Set24bitValue(unsigned char *data, int offset, int value)
 {
@@ -160,7 +160,7 @@ void Set24bitValue(unsigned char *data, int offset, int value)
 
 
 /************************************************************/
-/*  SetDWordValue() :  Place une valeur codée sur 4 octets. */
+/*  SetDWordValue() :  Place une valeur codÃ©e sur 4 octets. */
 /************************************************************/
 void SetDWordValue(unsigned char *data, int offset, DWORD value)
 {
@@ -172,7 +172,7 @@ void SetDWordValue(unsigned char *data, int offset, DWORD value)
 
 
 /************************************************************/
-/*  CreateBinaryFile() :  Création d'un fichier sur disque. */
+/*  CreateBinaryFile() :  CrÃ©ation d'un fichier sur disque. */
 /************************************************************/
 int CreateBinaryFile(char *file_path, unsigned char *data, int length)
 {
@@ -182,12 +182,12 @@ int CreateBinaryFile(char *file_path, unsigned char *data, int length)
   /* Suppression du fichier */
   my_DeleteFile(file_path);
 
-  /* Création du fichier */
+  /* CrÃ©ation du fichier */
   fd = fopen(file_path,"wb");
   if(fd == NULL)
     return(1);
 
-  /* Ecriture des données */
+  /* Ecriture des donnÃ©es */
   nb_write = fwrite(data,1,length,fd);
   if(nb_write != length)
     {
@@ -204,7 +204,7 @@ int CreateBinaryFile(char *file_path, unsigned char *data, int length)
 
 
 /***************************************************************/
-/*  CreateTextFile() :  Création d'un fichier Text sur disque. */
+/*  CreateTextFile() :  CrÃ©ation d'un fichier Text sur disque. */
 /***************************************************************/
 int CreateTextFile(char *file_path, unsigned char *data, int length)
 {
@@ -214,12 +214,12 @@ int CreateTextFile(char *file_path, unsigned char *data, int length)
   /* Suppression du fichier */
   my_DeleteFile(file_path);
 
-  /* Création du fichier */
+  /* CrÃ©ation du fichier */
   fd = fopen(file_path,"w");
   if(fd == NULL)
     return(1);
 
-  /* Ecriture des données */
+  /* Ecriture des donnÃ©es */
   nb_write = fwrite(data,1,length,fd);
   if(nb_write < length)
     {
@@ -270,11 +270,11 @@ char **BuildFileList(char *hierarchy, int *nb_file_rtn)
       return(tab_file);
     }
 
-  /** Hiérachie de fichier à traiter **/
+  /** HiÃ©rachie de fichier Ã  traiter **/
   strcpy(hierarchy_path,hierarchy);
   CleanHierarchie(hierarchy_path);
 
-  /** Répertoire de départ **/
+  /** RÃ©pertoire de dÃ©part **/
   strcpy(folder_path,hierarchy_path);
   for(i=0; i<(int)strlen(folder_path); i++)
     if(folder_path[i] == '*')
@@ -297,10 +297,10 @@ char **BuildFileList(char *hierarchy, int *nb_file_rtn)
       return(NULL);
     }
 
-  /** Création du tableau **/
+  /** CrÃ©ation du tableau **/
   my_Memory(MEMORY_GET_FILE_NB,&nb_file,NULL);
 
-  /* Allocation mémoire */
+  /* Allocation mÃ©moire */
   tab_file = (char **) calloc(nb_file,sizeof(char *));
   if(tab_file == NULL)
     {
@@ -320,7 +320,7 @@ char **BuildFileList(char *hierarchy, int *nb_file_rtn)
         }
     }
 
-  /* Libération mémoire */
+  /* LibÃ©ration mÃ©moire */
   my_Memory(MEMORY_FREE_FILE,NULL,NULL);
 
   /* Renvoi les valeurs */
@@ -330,7 +330,7 @@ char **BuildFileList(char *hierarchy, int *nb_file_rtn)
 
 
 /***********************************************************************/
-/*  MatchHierarchie() : Indique si un nom appartient à une hiérarchie. */
+/*  MatchHierarchie() : Indique si un nom appartient Ã  une hiÃ©rarchie. */
 /***********************************************************************/
 int MatchHierarchie(char *name, char *hierarchie)
 {
@@ -343,7 +343,7 @@ int MatchHierarchie(char *name, char *hierarchie)
   int offset;
   char buffer[BUFFER_SIZE];
 
-  /*** On parcours les deux chaînes ***/
+  /*** On parcours les deux chaÃ®nes ***/
   for(i=0,j=0; i<(int)strlen(hierarchie); i++)
     {
       if(hierarchie[i] != '*')
@@ -356,7 +356,7 @@ int MatchHierarchie(char *name, char *hierarchie)
         j++;
       else
         {
-          /* Si '*' dernier caractère de la chaîne => OK */
+          /* Si '*' dernier caractÃ¨re de la chaÃ®ne => OK */
           if(hierarchie[i+1] == '\0')
             return(1);
 
@@ -388,7 +388,7 @@ int MatchHierarchie(char *name, char *hierarchie)
           if(count == 0)
             return(0);
 
-          /** On lance la récursivité sur toutes les occurences trouvées **/
+          /** On lance la rÃ©cursivitÃ© sur toutes les occurences trouvÃ©es **/
           for(k=0,offset=j; k<count; k++)
             {
               name_ptr = mh_stristr(&name[offset],buffer);
@@ -401,17 +401,17 @@ int MatchHierarchie(char *name, char *hierarchie)
         }
     }
 
-  /* Est t'on également à la fin de name ? */
+  /* Est t'on Ã©galement Ã  la fin de name ? */
   if(j != (int)strlen(name))
     return(0);
 
-  /* On est arrivé au bout : OK */
+  /* On est arrivÃ© au bout : OK */
   return(1);
 }
 
 
 /****************************************************************/
-/* CleanHierarchie() : Supprime les '*' en trop dans la chaîne. */
+/* CleanHierarchie() : Supprime les '*' en trop dans la chaÃ®ne. */
 /****************************************************************/
 void CleanHierarchie(char *hierarchie)
 {
@@ -424,7 +424,7 @@ void CleanHierarchie(char *hierarchie)
         buffer[j++] = hierarchie[i];
       else
         {
-          /* On ne laisse pas plusieurs '*' consécutifs */
+          /* On ne laisse pas plusieurs '*' consÃ©cutifs */
           if(j == 0)
             buffer[j++] = hierarchie[i];
           else
@@ -437,13 +437,13 @@ void CleanHierarchie(char *hierarchie)
         }
     }
 
-  /* On recopie la chaine nettoyée */
+  /* On recopie la chaine nettoyÃ©e */
   strcpy(hierarchie,buffer);
 }
 
 
 /***********************************************************************/
-/*  mh_stristr() : Recherche l'occurence d'une chaîne dans une autre.  */
+/*  mh_stristr() : Recherche l'occurence d'une chaÃ®ne dans une autre.  */
 /***********************************************************************/
 char *mh_stristr(char *name, char *hierarchie)
 {
@@ -451,11 +451,11 @@ char *mh_stristr(char *name, char *hierarchie)
   int length_n = strlen(name);
   int length_h = strlen(hierarchie);
 
-  /* On élimine les cas extrêmes */
+  /* On Ã©limine les cas extrÃªmes */
   if(length_n < length_h)
     return(NULL);
 
-  /** On parcours la chaîne 'name' afin de localiser la chaine 'hierarchie' **/
+  /** On parcours la chaÃ®ne 'name' afin de localiser la chaine 'hierarchie' **/
   for(i=0; i<length_n-length_h+1; i++)
     {
       /* La recherche ne tient pas compte de la casse */
@@ -463,13 +463,13 @@ char *mh_stristr(char *name, char *hierarchie)
         return(&name[i]);
     }
 
-  /* On a rien trouvé */
+  /* On a rien trouvÃ© */
   return(NULL);
 }
 
 
 /********************************************************************/
-/*  mh_stricmp() : Compare deux chaînes de caractères avec les '?'. */
+/*  mh_stricmp() : Compare deux chaÃ®nes de caractÃ¨res avec les '?'. */
 /********************************************************************/
 int mh_stricmp(char *string_n, char *string_h)
 {
@@ -477,11 +477,11 @@ int mh_stricmp(char *string_n, char *string_h)
   int length_n = strlen(string_n);
   int length_h = strlen(string_h);
 
-  /* On élimine immédiatement les cas défavorables */
+  /* On Ã©limine immÃ©diatement les cas dÃ©favorables */
   if(length_n != length_h)
     return(1);
 
-  /** On compare tous les caractères avec gestion du '?' **/
+  /** On compare tous les caractÃ¨res avec gestion du '?' **/
   for(i=0; i<length_n; i++)
     {
       if(string_h[i] == '?')
@@ -490,13 +490,13 @@ int mh_stricmp(char *string_n, char *string_h)
         return(1);
     }
 
-  /* On a deux chaînes identiques */
+  /* On a deux chaÃ®nes identiques */
   return(0);
 }
 
 
 /*****************************************************************************/
-/*  BuildUniqueListFromFile() :  Récupère la liste des valeurs d'un fichier. */
+/*  BuildUniqueListFromFile() :  RÃ©cupÃ¨re la liste des valeurs d'un fichier. */
 /*****************************************************************************/
 char **BuildUniqueListFromFile(char *file_path, int *nb_value)
 {
@@ -529,7 +529,7 @@ char **BuildUniqueListFromFile(char *file_path, int *nb_value)
   fseek(fd,0L,SEEK_SET);
   while(fgets(buffer_line,1024-1,fd))
     {
-      /** Traitement préliminaire de nettoyage **/
+      /** Traitement prÃ©liminaire de nettoyage **/
       line_length = strlen(buffer_line);
       if(line_length < 2)              /* Ligne vide */
         continue;
@@ -568,7 +568,7 @@ char **BuildUniqueListFromFile(char *file_path, int *nb_value)
 
 
 /**************************************************************************/
-/*  GetContainerNumber() :  Détermine le nombre de container nécessaires. */
+/*  GetContainerNumber() :  DÃ©termine le nombre de container nÃ©cessaires. */
 /**************************************************************************/
 int GetContainerNumber(int data_size, int container_size)
 {
@@ -593,7 +593,7 @@ int GetContainerNumber(int data_size, int container_size)
 
 
 /*****************************************************************/
-/*  mem_free_filepath() :  Libération de la structure file_path. */
+/*  mem_free_filepath() :  LibÃ©ration de la structure file_path. */
 /*****************************************************************/
 void mem_free_filepath(struct file_path *current_filepath)
 {
@@ -608,7 +608,7 @@ void mem_free_filepath(struct file_path *current_filepath)
 
 
 /********************************************************/
-/*  mem_free_list() :  Libération mémoire d'un tableau. */
+/*  mem_free_list() :  LibÃ©ration mÃ©moire d'un tableau. */
 /********************************************************/
 void mem_free_list(int nb_element, char **element_tab)
 {

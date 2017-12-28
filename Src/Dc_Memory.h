@@ -1,6 +1,6 @@
 /***********************************************************************/
 /*                                                                     */
-/* Dc_Memory.h : Header pour la bibliothèque de gestion de la mémoire. */
+/* Dc_Memory.h : Header pour la bibliothÃ¨que de gestion de la mÃ©moire. */
 /*                                                                     */
 /***********************************************************************/
 /*  Auteur : Olivier ZARDINI  *  Brutal Deluxe Software  *  Dec 2011   */

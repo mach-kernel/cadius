@@ -32,7 +32,7 @@ struct line
   char *operand;
   char *comment;
 
-  int number;       /* Numéro de la ligne dans le fichier */
+  int number;       /* NumÃ©ro de la ligne dans le fichier */
   int length;       /* Taille de la ligne */
 
   struct line *next;
@@ -46,7 +46,7 @@ static int GetLineValue(char *,int,char **);
 static void mem_free_line(struct line *);
 
 /******************************************************************/
-/*  ClearFileHighBit() :  Met à 0 le bit 7 des octets du fichier. */
+/*  ClearFileHighBit() :  Met Ã  0 le bit 7 des octets du fichier. */
 /******************************************************************/
 int ClearFileHighBit(char *file_path)
 {
@@ -54,7 +54,7 @@ int ClearFileHighBit(char *file_path)
   int length;
   unsigned char *data;
 
-  /** Chargement en mémoire du fichier **/
+  /** Chargement en mÃ©moire du fichier **/
   data = LoadBinaryFile(file_path,&length);
   if(data == NULL)
     {
@@ -80,7 +80,7 @@ int ClearFileHighBit(char *file_path)
       return(1);
     }
 
-  /* Libération mémoire */
+  /* LibÃ©ration mÃ©moire */
   free(data);
 
   /* OK */
@@ -89,7 +89,7 @@ int ClearFileHighBit(char *file_path)
 
 
 /****************************************************************/
-/*  SetFileHighBit() :  Met à 1 le bit 7 des octets du fichier. */
+/*  SetFileHighBit() :  Met Ã  1 le bit 7 des octets du fichier. */
 /****************************************************************/
 int SetFileHighBit(char *file_path)
 {
@@ -97,7 +97,7 @@ int SetFileHighBit(char *file_path)
   int length;
   unsigned char *data;
 
-  /** Chargement en mémoire du fichier Texte **/
+  /** Chargement en mÃ©moire du fichier Texte **/
   data = LoadTextFile(file_path,&length);
   if(data == NULL)
     {
@@ -127,7 +127,7 @@ int SetFileHighBit(char *file_path)
       return(1);
     }
 
-  /* Libération mémoire */
+  /* LibÃ©ration mÃ©moire */
   free(data);
 
   /* OK */
@@ -145,7 +145,7 @@ int IndentFile(char *file_path)
   int nb_line;
   struct line **tab_line;
 
-  /** Chargement en mémoire du fichier **/
+  /** Chargement en mÃ©moire du fichier **/
   data = LoadTextFile(file_path,&length_src);
   if(data == NULL)
     {
@@ -161,13 +161,13 @@ int IndentFile(char *file_path)
       return(2);
     }
 
-  /* Libération du buffer */
+  /* LibÃ©ration du buffer */
   free(data);
 
-  /** Création du buffer des lignes indentées **/
+  /** CrÃ©ation du buffer des lignes indentÃ©es **/
   data = BuildIndentBuffer(nb_line,tab_line);
 
-  /* Libération mémoire */
+  /* LibÃ©ration mÃ©moire */
   for(i=0; i<nb_line; i++)
     mem_free_line(tab_line[i]);
   free(tab_line);
@@ -185,7 +185,7 @@ int IndentFile(char *file_path)
       return(4);
     }
 
-  /* Libération mémoire */
+  /* LibÃ©ration mÃ©moire */
   free(data);
 
   /* OK */
@@ -194,7 +194,7 @@ int IndentFile(char *file_path)
 
 
 /****************************************************************/
-/*  OutdentFile() :  Dé-Indente le contenu d'un fichier Source. */
+/*  OutdentFile() :  DÃ©-Indente le contenu d'un fichier Source. */
 /****************************************************************/
 int OutdentFile(char *file_path)
 {
@@ -203,7 +203,7 @@ int OutdentFile(char *file_path)
   int nb_line;
   struct line **tab_line;
 
-  /** Chargement en mémoire du fichier **/
+  /** Chargement en mÃ©moire du fichier **/
   data = LoadTextFile(file_path,&length);
   if(data == NULL)
     {
@@ -219,13 +219,13 @@ int OutdentFile(char *file_path)
       return(2);
     }
 
-  /* Libération du buffer */
+  /* LibÃ©ration du buffer */
   free(data);
 
-  /** Création du buffer des lignes dé-indentées **/
+  /** CrÃ©ation du buffer des lignes dÃ©-indentÃ©es **/
   data = BuildOutdentBuffer(nb_line,tab_line);
 
-  /* Libération mémoire */
+  /* LibÃ©ration mÃ©moire */
   for(i=0; i<nb_line; i++)
     mem_free_line(tab_line[i]);
   free(tab_line);
@@ -242,7 +242,7 @@ int OutdentFile(char *file_path)
       return(4);
     }
 
-  /* Libération mémoire */
+  /* LibÃ©ration mÃ©moire */
   free(data);
 
   /* OK */
@@ -251,7 +251,7 @@ int OutdentFile(char *file_path)
 
 
 /************************************************************************/
-/*  BuildIndentBuffer() :  Construction du buffer des lignes indentées. */
+/*  BuildIndentBuffer() :  Construction du buffer des lignes indentÃ©es. */
 /************************************************************************/
 static char *BuildIndentBuffer(int nb_line, struct line **tab_line)
 {
@@ -259,7 +259,7 @@ static char *BuildIndentBuffer(int nb_line, struct line **tab_line)
   int label_length, opcode_length, operand_length, operand_data_length, comment_length, line_length;
   unsigned char *data;
 
-  /** Détermine la taille max des zones **/
+  /** DÃ©termine la taille max des zones **/
   label_length = 10;
   opcode_length = 4;
   operand_length = 10;
@@ -298,7 +298,7 @@ static char *BuildIndentBuffer(int nb_line, struct line **tab_line)
   if(line_length < (label_length + opcode_length + operand_data_length + comment_length))
     line_length = (label_length + opcode_length + operand_data_length + comment_length);
 
-  /* Allocation mémoire du fichier */
+  /* Allocation mÃ©moire du fichier */
   data = (char *) calloc(nb_line,line_length+1);
   if(data == NULL)
     {
@@ -307,7 +307,7 @@ static char *BuildIndentBuffer(int nb_line, struct line **tab_line)
     }
 
   /**********************************/
-  /** Création du fichier résultat **/
+  /** CrÃ©ation du fichier rÃ©sultat **/
   /**********************************/
   for(i=0,offset=0; i<nb_line; i++)
     {
@@ -366,7 +366,7 @@ static char *BuildIndentBuffer(int nb_line, struct line **tab_line)
             }
           if(tab_line[i]->type == TYPE_LINE_CODE)
             {
-              /* L'opcode a débordé sur l'operand, qui n'était pas là */
+              /* L'opcode a dÃ©bordÃ© sur l'operand, qui n'Ã©tait pas lÃ  */
               if(strlen(tab_line[i]->operand) == 0 && (int) strlen(tab_line[i]->opcode) > opcode_length)
                 {
                   for(j=length+strlen(tab_line[i]->opcode)-opcode_length; j<operand_length; j++)
@@ -380,7 +380,7 @@ static char *BuildIndentBuffer(int nb_line, struct line **tab_line)
             }
           else if(tab_line[i]->type == TYPE_LINE_DATA && length < operand_length)
             {
-              /* On met le commentaire des Data au même niveau que celui du code */
+              /* On met le commentaire des Data au mÃªme niveau que celui du code */
               for(j=length; j<operand_length; j++)
                 data[offset++] = ' ';              
             }
@@ -404,14 +404,14 @@ static char *BuildIndentBuffer(int nb_line, struct line **tab_line)
 
 
 /****************************************************************************/
-/*  BuildOutdentBuffer() :  Construction du buffer des lignes dé-indentées. */
+/*  BuildOutdentBuffer() :  Construction du buffer des lignes dÃ©-indentÃ©es. */
 /****************************************************************************/
 static char *BuildOutdentBuffer(int nb_line, struct line **tab_line)
 {
   int i, length, offset, line_length;
   unsigned char *data;
 
-  /** Détermine la taille max de la ligne **/
+  /** DÃ©termine la taille max de la ligne **/
   line_length = 0;
   for(i=0; i<nb_line; i++)
     {
@@ -426,7 +426,7 @@ static char *BuildOutdentBuffer(int nb_line, struct line **tab_line)
         line_length = length;
     }
 
-  /* Allocation mémoire du fichier */
+  /* Allocation mÃ©moire du fichier */
   data = (char *) calloc(nb_line,line_length+1);
   if(data == NULL)
     {
@@ -435,7 +435,7 @@ static char *BuildOutdentBuffer(int nb_line, struct line **tab_line)
     }
 
   /**********************************/
-  /** Création du fichier résultat **/
+  /** CrÃ©ation du fichier rÃ©sultat **/
   /**********************************/
   for(i=0,offset=0; i<nb_line; i++)
     {
@@ -494,7 +494,7 @@ static char *BuildOutdentBuffer(int nb_line, struct line **tab_line)
 
 
 /*********************************************************************/
-/*  BuildLineTab() :  Décode un fichier sous forme de ligne de code. */
+/*  BuildLineTab() :  DÃ©code un fichier sous forme de ligne de code. */
 /*********************************************************************/
 static struct line **BuildLineTab(unsigned char *data, int length, int *nb_line_rtn)
 {
@@ -509,7 +509,7 @@ static struct line **BuildLineTab(unsigned char *data, int length, int *nb_line_
     if(data[i] == '\n')
       nb_line++;
 
-  /* Allocation mémoire du tableau */
+  /* Allocation mÃ©moire du tableau */
   tab_line = (struct line **) calloc(nb_line,sizeof(struct line *));
   if(tab_line == NULL)
     {
@@ -517,7 +517,7 @@ static struct line **BuildLineTab(unsigned char *data, int length, int *nb_line_
       return(NULL);
     }
 
-  /*** Décodage des lignes ***/
+  /*** DÃ©codage des lignes ***/
   nb_line = 0;
   begin = data;
   while(begin)
@@ -527,7 +527,7 @@ static struct line **BuildLineTab(unsigned char *data, int length, int *nb_line_
       if(end != NULL)
         *end = '\0';
 
-      /** Décodage de la ligne **/
+      /** DÃ©codage de la ligne **/
       current_line = BuildOneLine(begin,nb_line+1);
       if(current_line == NULL)
         {
@@ -551,7 +551,7 @@ static struct line **BuildLineTab(unsigned char *data, int length, int *nb_line_
 
 
 /************************************************/
-/*  BuildOneLine() :  Décode une ligne de Code. */
+/*  BuildOneLine() :  DÃ©code une ligne de Code. */
 /************************************************/
 static struct line *BuildOneLine(char *line, int line_nb)
 {
@@ -559,7 +559,7 @@ static struct line *BuildOneLine(char *line, int line_nb)
   struct line *current_line;
   char *data_tab[] = {"HEX","DC","DE","DP","DS","DA","DDB","DFB","DB","DW","ADR","ADRL","ASC","DCI","INV","FLS","STR","STRL","PUT","USE","ANOP","ORG","START","END","MX","XC","LONGA","LONGI","USING","LST","REL","DSK","IF","DO","ELSE","FIN","LUP","--^",NULL};  
 
-  /* Allocation mémoire */
+  /* Allocation mÃ©moire */
   current_line = (struct line *) calloc(1,sizeof(struct line));
   if(current_line == NULL)
     {
@@ -590,7 +590,7 @@ static struct line *BuildOneLine(char *line, int line_nb)
       return(current_line);
     }
 
-  /*** Décodage des 4 zones ***/  
+  /*** DÃ©codage des 4 zones ***/  
   current_line->type = TYPE_LINE_CODE;
 
   /** Label **/
@@ -650,7 +650,7 @@ static struct line *BuildOneLine(char *line, int line_nb)
 
 
 /************************************************************/
-/*  GetLineValue() :  Récupère une des valeurs de la ligne. */
+/*  GetLineValue() :  RÃ©cupÃ¨re une des valeurs de la ligne. */
 /************************************************************/
 static int GetLineValue(char *line_data, int is_comment, char **value_rtn)
 {
@@ -726,7 +726,7 @@ static int GetLineValue(char *line_data, int is_comment, char **value_rtn)
         }
       length = i;
 
-      /* Allocation mémoire */
+      /* Allocation mÃ©moire */
       value = (char *) calloc(1,length+1);
       if(value == NULL)
         return(-1);
@@ -744,7 +744,7 @@ static int GetLineValue(char *line_data, int is_comment, char **value_rtn)
 
 
 /****************************************************************/
-/*  mem_free_line() :  Libération mémoire de la structure line. */
+/*  mem_free_line() :  LibÃ©ration mÃ©moire de la structure line. */
 /****************************************************************/
 static void mem_free_line(struct line *current_line)
 {

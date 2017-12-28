@@ -20,7 +20,7 @@
 static char *GetObjectInfo(int,struct file_descriptive_entry *);
 
 /*****************************************************************/
-/*  CheckProdosImage() :  Vérifie le contenu d'une image Prodos. */
+/*  CheckProdosImage() :  VÃ©rifie le contenu d'une image Prodos. */
 /*****************************************************************/
 void CheckProdosImage(struct prodos_image *current_image, int verbose)
 {
@@ -83,7 +83,7 @@ void CheckProdosImage(struct prodos_image *current_image, int verbose)
             /* A qui ce block appartient */
             if(current_image->block_usage_type[current_directory->tab_used_block[j]] != BLOCK_TYPE_EMPTY)
               {
-                /* Déjà occupé ! */
+                /* DÃ©jÃ  occupÃ© ! */
                 object_info = GetObjectInfo(current_image->block_usage_type[current_directory->tab_used_block[j]],(struct file_descriptive_entry *)current_image->block_usage_object[current_directory->tab_used_block[j]]);
                 sprintf(error_message,"Block %04X is claimed by Folder %s but it is already used by %s",current_directory->tab_used_block[j],current_directory->file_path,object_info);
                 my_Memory(MEMORY_ADD_ERROR,error_message,NULL);
@@ -93,7 +93,7 @@ void CheckProdosImage(struct prodos_image *current_image, int verbose)
                 current_image->block_usage_type[current_directory->tab_used_block[j]] = BLOCK_TYPE_FOLDER;
                 current_image->block_usage_object[current_directory->tab_used_block[j]] = current_directory;
               }
-            /* Numéro du block */
+            /* NumÃ©ro du block */
             if(verbose)
               printf(";%04X",current_directory->tab_used_block[j]);
           }
@@ -116,7 +116,7 @@ void CheckProdosImage(struct prodos_image *current_image, int verbose)
             /* A qui ce block appartient */
             if(current_image->block_usage_type[current_file->tab_used_block[j]] != BLOCK_TYPE_EMPTY)
               {
-                /* Déjà occupé ! */
+                /* DÃ©jÃ  occupÃ© ! */
                 object_info = GetObjectInfo(current_image->block_usage_type[current_file->tab_used_block[j]],(struct file_descriptive_entry *)current_image->block_usage_object[current_file->tab_used_block[j]]);
                 sprintf(error_message,"Block %04X is claimed by File %s but it is already used by %s",current_file->tab_used_block[j],current_file->file_path,object_info);
                 my_Memory(MEMORY_ADD_ERROR,error_message,NULL);
@@ -127,7 +127,7 @@ void CheckProdosImage(struct prodos_image *current_image, int verbose)
                 current_image->block_usage_object[current_file->tab_used_block[j]] = current_file;
               }
 
-            /* Numéro du block */
+            /* NumÃ©ro du block */
             if(verbose)
               printf(";%04X",current_file->tab_used_block[j]);
           }
@@ -140,7 +140,7 @@ void CheckProdosImage(struct prodos_image *current_image, int verbose)
     printf("; ------------------  Block List  -------------------\n");
   for(i=0, first_block_number=-1; i<current_image->nb_block; i++)
     {
-      /** Décode le block **/
+      /** DÃ©code le block **/
       if(current_image->block_usage_type[i] == BLOCK_TYPE_BOOT)
         sprintf(current_block_info,"Boot");
       else if(current_image->block_usage_type[i] == BLOCK_TYPE_VOLUME)
@@ -154,7 +154,7 @@ void CheckProdosImage(struct prodos_image *current_image, int verbose)
       else
         sprintf(current_block_info,"Free");
 
-      /** Vérifie ce qui est déclaré dans la Bitmap (0=occupé, 1=libre) **/
+      /** VÃ©rifie ce qui est dÃ©clarÃ© dans la Bitmap (0=occupÃ©, 1=libre) **/
       if(current_image->block_allocation_table[i] == 1 && current_image->block_usage_type[i] != 0)
         {
           sprintf(error_message,"Block %04X is declared FREE in the Bitmap, but used by %s",i,current_block_info);
@@ -166,7 +166,7 @@ void CheckProdosImage(struct prodos_image *current_image, int verbose)
           my_Memory(MEMORY_ADD_ERROR,error_message,NULL);
         }
 
-      /** Teste une continuité **/
+      /** Teste une continuitÃ© **/
       if(first_block_number == -1)
         {
           first_block_number = i;
@@ -174,10 +174,10 @@ void CheckProdosImage(struct prodos_image *current_image, int verbose)
         }
       else
         {
-          /* Fin d'une série */
+          /* Fin d'une sÃ©rie */
           if(my_stricmp(first_block_info,current_block_info))
             {
-              /* On produit la série précédente */
+              /* On produit la sÃ©rie prÃ©cÃ©dente */
               if(verbose)
                 {
                   if(i == first_block_number+1)
@@ -186,7 +186,7 @@ void CheckProdosImage(struct prodos_image *current_image, int verbose)
                     printf("%04X-%04X;%s\n",first_block_number,i-1,first_block_info);
                 }
 
-              /* On stocke les infos pour la série suivante */
+              /* On stocke les infos pour la sÃ©rie suivante */
               first_block_number = i;
               strcpy(first_block_info,current_block_info);
             }
@@ -214,7 +214,7 @@ void CheckProdosImage(struct prodos_image *current_image, int verbose)
 
 
 /************************************************************/
-/*  GetObjectInfo() :  Crée la chaine identifiant un objet. */
+/*  GetObjectInfo() :  CrÃ©e la chaine identifiant un objet. */
 /************************************************************/
 static char *GetObjectInfo(int type, struct file_descriptive_entry *current_entry)
 {

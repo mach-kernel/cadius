@@ -1,6 +1,6 @@
 /***********************************************************************/
 /*                                                                     */
-/*   Dc_OS.h : Header pour les fonctions spécifiques à l'OS.           */
+/*   Dc_OS.h : Header pour les fonctions spÃ©cifiques Ã  l'OS.           */
 /*                                                                     */
 /***********************************************************************/
 /*  Auteur : Olivier ZARDINI  *  Brutal Deluxe Software  *  Mar 2012   */

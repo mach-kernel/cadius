@@ -1,6 +1,6 @@
 /***********************************************************************/
 /*                                                                     */
-/*  Dc_Shared.h : Header pour la bibliothèque de fonctions génériques. */
+/*  Dc_Shared.h : Header pour la bibliothÃ¨que de fonctions gÃ©nÃ©riques. */
 /*                                                                     */
 /***********************************************************************/
 /*  Auteur : Olivier ZARDINI  *  Brutal Deluxe Software  *  Dec 2011   */

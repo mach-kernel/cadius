@@ -29,7 +29,7 @@ void DeleteProdosFile(struct prodos_image *current_image, char *prodos_file_path
   int error;
   struct file_descriptive_entry *current_entry;
 
-  /* Recherche l'entrée Prodos */
+  /* Recherche l'entrÃ©e Prodos */
   current_entry = GetProdosFile(current_image,prodos_file_path);
   if(current_entry == NULL)
     {
@@ -37,7 +37,7 @@ void DeleteProdosFile(struct prodos_image *current_image, char *prodos_file_path
       return;
     }
 
-  /** Supprime une entrée Fichier **/
+  /** Supprime une entrÃ©e Fichier **/
   DeleteEntryFile(current_image,current_entry);
 
   /** Ecrit le fichier **/
@@ -46,7 +46,7 @@ void DeleteProdosFile(struct prodos_image *current_image, char *prodos_file_path
 
 
 /******************************************************************/
-/*  DeleteEntryFile() :  Suppression d'une entrée Fichier Prodos. */
+/*  DeleteEntryFile() :  Suppression d'une entrÃ©e Fichier Prodos. */
 /******************************************************************/
 static void DeleteEntryFile(struct prodos_image *current_image, struct file_descriptive_entry *current_entry)
 {
@@ -60,20 +60,20 @@ static void DeleteEntryFile(struct prodos_image *current_image, struct file_desc
   /* Date actuelle */
   GetCurrentDate(&now_date,&now_time);
 
-  /* Nombre de block nécessaires pour stocker la table */
+  /* Nombre de block nÃ©cessaires pour stocker la table */
   nb_bitmap_block = GetContainerNumber(current_image->nb_block,BLOCK_SIZE*8);
 
   /**********************************************************/
-  /** On va supprimer cette entrée de la structure mémoire **/
+  /** On va supprimer cette entrÃ©e de la structure mÃ©moire **/
 
-  /* Supprime cette entrée de la liste des entrées */
+  /* Supprime cette entrÃ©e de la liste des entrÃ©es */
   my_Memory(MEMORY_REMOVE_ENTRY,current_entry,NULL);
 
-  /** Supprime cette entrée du Répertoire dans lequel elle est enregistrée **/
+  /** Supprime cette entrÃ©e du RÃ©pertoire dans lequel elle est enregistrÃ©e **/
   current_directory = current_entry->parent_directory;
   if(current_directory == NULL)
     {
-      /** L'entrée est à la racine du volume **/
+      /** L'entrÃ©e est Ã  la racine du volume **/
       UpdateEntryTable(UPDATE_REMOVE,&current_image->nb_file,&current_image->tab_file,current_entry);
 
       /** Last Modification date : Volume Header **/
@@ -82,7 +82,7 @@ static void DeleteEntryFile(struct prodos_image *current_image, struct file_desc
     }
   else
     {
-      /** L'entrée est dans un sous répertoire **/
+      /** L'entrÃ©e est dans un sous rÃ©pertoire **/
       UpdateEntryTable(UPDATE_REMOVE,&current_directory->nb_file,&current_directory->tab_file,current_entry);
 
       /** Last Modification date : Directory **/
@@ -90,7 +90,7 @@ static void DeleteEntryFile(struct prodos_image *current_image, struct file_desc
       GetProdosTime(now_time,&current_directory->file_modification_time);
     }
 
-  /** Marque les blocs occupés par le fichier comme libres **/
+  /** Marque les blocs occupÃ©s par le fichier comme libres **/
   for(i=0; i<current_entry->nb_used_block; i++)
     {
       block_number = current_entry->tab_used_block[i];
@@ -103,7 +103,7 @@ static void DeleteEntryFile(struct prodos_image *current_image, struct file_desc
   /** Directory Block **/
   GetBlockData(current_image,current_entry->block_location,&directory_block[0]);
 
-  /** Place les informations dans le Directory : Marque l'entrée comme supprimée **/
+  /** Place les informations dans le Directory : Marque l'entrÃ©e comme supprimÃ©e **/
   storage_type = 0x00;
   memcpy(&directory_block[current_entry->entry_offset+FILE_STORAGETYPE_OFFSET],&storage_type,sizeof(BYTE));
 
@@ -120,7 +120,7 @@ static void DeleteEntryFile(struct prodos_image *current_image, struct file_desc
       subdirectory_block = GetWordValue(&directory_block[0],0);
     }
 
-  /* Une entrée en moins dans ce Directory */
+  /* Une entrÃ©e en moins dans ce Directory */
   file_count = GetWordValue(&directory_block[0],DIRECTORY_FILECOUNT_OFFSET);
   if(file_count > 0)
     file_count--;
@@ -129,7 +129,7 @@ static void DeleteEntryFile(struct prodos_image *current_image, struct file_desc
   /* Modifie le block Sub-Directory */
   SetBlockData(current_image,current_block,&directory_block[0]);
 
-  /** Marque les blocs occupés par le fichier comme libres **/
+  /** Marque les blocs occupÃ©s par le fichier comme libres **/
   total_modified = 0;
   for(i=0; i<nb_bitmap_block; i++)
     {
@@ -137,7 +137,7 @@ static void DeleteEntryFile(struct prodos_image *current_image, struct file_desc
       GetBlockData(current_image,current_image->volume_header->bitmap_block+i,&bitmap_block[0]);
       modified = 0;
 
-      /** Passe en revue les blocs utilisés du fichier **/
+      /** Passe en revue les blocs utilisÃ©s du fichier **/
       for(j=0; j<current_entry->nb_used_block; j++)
         if((current_entry->tab_used_block[j] >= i*8*BLOCK_SIZE) && (current_entry->tab_used_block[j] < (i+1)*8*BLOCK_SIZE))
           {
@@ -160,7 +160,7 @@ static void DeleteEntryFile(struct prodos_image *current_image, struct file_desc
         break;
     }
 
-  /* Libération mémoire de la structure */
+  /* LibÃ©ration mÃ©moire de la structure */
   mem_free_entry(current_entry);
 }
 
@@ -183,10 +183,10 @@ void DeleteProdosFolder(struct prodos_image *current_image, char *prodos_folder_
       return;
     }
 
-  /** Supprime tous les fichiers (récursivité dans les sous-répertoires) **/
+  /** Supprime tous les fichiers (rÃ©cursivitÃ© dans les sous-rÃ©pertoires) **/
   nb_folder = EmptyEntryFolder(current_image,current_entry,1);
 
-  /** Construit la liste des répertoires à supprimer **/
+  /** Construit la liste des rÃ©pertoires Ã  supprimer **/
   tab_folder = (struct file_descriptive_entry **) calloc(nb_folder,sizeof(struct file_descriptive_entry *));
   if(tab_folder == NULL)
     {
@@ -202,11 +202,11 @@ void DeleteProdosFolder(struct prodos_image *current_image, char *prodos_folder_
     }
   qsort(tab_folder,nb_folder,sizeof(struct file_descriptive_entry *),compare_folder);
 
-  /** Supprime tous les Sous-répertoires vides, par ordre de niveau **/
+  /** Supprime tous les Sous-rÃ©pertoires vides, par ordre de niveau **/
   for(i=0; i<nb_folder; i++)
     DeleteEmptyFolder(current_image,tab_folder[i]);
 
-  /* Libération mémoire */
+  /* LibÃ©ration mÃ©moire */
   free(tab_folder);
 
   /** Ecrit le fichier **/
@@ -221,15 +221,15 @@ static int EmptyEntryFolder(struct prodos_image *current_image, struct file_desc
 {
   int i, nb_folder;
 
-  /* Marque ce répertoire comme devant être supprimé */
+  /* Marque ce rÃ©pertoire comme devant Ãªtre supprimÃ© */
   nb_folder = 1;
   current_entry->delete_folder_depth = depth;
 
-  /** Supprime tous les fichiers du réperoire **/
+  /** Supprime tous les fichiers du rÃ©peroire **/
   while(current_entry->nb_file > 0)
     DeleteEntryFile(current_image,current_entry->tab_file[0]);
 
-  /** Vide tous les sous-répertoires de leurs fichiers (récursivité) **/
+  /** Vide tous les sous-rÃ©pertoires de leurs fichiers (rÃ©cursivitÃ©) **/
   for(i=0; i<current_entry->nb_directory; i++)
     nb_folder += EmptyEntryFolder(current_image,current_entry->tab_directory[i],depth+1);
 
@@ -250,27 +250,27 @@ void DeleteEmptyFolder(struct prodos_image *current_image, struct file_descripti
   unsigned char directory_block[BLOCK_SIZE];
   unsigned char bitmap_block[BLOCK_SIZE];
 
-  /* On vérifie que le répertoire est vide */
+  /* On vÃ©rifie que le rÃ©pertoire est vide */
   if(current_entry->nb_file != 0 || current_entry->nb_directory != 0)
     return;
 
   /* Date actuelle */
   GetCurrentDate(&now_date,&now_time);
 
-  /* Nombre de block nécessaires pour stocker la table */
+  /* Nombre de block nÃ©cessaires pour stocker la table */
   nb_bitmap_block = GetContainerNumber(current_image->nb_block,BLOCK_SIZE*8);
 
   /**********************************************************/
-  /** On va supprimer cette entrée de la structure mémoire **/
+  /** On va supprimer cette entrÃ©e de la structure mÃ©moire **/
 
-  /* Supprime cette entrée de la liste des entrées */
+  /* Supprime cette entrÃ©e de la liste des entrÃ©es */
   my_Memory(MEMORY_REMOVE_DIRECTORY,current_entry,NULL);
 
-  /** Supprime cette entrée répertoire du Répertoire dans lequel elle est enregistrée **/
+  /** Supprime cette entrÃ©e rÃ©pertoire du RÃ©pertoire dans lequel elle est enregistrÃ©e **/
   current_directory = current_entry->parent_directory;
   if(current_directory == NULL)
     {
-      /** Le répertoire est à la racine du volume **/
+      /** Le rÃ©pertoire est Ã  la racine du volume **/
       UpdateEntryTable(UPDATE_REMOVE,&current_image->nb_directory,&current_image->tab_directory,current_entry);
 
       /** Last Modification date : Volume Header **/
@@ -279,7 +279,7 @@ void DeleteEmptyFolder(struct prodos_image *current_image, struct file_descripti
     }
   else
     {
-      /** Le répertoire est dans un sous répertoire **/
+      /** Le rÃ©pertoire est dans un sous rÃ©pertoire **/
       UpdateEntryTable(UPDATE_REMOVE,&current_directory->nb_directory,&current_directory->tab_directory,current_entry);
 
       /** Last Modification date : Directory **/
@@ -287,7 +287,7 @@ void DeleteEmptyFolder(struct prodos_image *current_image, struct file_descripti
       GetProdosTime(now_time,&current_directory->file_modification_time);
     }
 
-  /** Marque les blocs occupés par le répertoire comme libres **/
+  /** Marque les blocs occupÃ©s par le rÃ©pertoire comme libres **/
   for(i=0; i<current_entry->nb_used_block; i++)
     {
       block_number = current_entry->tab_used_block[i];
@@ -300,7 +300,7 @@ void DeleteEmptyFolder(struct prodos_image *current_image, struct file_descripti
   /** Directory Block **/
   GetBlockData(current_image,current_entry->block_location,&directory_block[0]);
 
-  /** Place les informations dans le Directory : Marque l'entrée comme supprimée **/
+  /** Place les informations dans le Directory : Marque l'entrÃ©e comme supprimÃ©e **/
   storage_type = 0x00;
   memcpy(&directory_block[current_entry->entry_offset+FILE_STORAGETYPE_OFFSET],&storage_type,sizeof(BYTE));
 
@@ -317,7 +317,7 @@ void DeleteEmptyFolder(struct prodos_image *current_image, struct file_descripti
       subdirectory_block = GetWordValue(&directory_block[0],0);
     }
 
-  /* Une entrée en moins dans ce Directory */
+  /* Une entrÃ©e en moins dans ce Directory */
   file_count = GetWordValue(&directory_block[0],DIRECTORY_FILECOUNT_OFFSET);
   if(file_count > 0)
     file_count--;
@@ -326,7 +326,7 @@ void DeleteEmptyFolder(struct prodos_image *current_image, struct file_descripti
   /* Modifie le block Sub-Directory */
   SetBlockData(current_image,current_block,&directory_block[0]);
 
-  /** Marque les blocs occupés par le répertoire comme libres **/
+  /** Marque les blocs occupÃ©s par le rÃ©pertoire comme libres **/
   total_modified = 0;
   for(i=0; i<nb_bitmap_block; i++)
     {
@@ -334,7 +334,7 @@ void DeleteEmptyFolder(struct prodos_image *current_image, struct file_descripti
       GetBlockData(current_image,current_image->volume_header->bitmap_block+i,&bitmap_block[0]);
       modified = 0;
 
-      /** Passe en revue les blocs utilisés du répertoire **/
+      /** Passe en revue les blocs utilisÃ©s du rÃ©pertoire **/
       for(j=0; j<current_entry->nb_used_block; j++)
         if((current_entry->tab_used_block[j] >= i*8*BLOCK_SIZE) && (current_entry->tab_used_block[j] < (i+1)*8*BLOCK_SIZE))
           {
@@ -357,7 +357,7 @@ void DeleteEmptyFolder(struct prodos_image *current_image, struct file_descripti
         break;
     }
 
-  /* Libération mémoire de la structure */
+  /* LibÃ©ration mÃ©moire de la structure */
   mem_free_entry(current_entry);
 }
 
@@ -376,23 +376,23 @@ void DeleteProdosVolume(struct prodos_image *current_image)
   /* Date actuelle */
   GetCurrentDate(&now_date,&now_time);
 
-  /* Nombre de block nécessaires pour stocker la table */
+  /* Nombre de block nÃ©cessaires pour stocker la table */
   nb_bitmap_block = GetContainerNumber(current_image->nb_block,BLOCK_SIZE*8);
 
   /************************************************************/
-  /** On va supprimer tous les fichiers la structure mémoire **/
-  /* Plus de fichier à la racine */
+  /** On va supprimer tous les fichiers la structure mÃ©moire **/
+  /* Plus de fichier Ã  la racine */
   current_image->nb_file = 0;
   if(current_image->tab_file)
     free(current_image->tab_file);
   current_image->tab_file = NULL;
-  /* Plus de fichier à la racine */
+  /* Plus de fichier Ã  la racine */
   current_image->nb_directory = 0;
   if(current_image->tab_directory)
     free(current_image->tab_directory);
   current_image->tab_directory = NULL;
 
-  /* Libération mémoire : Plus de fichiers nul part */
+  /* LibÃ©ration mÃ©moire : Plus de fichiers nul part */
   my_Memory(MEMORY_FREE_DIRECTORY,NULL,NULL);
   my_Memory(MEMORY_FREE_ENTRY,NULL,NULL);
 
@@ -418,7 +418,7 @@ void DeleteProdosVolume(struct prodos_image *current_image)
       if(i == 0)
         {
           /** Volume Header **/
-          /* Nombre d'entrées */
+          /* Nombre d'entrÃ©es */
           nb_entry = 0;
           memcpy(&volume_block[VOLUME_FILECOUNT_OFFSET],&nb_entry,sizeof(WORD));
 
@@ -426,7 +426,7 @@ void DeleteProdosVolume(struct prodos_image *current_image)
           memcpy(&volume_block[VOLUME_DATEMODIF_OFFSET],&now_date,sizeof(WORD));
           memcpy(&volume_block[VOLUME_TIMEMODIF_OFFSET],&now_time,sizeof(WORD));
 
-          /** Entrées Suivantes **/
+          /** EntrÃ©es Suivantes **/
           memset(&volume_block[4+0x27],0,BLOCK_SIZE-(4+0x27));
         }
       else
@@ -441,10 +441,10 @@ void DeleteProdosVolume(struct prodos_image *current_image)
   block_number = current_image->volume_header->bitmap_block;
   for(i=0; i<nb_bitmap_block; i++)
     {
-      /* Récupère le block */
+      /* RÃ©cupÃ¨re le block */
       GetBlockData(current_image,block_number+i,&bitmap_block[0]);
 
-      /* Nettoyage préliminaire */
+      /* Nettoyage prÃ©liminaire */
       memset(bitmap_block,0,BLOCK_SIZE);
 
       /* Marque les bloc libres */
@@ -476,7 +476,7 @@ static int compare_folder(const void *data_1, const void *data_2)
   struct file_descriptive_entry *entry_1;
   struct file_descriptive_entry *entry_2;
 
-  /* Récupération des paramètres */
+  /* RÃ©cupÃ©ration des paramÃ¨tres */
   entry_1 = *((struct file_descriptive_entry **) data_1);
   entry_2 = *((struct file_descriptive_entry **) data_2);
 
