@@ -66,52 +66,51 @@ void my_DeleteFile(char *file_path)
  */
 int GetFolderFiles(char *folder_path, char *hierarchy)
 {
+  #if IS_WINDOWS
+  return GetFolderFiles_Win32(folder_path, hierarchy);
+  #endif
+
   int error = 0;
   if (folder_path == NULL || strlen(folder_path) == 0) return(0);
 
-  #if IS_WINDOWS
-    error = 1;
-  // rewrite the other code
-  #else
-    DIR *dirstream = opendir(folder_path);
-    if (dirstream == NULL) return(1);
+  DIR *dirstream = opendir(folder_path);
+  if (dirstream == NULL) return(1);
 
-    while(dirstream != NULL) {
-      dirent *entry = readdir(dirstream);
+  while(dirstream != NULL) {
+    struct dirent *entry = readdir(dirstream);
 
-      // If we encounter a directory other than .,..
-      // recurse upon it.
-      if (entry->d_type == DT_DIR) {
-        if (entry->d_name == "." || entry->d_name == "..") {
-          continue;
-        }
-
-        error = GetFolderFiles(folder_path, hierarchy);
-        if (error) break;
+    // If we encounter a directory other than .,..
+    // recurse upon it.
+    if (entry->d_type == DT_DIR) {
+      if (entry->d_name == "." || entry->d_name == "..") {
+        continue;
       }
-      else {
-        char *heap_path = calloc(num, sizeof(folder_path));
-        strcpy(heap_path, folder_path);
 
-        // Most POSIX filename limits are 255 bytes.
-        char *heap_path_filename = calloc(num, sizeof(folder_path) + 255);
-        strcpy(heap_path_filename, heap_path);
+      error = GetFolderFiles(folder_path, hierarchy);
+      if (error) break;
+    }
+    else {
+      char *heap_path = calloc(1, sizeof(folder_path));
+      strcpy(heap_path, folder_path);
 
-        // If there's no trailing dir slash, we append it, and a glob
-        // (but no longer check for the Win-style terminator)
-        char last_char = heap_path[strlen(heap_path) - 1];
-        if (last_char != '/') strcat(heap_path, FOLDER_CHARACTER);
-        strcat(heap_path, "*.*");
+      // Most POSIX filename limits are 255 bytes.
+      char *heap_path_filename = calloc(1, sizeof(folder_path) + 255);
+      strcpy(heap_path_filename, heap_path);
 
-        // Append the filename to the path we copied earlier
-        strcat(heap_path_filename, entry->d_name);
+      // If there's no trailing dir slash, we append it, and a glob
+      // (but no longer check for the Win-style terminator)
+      char last_char = heap_path[strlen(heap_path) - 1];
+      if (last_char != '/') strcat(heap_path, FOLDER_CHARACTER);
+      strcat(heap_path, "*.*");
 
-        if (MatchHierarchie(heap_path_filename, hierarchy)){
-          my_Memory(MEMORY_ADD_FILE, heap_path_filename);
-        }
+      // Append the filename to the path we copied earlier
+      strcat(heap_path_filename, entry->d_name);
+
+      if (MatchHierarchie(heap_path_filename, hierarchy)){
+        my_Memory(MEMORY_ADD_FILE, heap_path_filename, NULL);
       }
     }
-  #endif
+  }
 
   return error;
 }
@@ -120,8 +119,9 @@ int GetFolderFiles(char *folder_path, char *hierarchy)
 /********************************************************************/
 /*  GetFolderFiles() :  Récupère tous les fichiers d'un répertoire. */
 /********************************************************************/
-int GetFolderFiles(char *folder_path, char *hierarchy)
+int GetFolderFiles_Win32(char *folder_path, char *hierarchy)
 {
+#if IS_WINDOWS
   int error, rc;
   long hFile;
   int first_time = 1;
@@ -158,9 +158,9 @@ int GetFolderFiles(char *folder_path, char *hierarchy)
         rc = _findnext(hFile,&c_file);
 
         /* On analyse le résultat */
-    	if(rc == -1)
+      if(rc == -1)
           break;    /* no more files */
- 
+
       /** On traite cette entrée **/
       first_time++;
       strcpy(buffer_file_path,folder_path);
@@ -196,6 +196,7 @@ int GetFolderFiles(char *folder_path, char *hierarchy)
   free(buffer_file_path);
 
   return(error);
+#endif
 }
 
 
@@ -396,6 +397,8 @@ void my_SetFileAttribute(char *file_path, int flag)
       if((file_attributes | FILE_ATTRIBUTE_HIDDEN) != file_attributes)
         SetFileAttributes(file_path,file_attributes | FILE_ATTRIBUTE_HIDDEN);
     }
+#else
+  return;
 #endif
 }
 

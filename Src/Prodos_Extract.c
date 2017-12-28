@@ -9,10 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-// OS X (and everything else) should get this from stdlib.h?
-#if !defined(__APPLE__) && !defined(__MACH__)
 #include <malloc.h>
-#endif
 
 #include "Dc_Shared.h"
 #include "Dc_Prodos.h"
@@ -336,7 +333,7 @@ static int CreateOutputFile(struct prodos_file *current_file, char *output_direc
 
 
 /********************************************************************/
-/*  SetFileInformation() :  Place les informations dans un fichier. */ 
+/*  SetFileInformation() :  Place les informations dans un fichier. */
 /********************************************************************/
 static void SetFileInformation(char *file_information_path, struct prodos_file *current_file)
 {
@@ -348,7 +345,7 @@ static void SetFileInformation(char *file_information_path, struct prodos_file *
   char local_buffer[1024];
   char folder_info1[256];
   char folder_info2[256];
-  
+
   /* Folder Info */
   for(i=0; i<18; i++)
     {
@@ -369,12 +366,12 @@ static void SetFileInformation(char *file_information_path, struct prodos_file *
       CreateBinaryFile(file_information_path,(unsigned char *)local_buffer,(int)strlen(local_buffer));
 
       /* Rendre le fichier invisible */
-      my_SetFileAttribute(file_information_path,SET_FILE_HIDDEN);
+//      my_SetFileAttribute(file_information_path,SET_FILE_HIDDEN);
       return;
     }
 
   /* Rendre le fichier visible */
-  my_SetFileAttribute(file_information_path,SET_FILE_VISIBLE);
+//  my_SetFileAttribute(file_information_path,SET_FILE_VISIBLE);
 
   /** Création du fichier **/
   fd = fopen(file_information_path,"w");
@@ -400,7 +397,7 @@ static void SetFileInformation(char *file_information_path, struct prodos_file *
       if(my_stricmp(file_name,current_file->entry->file_name_case))
         fprintf(fd,"%s\n",line_tab[i]);
     }
-        
+
   /* Nouvelle ligne */
   fprintf(fd,"%s\n",local_buffer);
 
@@ -411,7 +408,7 @@ static void SetFileInformation(char *file_information_path, struct prodos_file *
   mem_free_list(nb_line,line_tab);
 
   /* Rendre le fichier invisible */
-  my_SetFileAttribute(file_information_path,SET_FILE_HIDDEN);
+//  my_SetFileAttribute(file_information_path,SET_FILE_HIDDEN);
 }
 
 /***********************************************************************/

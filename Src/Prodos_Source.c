@@ -16,7 +16,7 @@
 
 #include "Dc_Shared.h"
 #include "Dc_OS.h"
-#include "Prodos_source.h"
+#include "Prodos_Source.h"
 
 #define TYPE_LINE_CODE    1
 #define TYPE_LINE_COMMENT 2

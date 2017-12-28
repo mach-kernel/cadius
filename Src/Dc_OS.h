@@ -20,7 +20,10 @@
 #endif
 
 void my_DeleteFile(char *);
+
 int GetFolderFiles(char *,char *);
+int GetFolderFiles_Win32(char*, char*);
+
 int my_CreateDirectory(char *);
 void my_SetFileCreationModificationDate(char *,struct file_descriptive_entry *);
 void my_GetFileCreationModificationDate(char *,struct prodos_file *);
