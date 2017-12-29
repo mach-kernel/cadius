@@ -9,8 +9,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-// OS X (and everything else) should get this from stdlib.h?
-#if !defined(__APPLE__) && !defined(__MACH__)
+
+#if IS_WINDOWS
 #include <malloc.h>
 #endif
 
@@ -303,8 +303,13 @@ static int CreateOutputFile(struct prodos_file *current_file, char *output_direc
   /** Ajustement des Dates **/
   my_SetFileCreationModificationDate(file_data_path,current_file->entry);
 
+  #if IS_WINDOWS
   /** Change la visibilité du fichier **/
-  my_SetFileAttribute(file_data_path,((current_file->entry->access&0x04)==0x04)?SET_FILE_HIDDEN:SET_FILE_VISIBLE);
+  my_SetFileAttribute(
+    file_data_path,
+    ((current_file->entry->access & 0x04) == 0x04) ? SET_FILE_HIDDEN : SET_FILE_VISIBLE
+  );
+  #endif
 
   /** Ajoute des informations du fichier dans le fichier FileInformation.txt **/
   strcpy(file_information_path,directory_path);
@@ -326,8 +331,13 @@ static int CreateOutputFile(struct prodos_file *current_file, char *output_direc
       /** Ajustement des Dates **/
       my_SetFileCreationModificationDate(file_resource_path,current_file->entry);
 
+      #if IS_WINDOWS
       /** Change la visibilité du fichier **/
-      my_SetFileAttribute(file_resource_path,((current_file->entry->access&0x04)==0x04)?SET_FILE_HIDDEN:SET_FILE_VISIBLE);
+      my_SetFileAttribute(
+        file_resource_path,
+        ((current_file->entry->access & 0x04) == 0x04) ? SET_FILE_HIDDEN : SET_FILE_VISIBLE
+      );
+      #endif
     }
 
   /* OK */
@@ -336,7 +346,7 @@ static int CreateOutputFile(struct prodos_file *current_file, char *output_direc
 
 
 /********************************************************************/
-/*  SetFileInformation() :  Place les informations dans un fichier. */ 
+/*  SetFileInformation() :  Place les informations dans un fichier. */
 /********************************************************************/
 static void SetFileInformation(char *file_information_path, struct prodos_file *current_file)
 {
@@ -348,7 +358,7 @@ static void SetFileInformation(char *file_information_path, struct prodos_file *
   char local_buffer[1024];
   char folder_info1[256];
   char folder_info2[256];
-  
+
   /* Folder Info */
   for(i=0; i<18; i++)
     {
@@ -368,13 +378,17 @@ static void SetFileInformation(char *file_information_path, struct prodos_file *
       /* Créer le fichier FileInformation */
       CreateBinaryFile(file_information_path,(unsigned char *)local_buffer,(int)strlen(local_buffer));
 
+      #if IS_WINDOWS
       /* Rendre le fichier invisible */
-      my_SetFileAttribute(file_information_path,SET_FILE_HIDDEN);
+      my_SetFileAttribute(file_information_path, SET_FILE_HIDDEN);
       return;
+      #endif
     }
 
+  #if IS_WINDOWS
   /* Rendre le fichier visible */
-  my_SetFileAttribute(file_information_path,SET_FILE_VISIBLE);
+  my_SetFileAttribute(file_information_path, SET_FILE_VISIBLE);
+  #endif
 
   /** Création du fichier **/
   fd = fopen(file_information_path,"w");
@@ -400,7 +414,7 @@ static void SetFileInformation(char *file_information_path, struct prodos_file *
       if(my_stricmp(file_name,current_file->entry->file_name_case))
         fprintf(fd,"%s\n",line_tab[i]);
     }
-        
+
   /* Nouvelle ligne */
   fprintf(fd,"%s\n",local_buffer);
 
@@ -411,7 +425,9 @@ static void SetFileInformation(char *file_information_path, struct prodos_file *
   mem_free_list(nb_line,line_tab);
 
   /* Rendre le fichier invisible */
-  my_SetFileAttribute(file_information_path,SET_FILE_HIDDEN);
+  #if IS_WINDOWS
+  my_SetFileAttribute(file_information_path, SET_FILE_HIDDEN);
+  #endif
 }
 
 /***********************************************************************/

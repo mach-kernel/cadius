@@ -9,14 +9,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-// OS X (and everything else) should get this from stdlib.h?
-#if !defined(__APPLE__) && !defined(__MACH__)
+
+#if IS_WINDOWS
 #include <malloc.h>
 #endif
 
 #include "Dc_Shared.h"
 #include "Dc_OS.h"
-#include "Prodos_source.h"
+#include "Prodos_Source.h"
 
 #define TYPE_LINE_CODE    1
 #define TYPE_LINE_COMMENT 2

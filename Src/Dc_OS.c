@@ -8,28 +8,26 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-// OS X (and everything else) should get this from stdlib.h?
-#if !defined(__APPLE__) && !defined(__MACH__)
-#include <malloc.h>
+
+#if IS_WINDOWS
+  #include <malloc.h>
+  #include <io.h>
+  #include <direct.h>
+  #include <windows.h>
+#else
+  #include <dirent.h>
+
+  #if IS_LINUX
+  #include <strings.h>
+  #endif
 #endif
+
 #include <string.h>
-#ifdef LINUX
-#include <strings.h>
-#endif
-#if defined(WIN32) || defined(WIN64)
-#include <io.h>
-#include <direct.h>
-#endif
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/timeb.h>
-
 #include <errno.h>
-
-#if defined(WIN32) || defined(WIN64)
-#include <windows.h>
-#endif
 
 #include "Dc_Shared.h"
 #include "Dc_Prodos.h"
@@ -54,12 +52,80 @@ void my_DeleteFile(char *file_path)
   unlink(file_path);
 }
 
+/**
+ * Appears to be invoked via char **BuildFileList(), which is then
+ * used for things like the CLI set high bit or indent actions.
+ *
+ * Heap allocs the path and then inserts it into a singleton store
+ * via my_Memory.
+ *
+ * @brief GetFolderFiles Query OS and load path structure into store
+ * @param folder_path
+ * @param hierarchy
+ * @return
+ */
+int GetFolderFiles(char *folder_path, char *hierarchy)
+{
+  #if IS_WINDOWS
+  return GetFolderFiles_Win32(folder_path, hierarchy);
+  #endif
+
+  int error = 0;
+  if (folder_path == NULL || strlen(folder_path) == 0) return(0);
+
+  DIR *dirstream = opendir(folder_path);
+  if (dirstream == NULL) return(1);
+
+  while(dirstream != NULL) {
+    struct dirent *entry = readdir(dirstream);
+    if (entry == NULL) break;
+
+    // +1 for \0
+    char *heap_path = calloc(1, strlen(folder_path) + 1);
+    strcpy(heap_path, folder_path);
+
+    // If there's no trailing dir slash, we append it, and a glob
+    // (but no longer check for the Win-style terminator)
+    char last_char = heap_path[strlen(heap_path) - 1];
+    if (last_char != '/') strcat(heap_path, FOLDER_CHARACTER);
+
+    // Most POSIX filename limits are 255 bytes.
+    char *heap_path_filename = calloc(1, strlen(folder_path) + 256);
+    strcpy(heap_path_filename, heap_path);
+
+    // Append the filename to the path we copied earlier
+    strcat(heap_path_filename, entry->d_name);
+
+    // POSIX only guarantees that you'll have d_name,
+    // so we're going to use the S_ISREG macro which is more reliable
+    struct stat dirent_stat;
+    int staterr = stat(heap_path_filename, &dirent_stat);
+    if (staterr) return(staterr);
+
+    if (S_ISREG(dirent_stat.st_mode)) {
+      if (MatchHierarchie(heap_path_filename, hierarchy)){
+        my_Memory(MEMORY_ADD_FILE, heap_path_filename, NULL);
+      }
+    }
+    else if (S_ISDIR(dirent_stat.st_mode)) {
+      if (!my_stricmp(entry->d_name, ".") || !my_stricmp(entry->d_name, "..")) {
+        continue;
+      }
+
+      error = GetFolderFiles(heap_path_filename, hierarchy);
+      if (error) break;
+    }
+  }
+
+  return error;
+}
 
 /********************************************************************/
 /*  GetFolderFiles() :  Récupère tous les fichiers d'un répertoire. */
 /********************************************************************/
-int GetFolderFiles(char *folder_path, char *hierarchy)
+int GetFolderFiles_Win32(char *folder_path, char *hierarchy)
 {
+#if IS_WINDOWS
   int error, rc;
   long hFile;
   int first_time = 1;
@@ -96,9 +162,9 @@ int GetFolderFiles(char *folder_path, char *hierarchy)
         rc = _findnext(hFile,&c_file);
 
         /* On analyse le résultat */
-    	if(rc == -1)
+      if(rc == -1)
           break;    /* no more files */
- 
+
       /** On traite cette entrée **/
       first_time++;
       strcpy(buffer_file_path,folder_path);
@@ -134,6 +200,7 @@ int GetFolderFiles(char *folder_path, char *hierarchy)
   free(buffer_file_path);
 
   return(error);
+#endif
 }
 
 
@@ -168,13 +235,12 @@ int my_CreateDirectory(char *directory)
   
   /* On veut savoir si le ce repertoire existe et on verifie qu'on a un repertoire */
   if(stat(buffer,&sts))
-    mkdir(buffer);
+    my_mkdir(buffer);
   else if(!S_ISDIR(sts.st_mode))
     return(1);
 
   return(0);
 }
-
 
 /******************************************************/
 /*  MakeAllDir() :  Creation d'un nouveau répertoire  */
@@ -192,7 +258,7 @@ static int MakeAllDir(char *newdir)
   if(buffer[len-1] == '/' || buffer[len-1] == '\\')
     buffer[len-1] = '\0';
 
-  if(mkdir(buffer) == 0)
+  if(my_mkdir(buffer) == 0)
     return(1);
 
   p = buffer+1;
@@ -204,7 +270,7 @@ static int MakeAllDir(char *newdir)
         p++;
       hold = *p;
       *p = 0;
-      if((mkdir(buffer) == -1) && (errno == ENOENT))
+      if((my_mkdir(buffer) == -1) && (errno == ENOENT))
         return(0);
       if(hold == 0)
         break;
@@ -216,11 +282,11 @@ static int MakeAllDir(char *newdir)
 
 
 /**********************************************************************************************/
-/*  my_SetFileCreationModificationDate() :  Positionne les dates de Création et Modification. */
+/* SetFileCreationModificationDate() :  Positionne les dates de Création et Modification. */
 /**********************************************************************************************/
 void my_SetFileCreationModificationDate(char *file_data_path, struct file_descriptive_entry *current_entry)
 {
-#if defined(WIN32) || defined(WIN64)
+#if IS_WINDOWS
   BOOL result;
   HANDLE fd;
   SYSTEMTIME system_date;
@@ -271,7 +337,7 @@ void my_SetFileCreationModificationDate(char *file_data_path, struct file_descri
 /********************************************************************************************/
 void my_GetFileCreationModificationDate(char *file_data_path, struct prodos_file *current_file)
 {
-#if defined(WIN32) || defined(WIN64)
+#if IS_WINDOWS
   BOOL result;
   HANDLE fd;
   SYSTEMTIME system_utc;
@@ -310,41 +376,64 @@ void my_GetFileCreationModificationDate(char *file_data_path, struct prodos_file
 #endif
 }
 
-
-/****************************************************************/
-/*  my_SetFileAttribute() :  Change la visibilité d'un fichier. */
-/****************************************************************/
+/**
+ * Only applies to the Win32 API, you could ostensibly do this
+ * by invoking rename() to make it a dotfile but that is silly.
+ *
+ * @brief my_SetFileAttribute Win32 toggle hidden file header for path
+ * @param file_path Path
+ * @param flag Either SET_FILE_VISIBLE or SET_FILE_HIDDEN
+ */
 void my_SetFileAttribute(char *file_path, int flag)
 {
-#if defined(WIN32) || defined(WIN64)
-  DWORD file_attributes;
+  #if IS_WINDOWS
+    DWORD file_attributes;
 
-  /* Attributs du fichier */
-  file_attributes = GetFileAttributes(file_path);
+    /* Attributs du fichier */
+    file_attributes = GetFileAttributes(file_path);
 
-  /* Change la visibilité */
-  if(flag == SET_FILE_VISIBLE)
-    {
-      /* Montre le fichier */
-      if((file_attributes | FILE_ATTRIBUTE_HIDDEN) == file_attributes)
-        SetFileAttributes(file_path,file_attributes - FILE_ATTRIBUTE_HIDDEN);
-    }
-  else if(flag == SET_FILE_HIDDEN)
-    {
-      /* Cache le fichier */
-      if((file_attributes | FILE_ATTRIBUTE_HIDDEN) != file_attributes)
-        SetFileAttributes(file_path,file_attributes | FILE_ATTRIBUTE_HIDDEN);
-    }
-#endif
+    /* Change la visibilité */
+    if(flag == SET_FILE_VISIBLE)
+      {
+        /* Montre le fichier */
+        if((file_attributes | FILE_ATTRIBUTE_HIDDEN) == file_attributes)
+          SetFileAttributes(file_path,file_attributes - FILE_ATTRIBUTE_HIDDEN);
+      }
+    else if(flag == SET_FILE_HIDDEN)
+      {
+        /* Cache le fichier */
+        if((file_attributes | FILE_ATTRIBUTE_HIDDEN) != file_attributes)
+          SetFileAttributes(file_path,file_attributes | FILE_ATTRIBUTE_HIDDEN);
+      }
+  #endif
 }
 
+/**
+ * Creates a directory. The POSIX compliant one requires a mask,
+ * but the Win32 one does not.
+ *
+ * FWIW, the Win32 POSIX mkdir has been deprecated so we use _mkdir
+ * from direct.h (https://msdn.microsoft.com/en-us/library/2fkk4dzw.aspx)
+ *
+ * @param char *path
+ * @return
+ */
+int my_mkdir(char *path) {
+  #if IS_WINDOWS
+    return _mkdir(path);
+  #else
+    // For all visible flags if you wish to customize the behavior
+    // http://pubs.opengroup.org/onlinepubs/7908799/xsh/sysstat.h.html
+    return mkdir(path, S_IRWXU);
+  #endif
+}
 
 /*********************************************************/
 /*  my_stricmp() :  Comparaison de chaine sans la casse. */
 /*********************************************************/
 int my_stricmp(char *string1, char *string2)
 {
-#if defined(WIN32) || defined(WIN64)
+#if IS_WINDOWS
   return(stricmp(string1,string2));
 #else
   return(strcasecmp(string1,string2));
@@ -357,7 +446,7 @@ int my_stricmp(char *string1, char *string2)
 /**********************************************************/
 int my_strnicmp(char *string1, char *string2, size_t length)
 {
-#if defined(WIN32) || defined(WIN64)
+#if IS_WINDOWS
   return(strnicmp(string1,string2,length));
 #else
   return(strncasecmp(string1,string2,length));
