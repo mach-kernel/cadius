@@ -16,6 +16,7 @@
   #include <windows.h>
 #else
   #include <dirent.h>
+  #include <sys/stat.h>
 
   #if IS_LINUX
     #include <strings.h>
@@ -372,44 +373,56 @@ void my_GetFileCreationModificationDate(char *file_data_path, struct prodos_file
 #endif
 }
 
-
-/****************************************************************/
-/*  my_SetFileAttribute() :  Change la visibilité d'un fichier. */
-/****************************************************************/
+/**
+ * Only applies to the Win32 API, you could ostensibly do this
+ * by invoking rename() to make it a dotfile but that is silly.
+ *
+ * @brief my_SetFileAttribute Win32 toggle hidden file header for path
+ * @param file_path Path
+ * @param flag Either SET_FILE_VISIBLE or SET_FILE_HIDDEN
+ */
 void my_SetFileAttribute(char *file_path, int flag)
 {
-#if IS_WINDOWS
-  DWORD file_attributes;
+  #if IS_WINDOWS
+    DWORD file_attributes;
 
-  /* Attributs du fichier */
-  file_attributes = GetFileAttributes(file_path);
+    /* Attributs du fichier */
+    file_attributes = GetFileAttributes(file_path);
 
-  /* Change la visibilité */
-  if(flag == SET_FILE_VISIBLE)
-    {
-      /* Montre le fichier */
-      if((file_attributes | FILE_ATTRIBUTE_HIDDEN) == file_attributes)
-        SetFileAttributes(file_path,file_attributes - FILE_ATTRIBUTE_HIDDEN);
-    }
-  else if(flag == SET_FILE_HIDDEN)
-    {
-      /* Cache le fichier */
-      if((file_attributes | FILE_ATTRIBUTE_HIDDEN) != file_attributes)
-        SetFileAttributes(file_path,file_attributes | FILE_ATTRIBUTE_HIDDEN);
-    }
-#else
-  return;
-#endif
+    /* Change la visibilité */
+    if(flag == SET_FILE_VISIBLE)
+      {
+        /* Montre le fichier */
+        if((file_attributes | FILE_ATTRIBUTE_HIDDEN) == file_attributes)
+          SetFileAttributes(file_path,file_attributes - FILE_ATTRIBUTE_HIDDEN);
+      }
+    else if(flag == SET_FILE_HIDDEN)
+      {
+        /* Cache le fichier */
+        if((file_attributes | FILE_ATTRIBUTE_HIDDEN) != file_attributes)
+          SetFileAttributes(file_path,file_attributes | FILE_ATTRIBUTE_HIDDEN);
+      }
+  #endif
 }
 
 /**
- * Creates a directory
+ * Creates a directory. The POSIX compliant one requires a mask,
+ * but the Win32 one does not.
  *
- * @param buf An arbitrary buffer
+ * FWIW, the Win32 POSIX mkdir has been deprecated so we use _mkdir
+ * from direct.h (https://msdn.microsoft.com/en-us/library/2fkk4dzw.aspx)
+ *
+ * @param char *path
  * @return
  */
-int my_mkdir(char *buf) {
-  return -1;
+int my_mkdir(char *path) {
+  #if IS_WINDOWS
+    return _mkdir(path);
+  #else
+    // For all visible flags if you wish to customize the behavior
+    // http://pubs.opengroup.org/onlinepubs/7908799/xsh/sysstat.h.html
+    return mkdir(path, S_IRWXU);
+  #endif
 }
 
 /*********************************************************/

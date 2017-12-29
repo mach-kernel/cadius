@@ -9,7 +9,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <malloc.h>
+
+#if IS_WINDOWS
+  #include <malloc.h>
+#endif
 
 #include "Dc_Shared.h"
 #include "Dc_Prodos.h"
@@ -301,7 +304,10 @@ static int CreateOutputFile(struct prodos_file *current_file, char *output_direc
   my_SetFileCreationModificationDate(file_data_path,current_file->entry);
 
   /** Change la visibilité du fichier **/
-  my_SetFileAttribute(file_data_path,((current_file->entry->access&0x04)==0x04)?SET_FILE_HIDDEN:SET_FILE_VISIBLE);
+  my_SetFileAttribute(
+    file_data_path,
+    ((current_file->entry->access & 0x04) == 0x04) ? SET_FILE_HIDDEN : SET_FILE_VISIBLE
+  );
 
   /** Ajoute des informations du fichier dans le fichier FileInformation.txt **/
   strcpy(file_information_path,directory_path);
@@ -324,7 +330,10 @@ static int CreateOutputFile(struct prodos_file *current_file, char *output_direc
       my_SetFileCreationModificationDate(file_resource_path,current_file->entry);
 
       /** Change la visibilité du fichier **/
-      my_SetFileAttribute(file_resource_path,((current_file->entry->access&0x04)==0x04)?SET_FILE_HIDDEN:SET_FILE_VISIBLE);
+      my_SetFileAttribute(
+        file_resource_path,
+        ((current_file->entry->access & 0x04) == 0x04) ? SET_FILE_HIDDEN : SET_FILE_VISIBLE
+      );
     }
 
   /* OK */
@@ -365,13 +374,15 @@ static void SetFileInformation(char *file_information_path, struct prodos_file *
       /* Créer le fichier FileInformation */
       CreateBinaryFile(file_information_path,(unsigned char *)local_buffer,(int)strlen(local_buffer));
 
-      /* Rendre le fichier invisible */
-//      my_SetFileAttribute(file_information_path,SET_FILE_HIDDEN);
-      return;
+      #if IS_WINDOWS
+        /* Rendre le fichier invisible */
+        my_SetFileAttribute(file_information_path, SET_FILE_HIDDEN);
+        return;
+      #endif
     }
 
   /* Rendre le fichier visible */
-//  my_SetFileAttribute(file_information_path,SET_FILE_VISIBLE);
+  my_SetFileAttribute(file_information_path, SET_FILE_VISIBLE);
 
   /** Création du fichier **/
   fd = fopen(file_information_path,"w");
@@ -408,7 +419,9 @@ static void SetFileInformation(char *file_information_path, struct prodos_file *
   mem_free_list(nb_line,line_tab);
 
   /* Rendre le fichier invisible */
-//  my_SetFileAttribute(file_information_path,SET_FILE_HIDDEN);
+  #if IS_WINDOWS
+    my_SetFileAttribute(file_information_path, SET_FILE_HIDDEN);
+  #endif
 }
 
 /***********************************************************************/
