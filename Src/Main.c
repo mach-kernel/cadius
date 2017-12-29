@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
   verbose = 0;
 
   /* Message Information */
-  printf("%s v 1.1, (c) Brutal Deluxe 2011-2013.\n",argv[0]);
+  printf("%s v 1.2-b1, (c) Brutal Deluxe 2011-2013.\n",argv[0]);
 
   /* Vérification des paramètres */
   if(argc < 3)

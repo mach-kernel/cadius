@@ -95,10 +95,9 @@ int GetFolderFiles(char *folder_path, char *hierarchy)
 
     // Append the filename to the path we copied earlier
     strcat(heap_path_filename, entry->d_name);
-    printf("\t Found file: %s\n", entry->d_name);
 
     // POSIX only guarantees that you'll have d_name,
-    // so we're going to use the S_ISREG macro
+    // so we're going to use the S_ISREG macro which is more reliable
     struct stat dirent_stat;
     int staterr = stat(heap_path_filename, &dirent_stat);
     if (staterr) return(staterr);
