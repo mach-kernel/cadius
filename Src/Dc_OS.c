@@ -18,7 +18,7 @@
   #include <dirent.h>
 
   #if IS_LINUX
-    #include <strings.h>
+  #include <strings.h>
   #endif
 #endif
 

@@ -11,7 +11,7 @@
 #include <string.h>
 
 #if IS_WINDOWS
-  #include <malloc.h>
+#include <malloc.h>
 #endif
 
 #include "Dc_Shared.h"
