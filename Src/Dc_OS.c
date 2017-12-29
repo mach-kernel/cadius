@@ -16,7 +16,6 @@
   #include <windows.h>
 #else
   #include <dirent.h>
-  #include <sys/stat.h>
 
   #if IS_LINUX
     #include <strings.h>
@@ -79,43 +78,48 @@ int GetFolderFiles(char *folder_path, char *hierarchy)
 
   while(dirstream != NULL) {
     struct dirent *entry = readdir(dirstream);
+    if (entry == NULL) break;
 
-    // If we encounter a directory other than .,..
-    // recurse upon it.
-    if (entry->d_type == DT_DIR) {
-      if (entry->d_name == "." || entry->d_name == "..") {
-        continue;
-      }
+    // +1 for \0
+    char *heap_path = calloc(1, strlen(folder_path) + 1);
+    strcpy(heap_path, folder_path);
 
-      error = GetFolderFiles(folder_path, hierarchy);
-      if (error) break;
-    }
-    else {
-      char *heap_path = calloc(1, sizeof(folder_path));
-      strcpy(heap_path, folder_path);
+    // If there's no trailing dir slash, we append it, and a glob
+    // (but no longer check for the Win-style terminator)
+    char last_char = heap_path[strlen(heap_path) - 1];
+    if (last_char != '/') strcat(heap_path, FOLDER_CHARACTER);
 
-      // Most POSIX filename limits are 255 bytes.
-      char *heap_path_filename = calloc(1, sizeof(folder_path) + 255);
-      strcpy(heap_path_filename, heap_path);
+    // Most POSIX filename limits are 255 bytes.
+    char *heap_path_filename = calloc(1, strlen(folder_path) + 256);
+    strcpy(heap_path_filename, heap_path);
 
-      // If there's no trailing dir slash, we append it, and a glob
-      // (but no longer check for the Win-style terminator)
-      char last_char = heap_path[strlen(heap_path) - 1];
-      if (last_char != '/') strcat(heap_path, FOLDER_CHARACTER);
-      strcat(heap_path, "*.*");
+    // Append the filename to the path we copied earlier
+    strcat(heap_path_filename, entry->d_name);
+    printf("\t Found file: %s\n", entry->d_name);
 
-      // Append the filename to the path we copied earlier
-      strcat(heap_path_filename, entry->d_name);
+    // POSIX only guarantees that you'll have d_name,
+    // so we're going to use the S_ISREG macro
+    struct stat dirent_stat;
+    int staterr = stat(heap_path_filename, &dirent_stat);
+    if (staterr) return(staterr);
 
+    if (S_ISREG(dirent_stat.st_mode)) {
       if (MatchHierarchie(heap_path_filename, hierarchy)){
         my_Memory(MEMORY_ADD_FILE, heap_path_filename, NULL);
       }
+    }
+    else if (S_ISDIR(dirent_stat.st_mode)) {
+      if (!my_stricmp(entry->d_name, ".") || !my_stricmp(entry->d_name, "..")) {
+        continue;
+      }
+
+      error = GetFolderFiles(heap_path_filename, hierarchy);
+      if (error) break;
     }
   }
 
   return error;
 }
-
 
 /********************************************************************/
 /*  GetFolderFiles() :  Récupère tous les fichiers d'un répertoire. */
