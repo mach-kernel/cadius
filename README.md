@@ -16,14 +16,14 @@ cadius CATALOG ~/path/to/image.po | less
 
 This tutorial covers building for most *nix flavors, or on Windows with Cygwin. Windows instructions coming soon, but you should be able to add all of the files to a new MSVC project and build it.
 
-Ensure your system has `gcc` or `clang` and associated build tools, then clone the repository, generate the `Makefile`, and build it:
+Ensure your system has `gcc` or `clang` and associated build tools, then clone the repository, and build it:
 
 ```bash
 git clone https://github.com/mach-kernel/cadius.git
 cd cadius
 # GCC is default, but override with CC=clang for clang or your preferred compiler
 make
-./cadius
+./bin/release/cadius
 ```
 
 ## Contributions
@@ -46,4 +46,4 @@ Any and all contributions are welcome. Included is also a `cadius.pro` file you 
 
 ## License
 
-CADIUS was developed by [BrutalDeluxe](http://brutaldeluxe.fr). All contributions licensed under the [GNU/GPL](https://github.com/mach-kernel/cadius/blob/master/LICENSE) and are attributed to all prior / existing code under the original license. [GenericMakefile](https://github.com/mbcrawfo/GenericMakefile) is licensed under the [MIT License](https://github.com/mbcrawfo/GenericMakefile/blob/master/LICENSE)
+CADIUS was developed by [BrutalDeluxe](http://brutaldeluxe.fr). All contributions licensed under the [GNU/GPL](https://github.com/mach-kernel/cadius/blob/master/LICENSE) and are attributed to all prior / existing code under the original license. [GenericMakefile](https://github.com/mbcrawfo/GenericMakefile) is licensed under the [MIT License](https://github.com/mbcrawfo/GenericMakefile/blob/master/LICENSE).

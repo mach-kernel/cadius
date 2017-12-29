@@ -303,11 +303,13 @@ static int CreateOutputFile(struct prodos_file *current_file, char *output_direc
   /** Ajustement des Dates **/
   my_SetFileCreationModificationDate(file_data_path,current_file->entry);
 
+  #if IS_WINDOWS
   /** Change la visibilité du fichier **/
   my_SetFileAttribute(
     file_data_path,
     ((current_file->entry->access & 0x04) == 0x04) ? SET_FILE_HIDDEN : SET_FILE_VISIBLE
   );
+  #endif
 
   /** Ajoute des informations du fichier dans le fichier FileInformation.txt **/
   strcpy(file_information_path,directory_path);
@@ -329,11 +331,13 @@ static int CreateOutputFile(struct prodos_file *current_file, char *output_direc
       /** Ajustement des Dates **/
       my_SetFileCreationModificationDate(file_resource_path,current_file->entry);
 
+      #if IS_WINDOWS
       /** Change la visibilité du fichier **/
       my_SetFileAttribute(
         file_resource_path,
         ((current_file->entry->access & 0x04) == 0x04) ? SET_FILE_HIDDEN : SET_FILE_VISIBLE
       );
+      #endif
     }
 
   /* OK */
@@ -375,14 +379,16 @@ static void SetFileInformation(char *file_information_path, struct prodos_file *
       CreateBinaryFile(file_information_path,(unsigned char *)local_buffer,(int)strlen(local_buffer));
 
       #if IS_WINDOWS
-        /* Rendre le fichier invisible */
-        my_SetFileAttribute(file_information_path, SET_FILE_HIDDEN);
-        return;
+      /* Rendre le fichier invisible */
+      my_SetFileAttribute(file_information_path, SET_FILE_HIDDEN);
+      return;
       #endif
     }
 
+  #if IS_WINDOWS
   /* Rendre le fichier visible */
   my_SetFileAttribute(file_information_path, SET_FILE_VISIBLE);
+  #endif
 
   /** Création du fichier **/
   fd = fopen(file_information_path,"w");
@@ -420,7 +426,7 @@ static void SetFileInformation(char *file_information_path, struct prodos_file *
 
   /* Rendre le fichier invisible */
   #if IS_WINDOWS
-    my_SetFileAttribute(file_information_path, SET_FILE_HIDDEN);
+  my_SetFileAttribute(file_information_path, SET_FILE_HIDDEN);
   #endif
 }
 
