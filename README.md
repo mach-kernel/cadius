@@ -46,4 +46,4 @@ Any and all contributions are welcome. Included is also a `cadius.pro` file you 
 
 ## License
 
-CADIUS was developed by [BrutalDeluxe](http://brutaldeluxe.fr). All contributions licensed under the [GNU/GPL](https://github.com/mach-kernel/cadius/blob/master/LICENSE) and are attributed to all prior / existing code under the original license. [GenericMakefile](https://github.com/mbcrawfo/GenericMakefile) is licensed under the [MIT License](https://github.com/mbcrawfo/GenericMakefile/blob/master/LICENSE).
+CADIUS was developed by [BrutalDeluxe](http://brutaldeluxe.fr). All contributions licensed under the [GNU/GPL](https://github.com/mach-kernel/cadius/blob/master/LICENSE) and attributed to contributors. All prior / existing code attributed under the original license. [GenericMakefile](https://github.com/mbcrawfo/GenericMakefile) is licensed under the [MIT License](https://github.com/mbcrawfo/GenericMakefile/blob/master/LICENSE).
