@@ -89,7 +89,7 @@ void ExtractFolderFiles(struct prodos_image *current_image, struct file_descript
   strcat(windows_folder_path,FOLDER_CHARACTER);
 
   /* Création du dossier */
-  error = my_CreateDirectory(windows_folder_path);
+  error = os_CreateDirectory(windows_folder_path);
   if(error)
     {
       printf("  Error : Can't create folder : '%s'.\n",windows_folder_path);
@@ -188,7 +188,7 @@ void ExtractVolumeFiles(struct prodos_image *current_image, char *output_directo
   strcat(windows_folder_path,FOLDER_CHARACTER);
 
   /* Création du dossier */
-  error = my_CreateDirectory(windows_folder_path);
+  error = os_CreateDirectory(windows_folder_path);
   if(error)
     {
       printf("  Error : Can't create folder : '%s'.\n",windows_folder_path);
@@ -271,7 +271,7 @@ static int CreateOutputFile(struct prodos_file *current_file, char *output_direc
   char file_information_path[1024];
 
   /* Création du répertoire de base */
-  error = my_CreateDirectory(output_directory_path);
+  error = os_CreateDirectory(output_directory_path);
   if(error)
     {
       printf("  Error : Can't create output folder '%s'.\n",output_directory_path);
@@ -301,7 +301,7 @@ static int CreateOutputFile(struct prodos_file *current_file, char *output_direc
     }
 
   /** Ajustement des Dates **/
-  my_SetFileCreationModificationDate(file_data_path,current_file->entry);
+  os_SetFileCreationModificationDate(file_data_path,current_file->entry);
 
   #if IS_WINDOWS
   /** Change la visibilité du fichier **/
@@ -329,7 +329,7 @@ static int CreateOutputFile(struct prodos_file *current_file, char *output_direc
         }
 
       /** Ajustement des Dates **/
-      my_SetFileCreationModificationDate(file_resource_path,current_file->entry);
+      os_SetFileCreationModificationDate(file_resource_path,current_file->entry);
 
       #if IS_WINDOWS
       /** Change la visibilité du fichier **/

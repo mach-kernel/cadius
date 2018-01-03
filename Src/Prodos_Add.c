@@ -358,7 +358,7 @@ static struct prodos_file *LoadFile(char *file_path_data)
     }
 
   /** Récupération des Propriétés Date/Time du fichier **/
-  my_GetFileCreationModificationDate(file_path_data,current_file);
+  os_GetFileCreationModificationDate(file_path_data,current_file);
 
   /* Renvoie la structure */
   return(current_file);

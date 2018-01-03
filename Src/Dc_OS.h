@@ -19,15 +19,15 @@
   #define FOLDER_CHARACTER  "/"
 #endif
 
-void my_DeleteFile(char *);
+void os_DeleteFile(char *);
 
-int GetFolderFiles(char *,char *);
+int os_GetFolderFiles(char *,char *);
 int GetFolderFiles_Win32(char *, char *);
 
-int my_CreateDirectory(char *);
-void my_SetFileCreationModificationDate(char *,struct file_descriptive_entry *);
-void my_GetFileCreationModificationDate(char *,struct prodos_file *);
-void my_SetFileAttribute(char *,int);
+int os_CreateDirectory(char *);
+void os_SetFileCreationModificationDate(char *,struct file_descriptive_entry *);
+void os_GetFileCreationModificationDate(char *,struct prodos_file *);
+void os_SetFileAttribute(char *,int);
 int my_stricmp(char *,char *);
 int my_strnicmp(char *,char *,size_t);
 int my_mkdir(char* buf);

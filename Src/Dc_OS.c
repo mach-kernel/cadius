@@ -43,10 +43,10 @@ static int MakeAllDir(char *);
 /******************************************************/
 /*  my_DeleteFile() :  Supprime un fichier du disque. */
 /******************************************************/
-void my_DeleteFile(char *file_path)
+void os_DeleteFile(char *file_path)
 {
   /* Rend le fichier visible */
-  my_SetFileAttribute(file_path,SET_FILE_VISIBLE);
+  os_SetFileAttribute(file_path,SET_FILE_VISIBLE);
 
   /* Supprime le fichier */
   unlink(file_path);
@@ -64,7 +64,7 @@ void my_DeleteFile(char *file_path)
  * @param hierarchy
  * @return
  */
-int GetFolderFiles(char *folder_path, char *hierarchy)
+int os_GetFolderFiles(char *folder_path, char *hierarchy)
 {
   #if IS_WINDOWS
   return GetFolderFiles_Win32(folder_path, hierarchy);
@@ -112,7 +112,7 @@ int GetFolderFiles(char *folder_path, char *hierarchy)
         continue;
       }
 
-      error = GetFolderFiles(heap_path_filename, hierarchy);
+      error = os_GetFolderFiles(heap_path_filename, hierarchy);
       if (error) break;
     }
   }
@@ -207,7 +207,7 @@ int GetFolderFiles_Win32(char *folder_path, char *hierarchy)
 /******************************************************/
 /*  my_CreateDirectory() :  Création d'un répertoire. */
 /******************************************************/
-int my_CreateDirectory(char *directory)
+int os_CreateDirectory(char *directory)
 {
   int i, error;
   struct stat sts;
@@ -284,7 +284,7 @@ static int MakeAllDir(char *newdir)
 /**********************************************************************************************/
 /* SetFileCreationModificationDate() :  Positionne les dates de Création et Modification. */
 /**********************************************************************************************/
-void my_SetFileCreationModificationDate(char *file_data_path, struct file_descriptive_entry *current_entry)
+void os_SetFileCreationModificationDate(char *file_data_path, struct file_descriptive_entry *current_entry)
 {
 #if IS_WINDOWS
   BOOL result;
@@ -335,7 +335,7 @@ void my_SetFileCreationModificationDate(char *file_data_path, struct file_descri
 /********************************************************************************************/
 /*  my_GetFileCreationModificationDate() :  Récupère les dates de Création et Modification. */
 /********************************************************************************************/
-void my_GetFileCreationModificationDate(char *file_data_path, struct prodos_file *current_file)
+void os_GetFileCreationModificationDate(char *file_data_path, struct prodos_file *current_file)
 {
 #if IS_WINDOWS
   BOOL result;
@@ -384,7 +384,7 @@ void my_GetFileCreationModificationDate(char *file_data_path, struct prodos_file
  * @param file_path Path
  * @param flag Either SET_FILE_VISIBLE or SET_FILE_HIDDEN
  */
-void my_SetFileAttribute(char *file_path, int flag)
+void os_SetFileAttribute(char *file_path, int flag)
 {
   #if IS_WINDOWS
     DWORD file_attributes;
