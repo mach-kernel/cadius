@@ -83,15 +83,17 @@ void os_SetFileCreationModificationDate(char *path, struct file_descriptive_entr
   struct stat filestat;
   if(stat(path, &filestat)) return;
 
-  struct tm time;
+  time_t curtime;
+  time(&curtime);
+  struct tm *time = localtime(&curtime);
 
-  time.tm_mday = entry->file_creation_date.day;
-  time.tm_mon = entry->file_creation_date.month;
-  time.tm_year = entry->file_creation_date.year;
-  time.tm_hour = entry->file_creation_time.hour;
-  time.tm_min = entry->file_creation_time.minute;
+  time->tm_mday = entry->file_creation_date.day;
+  time->tm_mon = entry->file_creation_date.month;
+  time->tm_year = entry->file_creation_date.year;
+  time->tm_hour = entry->file_creation_time.hour;
+  time->tm_min = entry->file_creation_time.minute;
 
-  time_t modtime = mktime(&time);
+  time_t modtime = mktime(time);
 
   struct utimbuf utb = {
     .actime = modtime,
