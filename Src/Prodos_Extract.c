@@ -16,7 +16,7 @@
 
 #include "Dc_Shared.h"
 #include "Dc_Prodos.h"
-#include "Dc_OS.h"
+#include "os/os.h"
 #include "Prodos_Extract.h"
 
 static int CreateOutputFile(struct prodos_file *,char *);

@@ -14,7 +14,7 @@
 
 #include "Dc_Shared.h"
 #include "Dc_Memory.h"
-#include "Dc_OS.h"
+#include "os/os.h"
 #include "Dc_Prodos.h"
 
 static struct volume_directory_header *ODSReadVolumeDirectoryHeader(unsigned char *);

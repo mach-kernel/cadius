@@ -17,7 +17,7 @@
 #include "Dc_Shared.h"
 #include "Dc_Prodos.h"
 #include "Dc_Memory.h"
-#include "Dc_OS.h"
+#include "os/os.h"
 #include "Prodos_Dump.h"
 
 static void DumpVolumeFooter(struct prodos_image *,int);

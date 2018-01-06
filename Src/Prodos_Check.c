@@ -17,7 +17,7 @@
 #include "Dc_Shared.h"
 #include "Dc_Prodos.h"
 #include "Dc_Memory.h"
-#include "Dc_OS.h"
+#include "os/os.h"
 #include "Prodos_Check.h"
 
 static char *GetObjectInfo(int,struct file_descriptive_entry *);

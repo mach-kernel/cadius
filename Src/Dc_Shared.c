@@ -16,7 +16,7 @@
 #endif
 
 #include "Dc_Shared.h"
-#include "Dc_OS.h"
+#include "os/os.h"
 #include "Dc_Memory.h"
 
 /***************************************************************/

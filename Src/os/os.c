@@ -29,10 +29,10 @@
 #include <sys/timeb.h>
 #include <errno.h>
 
-#include "Dc_Shared.h"
-#include "Dc_Prodos.h"
-#include "Dc_Memory.h"
-#include "Dc_OS.h"
+#include "../Dc_Shared.h"
+#include "../Dc_Prodos.h"
+#include "../Dc_Memory.h"
+#include "os.h"
 
 #if !defined(S_ISDIR) && defined(S_IFDIR)
 #define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
@@ -203,83 +203,40 @@ int GetFolderFiles_Win32(char *folder_path, char *hierarchy)
 #endif
 }
 
-
-/******************************************************/
-/*  my_CreateDirectory() :  Création d'un répertoire. */
-/******************************************************/
+/**
+ * Recursively (if necessary) creates a directory. This should work
+ * on both POSIX and the classic Win32 C runtime, but will not work
+ * with UWP.
+ *
+ * @brief os_CreateDirectory Create a directory
+ * @param directory char *directory
+ * @return
+ */
 int os_CreateDirectory(char *directory)
 {
-  int i, error;
-  struct stat sts;
-  char buffer[1024];
+  int error = 0;
+  struct stat dirstat;
 
-  /* Isole le nom du répertoire */
-  strcpy(buffer,directory);
-  for(i=strlen(directory); i>=0; i--)
-    if(buffer[i] == '\\' || buffer[i] == '/')
-      {
-        buffer[i+1] = '\0';
-        break;
-      }
+  char *dir_tokenize = strdup(directory);
 
-  /* Vérifie s'il existe */
-  error = stat(buffer,&sts);
-  if(error == 0)
-    if(S_ISDIR(sts.st_mode))
-      return(0);
+  char *buffer = calloc(1, 1024);
+  char *token = strtok(dir_tokenize, FOLDER_CHARACTER);
 
-  /** Création des répertoires **/
-  error = MakeAllDir(buffer);
-  if(error == 0)
-    return(1);
-  
-  /* On veut savoir si le ce repertoire existe et on verifie qu'on a un repertoire */
-  if(stat(buffer,&sts))
-    my_mkdir(buffer);
-  else if(!S_ISDIR(sts.st_mode))
-    return(1);
+  while (token) {
+    if (strlen(buffer) + strlen(token) > 1024) return(-1);
+    strcat(buffer, token);
 
-  return(0);
+    if (stat(buffer, &dirstat) != 0)
+      error = my_mkdir(buffer);
+    else if (!S_ISDIR(dirstat.st_mode))
+      error = my_mkdir(buffer);
+
+    strcat(buffer, FOLDER_CHARACTER);
+    token = strtok(NULL, FOLDER_CHARACTER);
+  }
+
+  return error;
 }
-
-/******************************************************/
-/*  MakeAllDir() :  Creation d'un nouveau répertoire  */
-/******************************************************/
-static int MakeAllDir(char *newdir)
-{
-  int len = (int) strlen(newdir);
-  char buffer[1024];
-  char *p;
-
-  if(len <= 0)
-    return(0);
-  strcpy(buffer,newdir);
-
-  if(buffer[len-1] == '/' || buffer[len-1] == '\\')
-    buffer[len-1] = '\0';
-
-  if(my_mkdir(buffer) == 0)
-    return(1);
-
-  p = buffer+1;
-  while(1)
-    {
-      char hold;
-
-      while(*p && *p != '\\' && *p != '/')
-        p++;
-      hold = *p;
-      *p = 0;
-      if((my_mkdir(buffer) == -1) && (errno == ENOENT))
-        return(0);
-      if(hold == 0)
-        break;
-      *p++ = hold;
-    }
-
-  return(1);
-}
-
 
 /**********************************************************************************************/
 /* SetFileCreationModificationDate() :  Positionne les dates de Création et Modification. */
