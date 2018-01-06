@@ -8,18 +8,23 @@
 /*  Auteur : Olivier ZARDINI  *  Brutal Deluxe Software  *  Mar 2012   */
 /***********************************************************************/
 
-#define SET_FILE_VISIBLE 1
-#define SET_FILE_HIDDEN
-
 #define IS_WINDOWS defined(_WIN32) || defined(_WIN64)
 #define IS_DARWIN defined(__APPLE__) || defined(__MACH__)
 #define IS_LINUX defined(__linux__)
 
 #if IS_WINDOWS
-  #define FOLDER_CHARACTER  "\\"
+#define FOLDER_CHARACTER "\\"
 #else
-  #define FOLDER_CHARACTER  "/"
+#define FOLDER_CHARACTER "/"
 #endif
+
+#if !defined(S_ISDIR) && defined(S_IFDIR)
+#define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
+#endif
+
+#define SET_FILE_VISIBLE 1
+#define SET_FILE_HIDDEN
+
 
 void os_DeleteFile(char *);
 

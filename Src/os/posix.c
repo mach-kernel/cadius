@@ -1,4 +1,12 @@
+/**
+ * POSIX runtime calls for file manipulations
+ *
+ * Author: David Stancu, @mach-kernel, Jan. 2018
+ *
+ */
+
 #include <time.h>
+#include <utime.h>
 
 /**
  * Appears to be invoked via char **BuildFileList(), which is then
@@ -64,13 +72,55 @@ int os_GetFolderFiles(char *folder_path, char *hierarchy)
   return error;
 }
 
+/**
+ * Annotate an inode with updated timestamp for created / modified
+ *
+ * @brief os_SetFileCreationModificationDate
+ * @param path
+ * @param entry
+ */
 void os_SetFileCreationModificationDate(char *path, struct file_descriptive_entry *entry) {
+  struct stat filestat;
+  if(stat(path, &filestat)) return;
 
+  struct tm time;
+
+  time.tm_mday = entry->file_creation_date.day;
+  time.tm_mon = entry->file_creation_date.month;
+  time.tm_year = entry->file_creation_date.year;
+  time.tm_hour = entry->file_creation_time.hour;
+  time.tm_min = entry->file_creation_time.minute;
+
+  time_t modtime = mktime(&time);
+
+  struct utimbuf utb = {
+    .actime = modtime,
+    .modtime = modtime
+  };
+
+  utime(path, &utb);
 }
 
+/**
+ * Annotate the ProDOS file entry modify + create timestamps
+ * to mirror the libc/stat timestamp.
+ *
+ * @brief os_GetFileCreationModificationDate
+ * @param path
+ * @param file
+ */
 void os_GetFileCreationModificationDate(char *path, struct prodos_file *file) {
-//  struct stat dirstat;
-//  if (stat(path, &dirstat)) return;
+  struct stat filestat;
+  if (stat(path, &filestat)) return;
+
+  // TODO: Apply TZ transformations?
+  struct tm *time = localtime(&filestat.st_mtim.tv_sec);
+  if (time == NULL) return;
+
+  file->file_creation_date = BuildProdosDate(time->tm_mday, time->tm_mon, time->tm_year);
+  file->file_creation_time = BuildProdosTime(time->tm_min, time->tm_hour);
+  file->file_modification_date = BuildProdosDate(time->tm_mday, time->tm_mon, time->tm_year);
+  file->file_modification_time = BuildProdosTime(time->tm_min, time->tm_hour);
 }
 
 

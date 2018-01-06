@@ -9,31 +9,21 @@
  *
  */
 
-
+#include <dirent.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#include <dirent.h>
-
-#if IS_LINUX
-#include <strings.h>
-#endif
-
 #include <string.h>
-#include <fcntl.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/timeb.h>
-#include <errno.h>
+#include <sys/types.h>
 
 #include "../Dc_Shared.h"
 #include "../Dc_Prodos.h"
 #include "../Dc_Memory.h"
 #include "os.h"
-
-#if !defined(S_ISDIR) && defined(S_IFDIR)
-#define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
-#endif
 
 #if IS_WINDOWS
 #include "win32.c"
