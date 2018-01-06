@@ -16,7 +16,7 @@
 #endif
 
 #include "Dc_Shared.h"
-#include "Dc_OS.h"
+#include "os/os.h"
 #include "Dc_Memory.h"
 
 /***************************************************************/
@@ -183,7 +183,7 @@ int CreateBinaryFile(char *file_path, unsigned char *data, int length)
   FILE *fd;
 
   /* Suppression du fichier */
-  my_DeleteFile(file_path);
+  os_DeleteFile(file_path);
 
   /* Création du fichier */
   fd = fopen(file_path,"wb");
@@ -215,7 +215,7 @@ int CreateTextFile(char *file_path, unsigned char *data, int length)
   FILE *fd;
 
   /* Suppression du fichier */
-  my_DeleteFile(file_path);
+  os_DeleteFile(file_path);
 
   /* Création du fichier */
   fd = fopen(file_path,"w");
@@ -292,7 +292,7 @@ char **BuildFileList(char *hierarchy, int *nb_file_rtn)
       }
 
   /** Recherche des fichiers **/
-  result = GetFolderFiles(folder_path,hierarchy_path);
+  result = os_GetFolderFiles(folder_path,hierarchy_path);
   if(result)
     {
       my_Memory(MEMORY_FREE_FILE,NULL,NULL);

@@ -21,7 +21,7 @@
 #include "Dc_Shared.h"
 #include "Dc_Memory.h"
 #include "Dc_Prodos.h"
-#include "Dc_OS.h"
+#include "os/os.h"
 #include "Prodos_Create.h"
 #include "Prodos_Add.h"
 
@@ -358,7 +358,7 @@ static struct prodos_file *LoadFile(char *file_path_data)
     }
 
   /** Récupération des Propriétés Date/Time du fichier **/
-  my_GetFileCreationModificationDate(file_path_data,current_file);
+  os_GetFileCreationModificationDate(file_path_data,current_file);
 
   /* Renvoie la structure */
   return(current_file);

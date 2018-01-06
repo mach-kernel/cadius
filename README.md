@@ -37,6 +37,9 @@ Any and all contributions are welcome. Included is also a `cadius.pro` file you 
 
 ## Changelog
 
+#### 1.2-b2
+- Clean up OS macros, explicit `win32` and `posix` modules ([@mach-kernel](https://github.com/mach-kernel))
+
 #### 1.2-b1
 - UTF-8 encode all source files
 - Initial POSIX support ([@mach-kernel](https://github.com/mach-kernel))

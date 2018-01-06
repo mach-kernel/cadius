@@ -17,7 +17,7 @@
 #include "Dc_Shared.h"
 #include "Dc_Prodos.h"
 #include "Dc_Memory.h"
-#include "Dc_OS.h"
+#include "os/os.h"
 #include "Prodos_Dump.h"
 #include "Prodos_Check.h"
 #include "Prodos_Extract.h"
@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
   verbose = 0;
 
   /* Message Information */
-  printf("%s v 1.2-b1, (c) Brutal Deluxe 2011-2013.\n",argv[0]);
+  printf("%s v 1.2-b2, (c) Brutal Deluxe 2011-2013.\n",argv[0]);
 
   /* Vérification des paramètres */
   if(argc < 3)

@@ -18,7 +18,7 @@
 #include "Dc_Shared.h"
 #include "Dc_Memory.h"
 #include "Dc_Prodos.h"
-#include "Dc_OS.h"
+#include "os/os.h"
 #include "Prodos_Create.h"
 
 unsigned char block_zero[BLOCK_SIZE] =

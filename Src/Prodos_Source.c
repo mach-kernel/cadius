@@ -15,7 +15,7 @@
 #endif
 
 #include "Dc_Shared.h"
-#include "Dc_OS.h"
+#include "os/os.h"
 #include "Prodos_Source.h"
 
 #define TYPE_LINE_CODE    1
