@@ -7,6 +7,8 @@
 
 #include "os.h"
 
+#if !IS_WINDOWS
+
 /**
  * Creates a directory. The POSIX compliant one requires a mask,
  * but the Win32 one does not.
@@ -166,3 +168,5 @@ void os_GetFileCreationModificationDate(char *path, struct prodos_file *file) {
   file->file_modification_date = BuildProdosDate(time->tm_mday, time->tm_mon, time->tm_year);
   file->file_modification_time = BuildProdosTime(time->tm_min, time->tm_hour);
 }
+
+#endif

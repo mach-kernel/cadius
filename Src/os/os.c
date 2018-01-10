@@ -9,11 +9,7 @@
  *
  */
 
-#if IS_WINDOWS
-#include "win32.c"
-#else
-#include "posix.c"
-#endif
+#include "os.h"
 
 /**
  * Delete file at path

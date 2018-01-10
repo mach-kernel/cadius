@@ -6,6 +6,8 @@
 /*  Auteur : Olivier ZARDINI  *  Brutal Deluxe Software  *  Dec 2011   */
 /***********************************************************************/
 
+#pragma once
+
 #define MEMORY_INIT                 10
 #define MEMORY_FREE                 11
 

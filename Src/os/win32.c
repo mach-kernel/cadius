@@ -5,9 +5,10 @@
  *
  */
 
-#include "os.h"
 
 #if IS_WINDOWS
+
+#include "os.h"
 
 /**
  * Win32 C runtime get contents of directory.

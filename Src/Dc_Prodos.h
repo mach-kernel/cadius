@@ -6,6 +6,8 @@
 /*  Auteur : Olivier ZARDINI  *  Brutal Deluxe Software  *  Dec 2011  */
 /**********************************************************************/
 
+#pragma once
+
 #define IMG_HEADER_SIZE  0x40   /* 2MG Header Size */
 #define HDV_HEADER_SIZE  0x00   /* HDV Header Size */
 #define  PO_HEADER_SIZE  0x00   /*  PO Header Size */

@@ -37,6 +37,8 @@
 #include <sys/stat.h>
 #include <sys/timeb.h>
 #include <sys/types.h>
+#include <time.h>
+#include <utime.h>
 
 // #include <malloc.h>
 // #include <io.h>
