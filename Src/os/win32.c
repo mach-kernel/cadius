@@ -5,11 +5,9 @@
  *
  */
 
-#include <malloc.h>
-#include <io.h>
-#include <direct.h>
-#include <windows.h>
+#include "os.h"
 
+#if IS_WINDOWS
 
 /**
  * Win32 C runtime get contents of directory.
@@ -251,3 +249,4 @@ int my_strnicmp(char *string1, char *string2, size_t length)
   return strnicmp(string1, string2, length);
 }
 
+#endif

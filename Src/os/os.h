@@ -8,6 +8,8 @@
 /*  Auteur : Olivier ZARDINI  *  Brutal Deluxe Software  *  Mar 2012   */
 /***********************************************************************/
 
+#pragma once
+
 #define IS_WINDOWS defined(_WIN32) || defined(_WIN64)
 #define IS_DARWIN defined(__APPLE__) || defined(__MACH__)
 #define IS_LINUX defined(__linux__)
@@ -25,6 +27,25 @@
 #define SET_FILE_VISIBLE 1
 #define SET_FILE_HIDDEN
 
+#include <dirent.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <malloc.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/timeb.h>
+#include <sys/types.h>
+
+// #include <malloc.h>
+// #include <io.h>
+// #include <direct.h>
+// #include <windows.h>
+
+#include "../Dc_Shared.h"
+#include "../Dc_Prodos.h"
+#include "../Dc_Memory.h"
 
 void os_DeleteFile(char *);
 
