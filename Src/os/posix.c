@@ -169,4 +169,14 @@ void os_GetFileCreationModificationDate(char *path, struct prodos_file *file) {
   file->file_modification_time = BuildProdosTime(time->tm_min, time->tm_hour);
 }
 
+
+char *my_strcpy(char *s1, char *s2) 
+{
+	return strcpy(s1, s2);
+}
+
+char *my_strdup(char *s)
+{
+	return strdup(s);
+}
 #endif

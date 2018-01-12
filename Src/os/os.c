@@ -11,6 +11,12 @@
 
 #include "os.h"
 
+#if IS_WINDOWS
+#include "win32.c"
+#else
+#include "posix.c"
+#endif
+
 /**
  * Delete file at path
  * @brief os_DeleteFile

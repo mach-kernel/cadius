@@ -305,9 +305,8 @@ static int CreateOutputFile(struct prodos_file *current_file, char *output_direc
 
   #if IS_WINDOWS
   /** Change la visibilité du fichier **/
-  my_SetFileAttribute(
-    file_data_path,
-    ((current_file->entry->access & 0x04) == 0x04) ? SET_FILE_HIDDEN : SET_FILE_VISIBLE
+  os_SetFileAttribute(
+    file_data_path, ((current_file->entry->access & 0x04) == 0x04) ? SET_FILE_HIDDEN : SET_FILE_VISIBLE
   );
   #endif
 
@@ -333,7 +332,7 @@ static int CreateOutputFile(struct prodos_file *current_file, char *output_direc
 
       #if IS_WINDOWS
       /** Change la visibilité du fichier **/
-      my_SetFileAttribute(
+      os_SetFileAttribute(
         file_resource_path,
         ((current_file->entry->access & 0x04) == 0x04) ? SET_FILE_HIDDEN : SET_FILE_VISIBLE
       );
@@ -380,14 +379,14 @@ static void SetFileInformation(char *file_information_path, struct prodos_file *
 
       #if IS_WINDOWS
       /* Rendre le fichier invisible */
-      my_SetFileAttribute(file_information_path, SET_FILE_HIDDEN);
+      os_SetFileAttribute(file_information_path, SET_FILE_HIDDEN);
       return;
       #endif
     }
 
   #if IS_WINDOWS
   /* Rendre le fichier visible */
-  my_SetFileAttribute(file_information_path, SET_FILE_VISIBLE);
+  os_SetFileAttribute(file_information_path, SET_FILE_VISIBLE);
   #endif
 
   /** Création du fichier **/
@@ -426,7 +425,7 @@ static void SetFileInformation(char *file_information_path, struct prodos_file *
 
   /* Rendre le fichier invisible */
   #if IS_WINDOWS
-  my_SetFileAttribute(file_information_path, SET_FILE_HIDDEN);
+  os_SetFileAttribute(file_information_path, SET_FILE_HIDDEN);
   #endif
 }
 

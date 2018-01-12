@@ -5,7 +5,6 @@
  *
  */
 
-
 #if IS_WINDOWS
 
 #include "os.h"
@@ -74,7 +73,7 @@ int os_GetFolderFiles(char *folder_path, char *hierarchy)
             continue;
 
           /* Recherche dans le contenu du dossier */
-          error = GetFolderFiles(buffer_file_path,hierarchy);
+          error = os_GetFolderFiles(buffer_file_path,hierarchy);
           if(error)
             break;
         }
@@ -248,6 +247,21 @@ int my_stricmp(char *string1, char *string2)
 int my_strnicmp(char *string1, char *string2, size_t length)
 {
   return strnicmp(string1, string2, length);
+}
+
+char *my_strcpy(char *s1, char *s2)
+{
+	return strcpy_s(s1, strlen(s2), s2);
+}
+
+char *my_strdup(char *s)
+{
+	return _strdup(s);
+}
+
+int my_mkdir(char *path)
+{
+	return mkdir(path);
 }
 
 #endif

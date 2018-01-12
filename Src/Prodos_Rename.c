@@ -15,6 +15,7 @@
 #include <malloc.h>
 #endif
 
+#include "os/os.h"
 #include "Dc_Shared.h"
 #include "Dc_Prodos.h"
 #include "Prodos_Rename.h"
@@ -53,7 +54,7 @@ void RenameProdosFile(struct prodos_image *current_image, char *prodos_file_path
     return;
 
   /* Nom en majuscule */
-  strcpy(upper_case,new_file_name);
+  my_strcpy(upper_case,new_file_name);
   for(i=0; i<(int)strlen(upper_case); i++)
     upper_case[i] = toupper(upper_case[i]);
 
