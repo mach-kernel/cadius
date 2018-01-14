@@ -5,9 +5,9 @@
  *
  */
 
-#include "os.h"
+#if BUILD_POSIX
 
-#if !IS_WINDOWS
+#include "os.h"
 
 /**
  * Creates a directory. The POSIX compliant one requires a mask,
@@ -175,7 +175,7 @@ char *my_strcpy(char *s1, char *s2)
 	return strcpy(s1, s2);
 }
 
-char *my_strdup(char *s)
+char *my_strdup(const char *s)
 {
 	return strdup(s);
 }

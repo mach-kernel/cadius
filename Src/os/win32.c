@@ -5,7 +5,7 @@
  *
  */
 
-#if IS_WINDOWS
+#if BUILD_WIN32
 
 #include "os.h"
 

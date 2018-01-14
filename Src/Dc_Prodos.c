@@ -987,7 +987,7 @@ static int GetFileDataResourceSize(struct prodos_image *current_image, struct fi
   int *tab_used_block_resource;
   unsigned char extended_block[BLOCK_SIZE];
 
-  if (!file_entry) return;
+  if (!file_entry) return(0);
 
   if((file_entry->storage_type & 0x0F) == 0x00)
     {

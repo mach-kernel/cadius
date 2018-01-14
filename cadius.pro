@@ -3,13 +3,14 @@
 
 #TARGET = cadius
 
+CONFIG -= qt
+
 mac {
   CONFIG -= app_bundle
 }
 
 HEADERS = \
    $$PWD/Src/Dc_Memory.h \
-   $$PWD/Src/Dc_OS.h \
    $$PWD/Src/Dc_Prodos.h \
    $$PWD/Src/Dc_Shared.h \
    $$PWD/Src/Prodos_Add.h \
@@ -20,11 +21,11 @@ HEADERS = \
    $$PWD/Src/Prodos_Extract.h \
    $$PWD/Src/Prodos_Move.h \
    $$PWD/Src/Prodos_Rename.h \
-   $$PWD/Src/Prodos_Source.h
+   $$PWD/Src/Prodos_Source.h \
+   $$PWD/Src/os/os.h
 
 SOURCES = \
    $$PWD/Src/Dc_Memory.c \
-   $$PWD/Src/Dc_OS.c \
    $$PWD/Src/Dc_Prodos.c \
    $$PWD/Src/Dc_Shared.c \
    $$PWD/Src/Main.c \
@@ -36,7 +37,10 @@ SOURCES = \
    $$PWD/Src/Prodos_Extract.c \
    $$PWD/Src/Prodos_Move.c \
    $$PWD/Src/Prodos_Rename.c \
-   $$PWD/Src/Prodos_Source.c
+   $$PWD/Src/Prodos_Source.c \
+   $$PWD/Src/os/os.c \
+   $$PWD/Src/os/win32.c \
+   $$PWD/Src/os/posix.c
 
 INCLUDEPATH = \
     $$PWD/Src
