@@ -5,8 +5,52 @@
  *
  */
 
-#include <time.h>
-#include <utime.h>
+#if BUILD_POSIX
+
+#include "os.h"
+
+/**
+ * Creates a directory. The POSIX compliant one requires a mask,
+ * but the Win32 one does not.
+ *
+ * FWIW, the Win32 POSIX mkdir has been deprecated so we use _mkdir
+ * from direct.h (https://msdn.microsoft.com/en-us/library/2fkk4dzw.aspx)
+ *
+ * @param char *path
+ * @return
+ */
+int my_mkdir(char *path)
+{
+  return mkdir(path, S_IRWXU);
+}
+
+/**
+ * Delegator to strcasecmp
+ *
+ * @brief my_stricmp
+ * @param string1
+ * @param string2
+ * @return
+ */
+int my_stricmp(char *string1, char *string2)
+{
+  return(strcasecmp(string1,string2));
+}
+
+/**
+ * Delegator to strnicmp
+ *
+ * @brief my_strnicmp
+ * @param string1
+ * @param string2
+ * @param length
+ * @return
+ */
+int my_strnicmp(char *string1, char *string2, size_t length)
+{
+  return(strncasecmp(string1,string2,length));
+}
+
 
 /**
  * Appears to be invoked via char **BuildFileList(), which is then
@@ -116,7 +160,7 @@ void os_GetFileCreationModificationDate(char *path, struct prodos_file *file) {
   if (stat(path, &filestat)) return;
 
   // TODO: Apply TZ transformations?
-  struct tm *time = localtime(&filestat.st_mtim.tv_sec);
+  struct tm *time = localtime(&filestat.st_mtime);
   if (time == NULL) return;
 
   file->file_creation_date = BuildProdosDate(time->tm_mday, time->tm_mon, time->tm_year);
@@ -126,44 +170,13 @@ void os_GetFileCreationModificationDate(char *path, struct prodos_file *file) {
 }
 
 
-/**
- * Creates a directory. The POSIX compliant one requires a mask,
- * but the Win32 one does not.
- *
- * FWIW, the Win32 POSIX mkdir has been deprecated so we use _mkdir
- * from direct.h (https://msdn.microsoft.com/en-us/library/2fkk4dzw.aspx)
- *
- * @param char *path
- * @return
- */
-int my_mkdir(char *path)
+char *my_strcpy(char *s1, char *s2) 
 {
-  return mkdir(path, S_IRWXU);
+	return strcpy(s1, s2);
 }
 
-/**
- * Delegator to strcasecmp
- *
- * @brief my_stricmp
- * @param string1
- * @param string2
- * @return
- */
-int my_stricmp(char *string1, char *string2)
+char *my_strdup(const char *s)
 {
-  return(strcasecmp(string1,string2));
+	return strdup(s);
 }
-
-/**
- * Delegator to strnicmp
- *
- * @brief my_strnicmp
- * @param string1
- * @param string2
- * @param length
- * @return
- */
-int my_strnicmp(char *string1, char *string2, size_t length)
-{
-  return(strncasecmp(string1,string2,length));
-}
+#endif

@@ -16,6 +16,7 @@
 
 #include <errno.h>
 
+#include "os/os.h"
 #include "Dc_Shared.h"
 #include "Dc_Prodos.h"
 #include "Dc_Memory.h"
@@ -295,7 +296,9 @@ void my_Memory(int code, void *data, void *value)
         current_filepath = (struct file_path *) calloc(1,sizeof(struct file_path));
         if(current_filepath == NULL)
           return;
-        current_filepath->path = strdup(path);
+
+		current_filepath->path = my_strdup(path);
+
         if(current_filepath->path == NULL)
           {
             free(current_filepath);
@@ -349,7 +352,7 @@ void my_Memory(int code, void *data, void *value)
         current_error = (struct error *) calloc(1,sizeof(struct error));
         if(current_error == NULL)
           return;
-        current_error->message = strdup(message);
+        current_error->message = my_strdup(message);
         if(current_error->message == NULL)
           {
             free(current_error);
