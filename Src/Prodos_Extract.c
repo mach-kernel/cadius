@@ -258,10 +258,14 @@ void ExtractVolumeFiles(struct prodos_image *current_image, char *output_directo
   free(windows_folder_path);
 }
 
-
-/************************************************************/
-/*  CreateOutputFile() :  Création d'un fichier sur disque. */
-/************************************************************/
+/**
+ * Writes a file to disk
+ *
+ * @brief CreateOutputFile
+ * @param current_file
+ * @param output_directory_path
+ * @return
+ */
 static int CreateOutputFile(struct prodos_file *current_file, char *output_directory_path)
 {
   int error;
@@ -278,15 +282,21 @@ static int CreateOutputFile(struct prodos_file *current_file, char *output_direc
       return(1);
     }
   strcpy(directory_path,output_directory_path);
-  if(strlen(directory_path) > 0)
-    if(directory_path[strlen(directory_path)-1] != '\\' && directory_path[strlen(directory_path)-1] != '/')
-      strcat(directory_path,FOLDER_CHARACTER);
 
-  /* Chemin du fichier : Data */
+  if(strlen(directory_path) > 0 && directory_path[strlen(directory_path)-1] != FOLDER_CHARACTER)
+    strcat(directory_path,FOLDER_CHARACTER);
+
+  // Data file path
   strcpy(file_data_path,directory_path);
   strcat(file_data_path,current_file->entry->file_name_case);
 
-  /* Chemin du fichier : Resource */
+  // Append the file type and auxtype extension
+  char extension[6];
+  strcat(file_data_path, "!");
+  sprintf(extension, "%02X%04X", current_file->type, current_file->aux_type);
+  strcat(file_data_path, extension);
+
+  // ResourceFork path
   strcpy(file_resource_path,file_data_path);
   strcat(file_resource_path,"_ResourceFork.bin");
 
