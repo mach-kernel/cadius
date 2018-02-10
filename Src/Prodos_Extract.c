@@ -291,9 +291,9 @@ static int CreateOutputFile(struct prodos_file *current_file, char *output_direc
   strcat(file_data_path,current_file->entry->file_name_case);
 
   // Append the file type and auxtype extension
-  char extension[6];
+  char extension[7];
   strcat(file_data_path, "!");
-  sprintf(extension, "%02X%04X", current_file->type, current_file->aux_type);
+  sprintf(extension, "%02X%04X", current_file->entry->file_type, current_file->entry->file_aux_type);
   strcat(file_data_path, extension);
 
   // ResourceFork path
