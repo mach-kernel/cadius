@@ -479,8 +479,8 @@ void usage(char *program_path)
   printf("        %s DELETEVOLUME  <[2mg|hdv|po]_image_path>\n",program_path);
   printf("        ----\n");
   printf("        %s ADDFILE       <[2mg|hdv|po]_image_path>   <prodos_folder_path>  <file_path>\n",program_path);
-  printf("        Specify a file's auxtype by formatting the file name: THING.S16!B30000\n");
-  printf("        Delimiter must be '!'\n");
+  printf("        Specify a file's auxtype by formatting the file name: THING.S16#B30000\n");
+  printf("        Delimiter must be '#'\n");
   printf("        ----\n");
   printf("        %s ADDFOLDER     <[2mg|hdv|po]_image_path>   <prodos_folder_path>  <folder_path>\n",program_path);
   printf("        ----\n");

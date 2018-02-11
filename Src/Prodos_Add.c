@@ -309,7 +309,7 @@ static struct prodos_file *LoadFile(char *file_path_data)
   // Start from end of string until we arrive to path delimiter
   strcpy(folder_path,file_path_data);
   for(i=strlen(folder_path); i>=0; i--)
-    if(folder_path[i] == FOLDER_CHARACTER)
+    if(!strncmp(&folder_path[i], FOLDER_CHARACTER, sizeof(FOLDER_CHARACTER)))
       {
         folder_path[i+1] = '\0';
         break;
@@ -318,7 +318,7 @@ static struct prodos_file *LoadFile(char *file_path_data)
   // Similarly, also extract the filename
   strcpy(file_name,file_path_data);
   for(i=strlen(file_path_data); i>=0; i--)
-    if(file_path_data[i] == FOLDER_CHARACTER)
+    if(!strncmp(&folder_path[i], FOLDER_CHARACTER, sizeof(FOLDER_CHARACTER)))
       {
         strcpy(file_name,&file_path_data[i+1]);
         break;
@@ -328,10 +328,10 @@ static struct prodos_file *LoadFile(char *file_path_data)
 
 
   // Attempt to extract ProDOS metadata from the filename
-  char *prodos_meta = strtok(current_file->file_name, "!");
+  char *prodos_meta = strtok(current_file->file_name, "#");
 
   if (prodos_meta) strcpy(file_name, prodos_meta);
-  prodos_meta = strtok(NULL, "!");
+  prodos_meta = strtok(NULL, "#");
   if (prodos_meta != NULL && strlen(prodos_meta) != 6)
     prodos_meta = NULL;
 
@@ -364,41 +364,34 @@ static struct prodos_file *LoadFile(char *file_path_data)
       current_file->resource = NULL;
     }
 
-  // If metadata is in path use it, otherwise fallback to original
-  // TODO: Evaluate if overriding after or making a flag is worth it to
-  // merge what is in the filename with _FileInformation.txt
+  /** Chargement des Informations du fichier contenue dans _FileInformation.txt **/
+  sprintf(file_path,"%s_FileInformation.txt",folder_path);
+  found = GetFileInformation(file_path,file_name,current_file);
+  if(!found)
+    {
+      /* Valeurs par défaut */
+      current_file->type = 0x00;
+      current_file->aux_type = 0x0000;
+      current_file->version_create = 0x00;
+      current_file->min_version = 0x00;
+      current_file->access = 0xE3;
+    }
+
+  /** Récupération des Propriétés Date/Time du fichier **/
+  os_GetFileCreationModificationDate(file_path_data,current_file);
+
+  // Override values in _FileInformation.txt if the suffix is present
   if (prodos_meta)
   {
     char type;
     WORD aux_type;
 
-    if (sscanf(prodos_meta, "%02X%04X", &type, &aux_type) == 2)
+    if (sscanf(prodos_meta, "%02hhX%04hX", &type, &aux_type) == 2)
     {
       current_file->type = type;
       current_file->aux_type = aux_type;
-      current_file->version_create = 0x00;
-      current_file->min_version = 0x00;
-      current_file->access = 0xE3;
     }
   }
-  else 
-  {
-    /** Chargement des Informations du fichier contenue dans _FileInformation.txt **/
-    sprintf(file_path,"%s_FileInformation.txt",folder_path);
-    found = GetFileInformation(file_path,file_name,current_file);
-    if(!found)
-      {
-        /* Valeurs par défaut */
-        current_file->type = 0x00;
-        current_file->aux_type = 0x0000;
-        current_file->version_create = 0x00;
-        current_file->min_version = 0x00;
-        current_file->access = 0xE3;
-      }    
-  }
-
-  /** Récupération des Propriétés Date/Time du fichier **/
-  os_GetFileCreationModificationDate(file_path_data,current_file);
 
   /* Renvoie la structure */
   return(current_file);
@@ -440,45 +433,45 @@ static int GetFileInformation(char *file_information_path, char *file_name, stru
           GetLineValue(line_tab[i],"Type",local_buffer);
           if(strlen(local_buffer) == 2)
             {
-              sscanf(local_buffer,"%02X",&value);
+              sscanf(local_buffer,"%02lX",&value);
               current_file->type = (unsigned char) value;
             }
           GetLineValue(line_tab[i],"AuxType",local_buffer);
           if(strlen(local_buffer) == 4)
             {
-              sscanf(local_buffer,"%04X",&value);
+              sscanf(local_buffer,"%04lX",&value);
               current_file->aux_type = (WORD) value;
             }
           GetLineValue(line_tab[i],"VersionCreate",local_buffer);
           if(strlen(local_buffer) == 2)
             {
-              sscanf(local_buffer,"%02X",&value);
+              sscanf(local_buffer,"%02lX",&value);
               current_file->version_create = (unsigned char) value;
             }
           GetLineValue(line_tab[i],"MinVersion",local_buffer);
           if(strlen(local_buffer) == 2)
             {
-              sscanf(local_buffer,"%02X",&value);
+              sscanf(local_buffer,"%02lX",&value);
               current_file->min_version = (unsigned char) value;
             }
           GetLineValue(line_tab[i],"Access",local_buffer);
           if(strlen(local_buffer) == 2)
             {
-              sscanf(local_buffer,"%02X",&value);
+              sscanf(local_buffer,"%02lX",&value);
               current_file->access = (unsigned char) value;
             }
           GetLineValue(line_tab[i],"FolderInfo1",local_buffer);
           if(strlen(local_buffer) == 36)
             for(j=0; j<18; j++)
               {
-                sscanf(&local_buffer[2*j],"%02X",&value);
+                sscanf(&local_buffer[2*j],"%02lX",&value);
                 current_file->resource_finderinfo_1[j] = (unsigned char) value;
               }
           GetLineValue(line_tab[i],"FolderInfo2",local_buffer);
           if(strlen(local_buffer) == 36)
             for(j=0; j<18; j++)
               {
-                sscanf(&local_buffer[2*j],"%02X",&value);
+                sscanf(&local_buffer[2*j],"%02lX",&value);
                 current_file->resource_finderinfo_2[j] = (unsigned char) value;
               }
             
