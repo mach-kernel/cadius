@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
   verbose = 0;
 
   /* Message Information */
-  printf("%s v 1.2-b3, (c) Brutal Deluxe 2011-2013.\n",argv[0]);
+  printf("%s v 1.3, (c) Brutal Deluxe 2011-2013.\n",argv[0]);
 
   /* Vérification des paramètres */
   if(argc < 3)
@@ -479,6 +479,9 @@ void usage(char *program_path)
   printf("        %s DELETEVOLUME  <[2mg|hdv|po]_image_path>\n",program_path);
   printf("        ----\n");
   printf("        %s ADDFILE       <[2mg|hdv|po]_image_path>   <prodos_folder_path>  <file_path>\n",program_path);
+  printf("        Specify a file's auxtype by formatting the file name: THING.S16!B30000\n");
+  printf("        Delimiter must be '!'\n");
+  printf("        ----\n");
   printf("        %s ADDFOLDER     <[2mg|hdv|po]_image_path>   <prodos_folder_path>  <folder_path>\n",program_path);
   printf("        ----\n");
   printf("        %s CREATEFOLDER  <[2mg|hdv|po]_image_path>   <prodos_folder_path>\n",program_path);

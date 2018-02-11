@@ -37,6 +37,9 @@ Any and all contributions are welcome. Included is also a `cadius.pro` file you 
 
 ## Changelog
 
+#### 1.3
+- Adds ability to specify a file's `type` and `auxtype` via the filename, resolving [#4](https://github.com/mach-kernel/cadius/issues/4).
+
 #### 1.2-b3
 - Fix Windows build issues, make some shared OS methods static / remove from `os.c` ([@mach-kernel](https://github.com/mach-kernel))
 
