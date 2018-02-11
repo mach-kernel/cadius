@@ -36,9 +36,16 @@ static WORD CreateSeedlingContent(struct prodos_image *,struct prodos_file *,uns
 static WORD CreateSaplingContent(struct prodos_image *,struct prodos_file *,unsigned char *,int,int,int);
 static WORD CreateTreeContent(struct prodos_image *,struct prodos_file *,unsigned char *,int,int,int,int);
 
-/***************************************************************/
-/*  AddFile() :  Ajoute un fichier Windows à l'archive Prodos. */
-/***************************************************************/
+/**
+ * @brief      Adds a file.
+ *
+ * @param      current_image       The current image
+ * @param      file_path           The file path
+ * @param      target_folder_path  The target folder path
+ * @param[in]  update_image        The update image
+ *
+ * @return     { description_of_the_return_value }
+ */
 int AddFile(struct prodos_image *current_image, char *file_path, char *target_folder_path, int update_image)
 {
   int i, is_volume_header, error, is_valid;
@@ -49,8 +56,7 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
 
   /** Charge le fichier depuis le disque **/
   current_file = LoadFile(file_path);
-  if(current_file == NULL)
-    return(1);
+  if(current_file == NULL) return(1);
 
   /** On vérifie si ce fichier est compatible Prodos **/
   /* Nom */
@@ -277,9 +283,13 @@ void AddFolder(struct prodos_image *current_image, char *folder_path, char *targ
 }
 
 
-/********************************************************************/
-/*  LoadFile() :  Charge un fichier depuis le disque de la machine. */
-/********************************************************************/
+/**
+ * @brief      Loads a file from disk.
+ *
+ * @param      file_path_data  The file path data
+ *
+ * @return     { description_of_the_return_value }
+ */
 static struct prodos_file *LoadFile(char *file_path_data)
 {
   int i, found;
@@ -295,26 +305,36 @@ static struct prodos_file *LoadFile(char *file_path_data)
       printf("  Error : Impossible to allocate memory.\n");
       return(NULL);
     }
-  
-  /* Extrait le répertoire du nom de fichier */
+
+  // Start from end of string until we arrive to path delimiter
   strcpy(folder_path,file_path_data);
   for(i=strlen(folder_path); i>=0; i--)
-    if(folder_path[i] == '\\' || folder_path[i] == '/')
+    if(folder_path[i] == FOLDER_CHARACTER)
       {
         folder_path[i+1] = '\0';
         break;
       }
 
-  /** Extrait le nom de fichier **/
+  // Similarly, also extract the filename
   strcpy(file_name,file_path_data);
   for(i=strlen(file_path_data); i>=0; i--)
-    if(file_path_data[i] == '\\' || file_path_data[i] == '/')
+    if(file_path_data[i] == FOLDER_CHARACTER)
       {
         strcpy(file_name,&file_path_data[i+1]);
         break;
       }
   current_file->file_name = strdup(file_name);
-  current_file->file_name_case = strdup(file_name);  
+  current_file->file_name_case = strdup(file_name);
+
+
+  // Attempt to extract ProDOS metadata from the filename
+  char *prodos_meta = strtok(current_file->file_name, "!");
+
+  if (prodos_meta) strcpy(file_name, prodos_meta);
+  prodos_meta = strtok(NULL, "!");
+  if (prodos_meta != NULL && strlen(prodos_meta) != 6)
+    prodos_meta = NULL;
+
   if(current_file->file_name == NULL || current_file->file_name_case == NULL)
     {
       free(current_file);
@@ -344,18 +364,38 @@ static struct prodos_file *LoadFile(char *file_path_data)
       current_file->resource = NULL;
     }
 
-  /** Chargement des Informations du fichier contenue dans _FileInformation.txt **/
-  sprintf(file_path,"%s_FileInformation.txt",folder_path);
-  found = GetFileInformation(file_path,file_name,current_file);
-  if(!found)
+  // If metadata is in path use it, otherwise fallback to original
+  // TODO: Evaluate if overriding after or making a flag is worth it to
+  // merge what is in the filename with _FileInformation.txt
+  if (prodos_meta)
+  {
+    char type;
+    WORD aux_type;
+
+    if (sscanf(prodos_meta, "%02X%04X", &type, &aux_type) == 2)
     {
-      /* Valeurs par défaut */
-      current_file->type = 0x00;
-      current_file->aux_type = 0x0000;
+      current_file->type = type;
+      current_file->aux_type = aux_type;
       current_file->version_create = 0x00;
       current_file->min_version = 0x00;
       current_file->access = 0xE3;
     }
+  }
+  else 
+  {
+    /** Chargement des Informations du fichier contenue dans _FileInformation.txt **/
+    sprintf(file_path,"%s_FileInformation.txt",folder_path);
+    found = GetFileInformation(file_path,file_name,current_file);
+    if(!found)
+      {
+        /* Valeurs par défaut */
+        current_file->type = 0x00;
+        current_file->aux_type = 0x0000;
+        current_file->version_create = 0x00;
+        current_file->min_version = 0x00;
+        current_file->access = 0xE3;
+      }    
+  }
 
   /** Récupération des Propriétés Date/Time du fichier **/
   os_GetFileCreationModificationDate(file_path_data,current_file);
