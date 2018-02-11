@@ -323,17 +323,18 @@ static struct prodos_file *LoadFile(char *file_path_data)
         strcpy(file_name,&file_path_data[i+1]);
         break;
       }
-  current_file->file_name = strdup(file_name);
-  current_file->file_name_case = strdup(file_name);
-
 
   // Attempt to extract ProDOS metadata from the filename
-  char *prodos_meta = strtok(current_file->file_name, "#");
+  char *nametok = strdup(file_name);
+  char *prodos_meta = strtok(nametok, "#");
 
   if (prodos_meta) strcpy(file_name, prodos_meta);
   prodos_meta = strtok(NULL, "#");
   if (prodos_meta != NULL && strlen(prodos_meta) != 6)
     prodos_meta = NULL;
+
+  current_file->file_name = strdup(file_name);
+  current_file->file_name_case = strdup(file_name);
 
   if(current_file->file_name == NULL || current_file->file_name_case == NULL)
     {
