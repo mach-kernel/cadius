@@ -24,13 +24,20 @@ static int EmptyEntryFolder(struct prodos_image *,struct file_descriptive_entry 
 static void DeleteEmptyFolder(struct prodos_image *,struct file_descriptive_entry *);
 static int compare_folder(const void *,const void *);
 
-/***********************************************************/
-/*  DeleteProdosFile() :  Suppression d'un fichier Prodos. */
-/***********************************************************/
+/**
+ * @brief      Delete a ProDOS file
+ *
+ * @param      current_image     The current image
+ * @param      prodos_file_path  The prodos file path
+ */
 void DeleteProdosFile(struct prodos_image *current_image, char *prodos_file_path)
 {
   int error;
   struct file_descriptive_entry *current_entry;
+
+  // If there's a type suffix, remove it before continuing
+  char *suffix = strchr(prodos_file_path, '#');
+  if (suffix && strlen(suffix + 1) == 6) *suffix = '\0'; 
 
   /* Recherche l'entrée Prodos */
   current_entry = GetProdosFile(current_image,prodos_file_path);

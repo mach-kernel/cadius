@@ -325,13 +325,14 @@ static struct prodos_file *LoadFile(char *file_path_data)
       }
 
   // Attempt to extract ProDOS metadata from the filename
-  char *nametok = strdup(file_name);
-  char *prodos_meta = strtok(nametok, "#");
-
-  if (prodos_meta) strcpy(file_name, prodos_meta);
-  prodos_meta = strtok(NULL, "#");
-  if (prodos_meta != NULL && strlen(prodos_meta) != 6)
-    prodos_meta = NULL;
+  char *prodos_meta = strchr(file_name, '#');
+  // Skip the delim char and chop off the name string
+  if (prodos_meta && strlen(prodos_meta + 1) == 6)
+  {
+    *prodos_meta = '\0';
+    prodos_meta++;
+  }
+  else prodos_meta = NULL;
 
   current_file->file_name = strdup(file_name);
   current_file->file_name_case = strdup(file_name);

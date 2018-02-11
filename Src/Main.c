@@ -48,6 +48,7 @@
 
 #define ACTION_ADD_FILE          60
 #define ACTION_ADD_FOLDER        61
+#define ACTION_REPLACE_FILE      62
 
 #define ACTION_CREATE_FOLDER     70
 #define ACTION_CREATE_VOLUME     71
@@ -383,6 +384,35 @@ int main(int argc, char *argv[])
       /* Libération mémoire */
       mem_free_image(current_image);
     }
+  else if(param->action == ACTION_REPLACE_FILE) 
+    {
+      /** Charge l'image 2mg **/
+      current_image = LoadProdosImage(param->image_file_path);
+      if(current_image == NULL)
+        return(3);
+
+      int fcharloc = 0;
+      for (int i=strlen(param->file_path); i >= 0; --i) {
+        if (!strncmp(&param->file_path[i], FOLDER_CHARACTER, sizeof(FOLDER_CHARACTER))) 
+        {
+          fcharloc = i;
+          break;
+        }
+      }
+
+      // Prepare parameters for delete
+      char *file_name = param->file_path + fcharloc;
+      char *prodos_file_name = strdup(param->prodos_folder_path);
+      strcat(prodos_file_name, &FOLDER_CHARACTER);
+      strcat(prodos_file_name, file_name);
+
+      printf("  - Replacing file '%s' :\n",param->file_path);
+
+      DeleteProdosFile(current_image, prodos_file_name);
+      AddFile(current_image, param->file_path, param->prodos_folder_path,1);
+
+      mem_free_image(current_image);
+    }
   else if(param->action == ACTION_CLEAR_HIGH_BIT)
     {
       /** Construit la liste des fichiers **/
@@ -480,7 +510,8 @@ void usage(char *program_path)
   printf("        ----\n");
   printf("        %s ADDFILE       <[2mg|hdv|po]_image_path>   <prodos_folder_path>  <file_path>\n",program_path);
   printf("        Specify a file's auxtype by formatting the file name: THING.S16#B30000\n");
-  printf("        Delimiter must be '#'\n");
+  printf("        Delimiter must be '#'. Also works with REPLACEFILE, DELETEFILE, etc.\n");
+  printf("        %s REPLACEFILE       <[2mg|hdv|po]_image_path>   <prodos_folder_path>  <file_path>\n",program_path);
   printf("        ----\n");
   printf("        %s ADDFOLDER     <[2mg|hdv|po]_image_path>   <prodos_folder_path>  <folder_path>\n",program_path);
   printf("        ----\n");
@@ -891,6 +922,32 @@ struct parameter *GetParamLine(int argc, char *argv[])
   if(!my_stricmp(argv[1],"ADDFILE") && argc == 5)
     {
       param->action = ACTION_ADD_FILE;
+
+      /* Chemin du fichier Image */
+      param->image_file_path = strdup(argv[2]);
+
+      /* Chemin du dossier où copier ce fichier */
+      param->prodos_folder_path = strdup(argv[3]);
+
+      /* Chemin du fichier Windows */
+      param->file_path = strdup(argv[4]);
+
+      /* Vérification */
+      if(param->image_file_path == NULL || param->file_path == NULL || param->prodos_folder_path == NULL)
+        {
+          printf("  Error : Impossible to allocate memory for structure Param.\n");
+          mem_free_param(param);
+          return(NULL);
+        }
+
+      /* OK */
+      return(param);
+    }
+
+  /** ADDFILE <2mg_image_path> <target_folder_path> <file_path> **/
+  if(!my_stricmp(argv[1],"REPLACEFILE") && argc == 5)
+    {
+      param->action = ACTION_REPLACE_FILE;
 
       /* Chemin du fichier Image */
       param->image_file_path = strdup(argv[2]);
