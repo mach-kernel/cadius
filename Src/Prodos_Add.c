@@ -36,9 +36,16 @@ static WORD CreateSeedlingContent(struct prodos_image *,struct prodos_file *,uns
 static WORD CreateSaplingContent(struct prodos_image *,struct prodos_file *,unsigned char *,int,int,int);
 static WORD CreateTreeContent(struct prodos_image *,struct prodos_file *,unsigned char *,int,int,int,int);
 
-/***************************************************************/
-/*  AddFile() :  Ajoute un fichier Windows à l'archive Prodos. */
-/***************************************************************/
+/**
+ * @brief      Adds a file.
+ *
+ * @param      current_image       The current image
+ * @param      file_path           The file path
+ * @param      target_folder_path  The target folder path
+ * @param[in]  update_image        The update image
+ *
+ * @return     { description_of_the_return_value }
+ */
 int AddFile(struct prodos_image *current_image, char *file_path, char *target_folder_path, int update_image)
 {
   int i, is_volume_header, error, is_valid;
@@ -49,8 +56,7 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
 
   /** Charge le fichier depuis le disque **/
   current_file = LoadFile(file_path);
-  if(current_file == NULL)
-    return(1);
+  if(current_file == NULL) return(1);
 
   /** On vérifie si ce fichier est compatible Prodos **/
   /* Nom */
@@ -277,9 +283,13 @@ void AddFolder(struct prodos_image *current_image, char *folder_path, char *targ
 }
 
 
-/********************************************************************/
-/*  LoadFile() :  Charge un fichier depuis le disque de la machine. */
-/********************************************************************/
+/**
+ * @brief      Loads a file from disk.
+ *
+ * @param      file_path_data  The file path data
+ *
+ * @return     { description_of_the_return_value }
+ */
 static struct prodos_file *LoadFile(char *file_path_data)
 {
   int i, found;
@@ -295,26 +305,38 @@ static struct prodos_file *LoadFile(char *file_path_data)
       printf("  Error : Impossible to allocate memory.\n");
       return(NULL);
     }
-  
-  /* Extrait le répertoire du nom de fichier */
+
+  // Start from end of string until we arrive to path delimiter
   strcpy(folder_path,file_path_data);
   for(i=strlen(folder_path); i>=0; i--)
-    if(folder_path[i] == '\\' || folder_path[i] == '/')
+    if(!strncmp(&folder_path[i], FOLDER_CHARACTER, sizeof(FOLDER_CHARACTER)))
       {
         folder_path[i+1] = '\0';
         break;
       }
 
-  /** Extrait le nom de fichier **/
+  // Similarly, also extract the filename
   strcpy(file_name,file_path_data);
   for(i=strlen(file_path_data); i>=0; i--)
-    if(file_path_data[i] == '\\' || file_path_data[i] == '/')
+    if(!strncmp(&folder_path[i], FOLDER_CHARACTER, sizeof(FOLDER_CHARACTER)))
       {
         strcpy(file_name,&file_path_data[i+1]);
         break;
       }
+
+  // Attempt to extract ProDOS metadata from the filename
+  char *prodos_meta = strchr(file_name, '#');
+  // Skip the delim char and chop off the name string
+  if (prodos_meta && strlen(prodos_meta + 1) == 6)
+  {
+    *prodos_meta = '\0';
+    prodos_meta++;
+  }
+  else prodos_meta = NULL;
+
   current_file->file_name = strdup(file_name);
-  current_file->file_name_case = strdup(file_name);  
+  current_file->file_name_case = strdup(file_name);
+
   if(current_file->file_name == NULL || current_file->file_name_case == NULL)
     {
       free(current_file);
@@ -360,6 +382,19 @@ static struct prodos_file *LoadFile(char *file_path_data)
   /** Récupération des Propriétés Date/Time du fichier **/
   os_GetFileCreationModificationDate(file_path_data,current_file);
 
+  // Override values in _FileInformation.txt if the suffix is present
+  if (prodos_meta)
+  {
+    char type;
+    WORD aux_type;
+
+    if (sscanf(prodos_meta, "%02hhX%04hX", &type, &aux_type) == 2)
+    {
+      current_file->type = type;
+      current_file->aux_type = aux_type;
+    }
+  }
+
   /* Renvoie la structure */
   return(current_file);
 }
@@ -400,45 +435,45 @@ static int GetFileInformation(char *file_information_path, char *file_name, stru
           GetLineValue(line_tab[i],"Type",local_buffer);
           if(strlen(local_buffer) == 2)
             {
-              sscanf(local_buffer,"%02X",&value);
+              sscanf(local_buffer,"%02lX",&value);
               current_file->type = (unsigned char) value;
             }
           GetLineValue(line_tab[i],"AuxType",local_buffer);
           if(strlen(local_buffer) == 4)
             {
-              sscanf(local_buffer,"%04X",&value);
+              sscanf(local_buffer,"%04lX",&value);
               current_file->aux_type = (WORD) value;
             }
           GetLineValue(line_tab[i],"VersionCreate",local_buffer);
           if(strlen(local_buffer) == 2)
             {
-              sscanf(local_buffer,"%02X",&value);
+              sscanf(local_buffer,"%02lX",&value);
               current_file->version_create = (unsigned char) value;
             }
           GetLineValue(line_tab[i],"MinVersion",local_buffer);
           if(strlen(local_buffer) == 2)
             {
-              sscanf(local_buffer,"%02X",&value);
+              sscanf(local_buffer,"%02lX",&value);
               current_file->min_version = (unsigned char) value;
             }
           GetLineValue(line_tab[i],"Access",local_buffer);
           if(strlen(local_buffer) == 2)
             {
-              sscanf(local_buffer,"%02X",&value);
+              sscanf(local_buffer,"%02lX",&value);
               current_file->access = (unsigned char) value;
             }
           GetLineValue(line_tab[i],"FolderInfo1",local_buffer);
           if(strlen(local_buffer) == 36)
             for(j=0; j<18; j++)
               {
-                sscanf(&local_buffer[2*j],"%02X",&value);
+                sscanf(&local_buffer[2*j],"%02lX",&value);
                 current_file->resource_finderinfo_1[j] = (unsigned char) value;
               }
           GetLineValue(line_tab[i],"FolderInfo2",local_buffer);
           if(strlen(local_buffer) == 36)
             for(j=0; j<18; j++)
               {
-                sscanf(&local_buffer[2*j],"%02X",&value);
+                sscanf(&local_buffer[2*j],"%02lX",&value);
                 current_file->resource_finderinfo_2[j] = (unsigned char) value;
               }
             
