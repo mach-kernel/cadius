@@ -37,7 +37,10 @@ Any and all contributions are welcome. Included is also a `cadius.pro` file you 
 
 ## Changelog
 
-#### 1.3
+#### 1.3.1
+- Resolves timestamp bugs in [#10](https://github.com/mach-kernel/cadius/issues/10). Thanks, @a2-4am!
+
+#### 1.3.0
 - Adds ability to specify a file's `type` and `auxtype` via the filename, resolving [#4](https://github.com/mach-kernel/cadius/issues/4). A big thank you to @JohnMBrooks for testing this PR!
 - `REPLACEFILE` command, `DELETEFILE` support for type/auxtype suffix. 
 
