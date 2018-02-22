@@ -5,9 +5,13 @@
  *
  */
 
-#if BUILD_WIN32
-
 #include "os.h"
+
+#include "../Dc_Shared.h"
+#include "../Dc_Prodos.h"
+#include "../Dc_Memory.h"
+
+#ifdef IS_WINDOWS
 
 /**
  * Win32 C runtime get contents of directory.

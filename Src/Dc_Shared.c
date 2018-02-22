@@ -11,13 +11,13 @@
 #include <string.h>
 #include <ctype.h>
 
-#if IS_WINDOWS
-#include <malloc.h>
-#endif
-
 #include "Dc_Shared.h"
 #include "os/os.h"
 #include "Dc_Memory.h"
+
+#ifdef IS_WINDOWS
+#include <malloc.h>
+#endif
 
 /***************************************************************/
 /*  LoadBinaryFile() :  Récupération des données d'un fichier. */

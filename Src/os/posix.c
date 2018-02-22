@@ -5,9 +5,9 @@
  *
  */
 
-#if BUILD_POSIX
+#include "os.h" 
 
-#include "os.h"
+#if IS_LINUX || IS_DARWIN
 
 /**
  * Creates a directory. The POSIX compliant one requires a mask,
