@@ -5,9 +5,9 @@
  *
  */
 
-#if BUILD_WIN32
-
 #include "os.h"
+
+#ifdef BUILD_WINDOWS
 
 /**
  * Win32 C runtime get contents of directory.

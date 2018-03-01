@@ -37,6 +37,9 @@ Any and all contributions are welcome. Included is also a `cadius.pro` file you 
 
 ## Changelog
 
+#### 1.3.2
+- Maintenance release / macro cleanup
+
 #### 1.3.1
 - Resolves timestamp bugs in [#10](https://github.com/mach-kernel/cadius/issues/10). Thanks, @a2-4am!
 

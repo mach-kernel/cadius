@@ -5,9 +5,9 @@
  *
  */
 
-#if BUILD_POSIX
+#include "os.h" 
 
-#include "os.h"
+#ifdef BUILD_POSIX
 
 /**
  * Creates a directory. The POSIX compliant one requires a mask,
