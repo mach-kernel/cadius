@@ -7,11 +7,7 @@
 
 #include "os.h"
 
-#include "../Dc_Shared.h"
-#include "../Dc_Prodos.h"
-#include "../Dc_Memory.h"
-
-#ifdef IS_WINDOWS
+#ifdef BUILD_WINDOWS
 
 /**
  * Win32 C runtime get contents of directory.

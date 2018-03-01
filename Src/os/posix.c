@@ -7,7 +7,7 @@
 
 #include "os.h" 
 
-#if IS_LINUX || IS_DARWIN
+#ifdef BUILD_POSIX
 
 /**
  * Creates a directory. The POSIX compliant one requires a mask,

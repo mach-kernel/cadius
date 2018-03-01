@@ -18,7 +18,7 @@
 */
 void os_DeleteFile(char *file_path)
 {
-#ifdef IS_WINDOWS
+#ifdef BUILD_WINDOWS
 	os_SetFileAttribute(file_path, SET_FILE_VISIBLE);
 #endif
 	unlink(file_path);

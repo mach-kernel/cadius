@@ -10,9 +10,11 @@
 
 #pragma once
 
-#define IS_WINDOWS (defined (_WIN32) || defined(_WIN64))
-#define IS_DARWIN defined(__APPLE__) || defined(__MACH__)
-#define IS_LINUX defined(__linux__)
+#if defined(_WIN32) || defined(_WIN64)
+#define BUILD_WINDOWS 1
+#else
+#define BUILD_POSIX 1
+#endif
 
 #include <errno.h>
 #include <fcntl.h>
@@ -24,7 +26,17 @@
 #include <sys/types.h>
 #include <time.h>
 
-#ifdef IS_WINDOWS
+#ifdef BUILD_POSIX
+
+#define FOLDER_CHARACTER "/"
+
+#include <dirent.h>
+#include <utime.h>
+
+#endif
+
+#ifdef BUILD_WINDOWS
+
 #pragma warning(disable:4996)
 
 #define FOLDER_CHARACTER "\\"
@@ -34,13 +46,8 @@
 #include <direct.h>
 #include <windows.h>
 
-#else
-#define FOLDER_CHARACTER "/"
-
-#include <dirent.h>
-#include <utime.h>
-
 #endif
+
 
 #if !defined(S_ISDIR) && defined(S_IFDIR)
 #define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
@@ -48,6 +55,10 @@
 
 #define SET_FILE_VISIBLE 1
 #define SET_FILE_HIDDEN 2
+
+#include "../Dc_Shared.h"
+#include "../Dc_Prodos.h"
+#include "../Dc_Memory.h"
 
 int os_GetFolderFiles(char *,char *);
 int os_CreateDirectory(char *directory);
