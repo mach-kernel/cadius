@@ -18,12 +18,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include "os/os.h"
 #include "Dc_Shared.h"
 #include "Dc_Memory.h"
 #include "Dc_Prodos.h"
-#include "os/os.h"
 #include "Prodos_Create.h"
 #include "Prodos_Add.h"
+#include "File_AppleSingle.h"
 
 static struct prodos_file *LoadFile(char *);
 static int GetFileInformation(char *,char *,struct prodos_file *);
@@ -347,9 +348,19 @@ static struct prodos_file *LoadFile(char *file_path_data)
     current_file->file_name[i] = toupper(current_file->file_name[i]);
   /* Proper Case */
   current_file->name_case = BuildProdosCase(current_file->file_name_case);
-    
-  /*** Chargement des Data ***/
-  current_file->data = LoadBinaryFile(file_path_data,&current_file->data_length);
+
+  // Load data. If an AppleSingle file, parse it.
+  unsigned char *data = LoadBinaryFile(file_path_data, &current_file->data_length);
+  if (IsAppleSingle(data))
+  {
+    printf("  AppleSingle format detected!");
+    DecorateProdosFile(current_file, data);
+  }
+  else
+  {
+    current_file->data = data;
+  }
+
   if(current_file->data != NULL && current_file->data_length == 0)
     {
       free(current_file->data);
