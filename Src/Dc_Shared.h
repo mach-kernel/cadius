@@ -8,9 +8,11 @@
 
 #pragma once
 
-typedef unsigned char   BYTE;
-typedef unsigned short  WORD;
-typedef unsigned long   DWORD;
+#include <stdint.h>
+
+typedef unsigned char BYTE;
+typedef uint16_t WORD;
+typedef uint32_t DWORD;
 
 #define BUFFER_SIZE 2048
 

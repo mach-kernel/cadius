@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <inttypes.h>
 
 #include "Dc_Shared.h"
 #include "Dc_Prodos.h"
@@ -20,7 +21,7 @@ typedef struct as_file_header
 {
     DWORD magic;
     DWORD version;
-    int filler[4];
+    DWORD filler[4];
     WORD num_entries;
 } as_file_header;
 
