@@ -353,7 +353,7 @@ static struct prodos_file *LoadFile(char *file_path_data)
   unsigned char *data = LoadBinaryFile(file_path_data, &current_file->data_length);
   if (IsAppleSingle(data))
   {
-    printf("  AppleSingle format detected!");
+    printf("      AppleSingle format detected!\n");
     DecorateProdosFile(current_file, data);
   }
   else

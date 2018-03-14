@@ -52,6 +52,6 @@ typedef enum as_entry_types
 
 const unsigned char AS_MAGIC[4];
 
-struct as_file_entry **GetEntries(unsigned char *buf);
+struct as_file_entry *GetEntries(unsigned char *buf);
 unsigned char *GetDataSegment(unsigned char *buf);
 void DecorateProdosFile(struct prodos_file *current_file, unsigned char *data);
