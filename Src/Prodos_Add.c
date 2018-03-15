@@ -351,7 +351,9 @@ static struct prodos_file *LoadFile(char *file_path_data)
 
   // Load data. If an AppleSingle file, parse it.
   unsigned char *data = LoadBinaryFile(file_path_data, &current_file->data_length);
-  if (ASIsAppleSingle(data))
+  bool is_apple_single = ASIsAppleSingle(data);
+
+  if (is_apple_single)
   {
     printf("      AppleSingle format detected!\n");
     ASDecorateProdosFile(current_file, data);
@@ -380,7 +382,7 @@ static struct prodos_file *LoadFile(char *file_path_data)
   /** Chargement des Informations du fichier contenue dans _FileInformation.txt **/
   sprintf(file_path,"%s_FileInformation.txt",folder_path);
   found = GetFileInformation(file_path,file_name,current_file);
-  if(!found)
+  if(!found && !is_apple_single)
     {
       /* Valeurs par défaut */
       current_file->type = 0x00;
