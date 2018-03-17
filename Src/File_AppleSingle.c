@@ -24,10 +24,10 @@ struct as_file_header *ASParseHeader(unsigned char *buf)
   struct as_file_header *header = malloc(sizeof(as_file_header));
   memcpy(header, buf, sizeof(as_file_header));
 
-  if (__ORDER_LITTLE_ENDIAN__) {
-    header->magic = __builtin_bswap32(header->magic);
-    header->version = __builtin_bswap32(header->version);
-    header->num_entries = __builtin_bswap16(header->num_entries);
+  if (IS_LITTLE_ENDIAN) {
+    header->magic = swap32(header->magic);
+    header->version = swap32(header->version);
+    header->num_entries = swap16(header->num_entries);
   }
 
   return header;
@@ -43,11 +43,11 @@ struct as_prodos_info *ASParseProdosEntry(unsigned char *entry_buf, DWORD length
   struct as_prodos_info *prodos_entry = malloc(sizeof(as_prodos_info));
   memcpy(prodos_entry, entry_buf, length);
 
-  if (__ORDER_LITTLE_ENDIAN__) 
+  if (IS_LITTLE_ENDIAN) 
   {
-    prodos_entry->access = __builtin_bswap16(prodos_entry->access);
-    prodos_entry->filetype = __builtin_bswap16(prodos_entry->filetype);
-    prodos_entry->auxtype = __builtin_bswap32(prodos_entry->auxtype);
+    prodos_entry->access = swap16(prodos_entry->access);
+    prodos_entry->filetype = swap16(prodos_entry->filetype);
+    prodos_entry->auxtype = swap32(prodos_entry->auxtype);
   }
 
   return prodos_entry;
@@ -74,12 +74,12 @@ struct as_file_entry *ASGetEntries(struct as_file_header *header, unsigned char 
   struct as_file_entry *buf_entries = buf + 26;
   memcpy(entries, buf_entries, header->num_entries * sizeof(as_file_entry));
 
-  if (__ORDER_LITTLE_ENDIAN__)
+  if (IS_LITTLE_ENDIAN)
     for (int i = 0; i < header->num_entries; ++i)
     {
-      entries[i].entry_id = __builtin_bswap32(entries[i].entry_id);
-      entries[i].offset = __builtin_bswap32(entries[i].offset);
-      entries[i].length = __builtin_bswap32(entries[i].length);
+      entries[i].entry_id = swap32(entries[i].entry_id);
+      entries[i].offset = swap32(entries[i].offset);
+      entries[i].length = swap32(entries[i].length);
     }
 
   return entries;

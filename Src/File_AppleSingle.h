@@ -17,6 +17,10 @@
 #include "Dc_Shared.h"
 #include "Dc_Prodos.h"
 
+const unsigned char AS_MAGIC[4];
+
+#define IS_LITTLE_ENDIAN (uint32_t) AS_MAGIC != 0x00051600
+
 typedef struct as_file_header
 {
   DWORD magic;
@@ -56,8 +60,6 @@ typedef struct as_prodos_info
   WORD filetype;
   DWORD auxtype;
 } as_prodos_info;
-
-const unsigned char AS_MAGIC[4];
 
 struct as_file_header *ASParseHeader(unsigned char *buf);
 struct as_prodos_info *ASParseProdosEntry(unsigned char *entry_buf, DWORD length);

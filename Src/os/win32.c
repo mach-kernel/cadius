@@ -264,4 +264,14 @@ int my_mkdir(char *path)
 	return mkdir(path);
 }
 
+uint32_t swap32(uint32_t num)
+{
+  return _byteswap_ulong(num);
+}
+
+uint16_t swap16(uint16_t num)
+{
+  return _byteswap_ushort(num);
+}
+
 #endif

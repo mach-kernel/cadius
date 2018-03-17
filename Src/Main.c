@@ -404,9 +404,10 @@ int main(int argc, char *argv[])
       char *file_name = param->file_path + fcharloc;
       char *prodos_file_name = strdup(param->prodos_folder_path);
 
+      // The tool does not use Windows path conventions
       if (strncmp(&prodos_file_name[strlen(prodos_file_name) - 1], \
-                   &FOLDER_CHARACTER, strlen(FOLDER_CHARACTER)))
-        strcat(prodos_file_name, &FOLDER_CHARACTER);
+                  &FOLDER_CHARACTER, strlen(FOLDER_CHARACTER)))
+        strcat(prodos_file_name, "/");
 
       strcat(prodos_file_name, file_name);
 

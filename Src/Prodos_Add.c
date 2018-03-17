@@ -351,6 +351,13 @@ static struct prodos_file *LoadFile(char *file_path_data)
 
   // Load data. If an AppleSingle file, parse it.
   unsigned char *data = LoadBinaryFile(file_path_data, &current_file->data_length);
+
+  if (data == NULL) 
+  {
+    printf("  Error : Cannot load file %s\n", file_path_data);
+    return NULL;
+  }
+
   bool is_apple_single = ASIsAppleSingle(data);
 
   if (is_apple_single)
