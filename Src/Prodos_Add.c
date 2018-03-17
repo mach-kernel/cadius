@@ -310,7 +310,7 @@ static struct prodos_file *LoadFile(char *file_path_data)
   // Start from end of string until we arrive to path delimiter
   strcpy(folder_path,file_path_data);
   for(i=strlen(folder_path); i>=0; i--)
-    if(!strncmp(&folder_path[i], FOLDER_CHARACTER, sizeof(FOLDER_CHARACTER)))
+    if(!strncmp(&folder_path[i], &FOLDER_CHARACTER, strlen(FOLDER_CHARACTER)))
       {
         folder_path[i+1] = '\0';
         break;
@@ -319,7 +319,7 @@ static struct prodos_file *LoadFile(char *file_path_data)
   // Similarly, also extract the filename
   strcpy(file_name,file_path_data);
   for(i=strlen(file_path_data); i>=0; i--)
-    if(!strncmp(&folder_path[i], FOLDER_CHARACTER, sizeof(FOLDER_CHARACTER)))
+    if(!strncmp(&folder_path[i], &FOLDER_CHARACTER, strlen(FOLDER_CHARACTER)))
       {
         strcpy(file_name,&file_path_data[i+1]);
         break;

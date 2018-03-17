@@ -393,9 +393,9 @@ int main(int argc, char *argv[])
 
       int fcharloc = 0;
       for (int i=strlen(param->file_path); i >= 0; --i) {
-        if (!strncmp(&param->file_path[i], FOLDER_CHARACTER, sizeof(FOLDER_CHARACTER))) 
+        if (!strncmp(&param->file_path[i], &FOLDER_CHARACTER, 1))
         {
-          fcharloc = i;
+          fcharloc = i + 1;
           break;
         }
       }
@@ -403,10 +403,14 @@ int main(int argc, char *argv[])
       // Prepare parameters for delete
       char *file_name = param->file_path + fcharloc;
       char *prodos_file_name = strdup(param->prodos_folder_path);
-      strcat(prodos_file_name, &FOLDER_CHARACTER);
+
+      if (strncmp(&prodos_file_name[strlen(prodos_file_name) - 1], \
+                   &FOLDER_CHARACTER, strlen(FOLDER_CHARACTER)))
+        strcat(prodos_file_name, &FOLDER_CHARACTER);
+
       strcat(prodos_file_name, file_name);
 
-      printf("  - Replacing file '%s' :\n",param->file_path);
+      printf("  - Replacing file '%s' :\n",prodos_file_name);
 
       DeleteProdosFile(current_image, prodos_file_name);
       AddFile(current_image, param->file_path, param->prodos_folder_path,1);
