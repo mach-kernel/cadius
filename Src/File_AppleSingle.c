@@ -71,7 +71,7 @@ struct as_file_entry *ASGetEntries(struct as_file_header *header, unsigned char 
     header->num_entries * sizeof(as_file_entry)
   );
 
-  struct as_file_entry *buf_entries = buf + 26;
+  struct as_file_entry *buf_entries = buf + sizeof(as_file_header);
   memcpy(entries, buf_entries, header->num_entries * sizeof(as_file_entry));
 
   if (IS_LITTLE_ENDIAN)

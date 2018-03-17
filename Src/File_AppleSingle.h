@@ -21,6 +21,8 @@ const unsigned char AS_MAGIC[4];
 
 #define IS_LITTLE_ENDIAN (uint32_t) AS_MAGIC != 0x00051600
 
+#pragma pack(1)
+
 typedef struct as_file_header
 {
   DWORD magic;
@@ -61,14 +63,15 @@ typedef struct as_prodos_info
   DWORD auxtype;
 } as_prodos_info;
 
+#pragma pack(pop)
+
+bool ASIsAppleSingle(unsigned char *buf);
+
 struct as_file_header *ASParseHeader(unsigned char *buf);
 struct as_prodos_info *ASParseProdosEntry(unsigned char *entry_buf, DWORD length);
+struct as_file_entry *ASGetEntries(struct as_file_header *header, unsigned char *buf);
 
 void ASDecorateDataFork(struct prodos_file *current_file, unsigned char *data, as_file_entry *data_fork_entry);
 void ASDeocrateProdosFileInfo(struct prodos_file *current_file, unsigned char *data, as_file_entry *prodos_entry);
-
-bool ASIsAppleSingle(unsigned char *buf);
-struct as_file_entry *ASGetEntries(struct as_file_header *header, unsigned char *buf);
-unsigned char *ASGetDataSegment(unsigned char *buf);
-
 void ASDecorateProdosFile(struct prodos_file *current_file, unsigned char *data);
+

@@ -542,6 +542,13 @@ struct parameter *GetParamLine(int argc, char *argv[])
   struct parameter *param;
   char local_buffer[256];
 
+  for (int i = 0; i < argc; ++i)
+    if (strlen(argv[i]) > 256)
+    {
+      printf("  Error: Argument too long!\n");
+      return(NULL);
+    }
+
   /* Vérifications */
   if(argc < 3)
     {
