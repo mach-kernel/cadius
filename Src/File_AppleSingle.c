@@ -1,6 +1,6 @@
 #include "File_AppleSingle.h"
 
-const unsigned char AS_MAGIC[] = {0x00, 0x05, 0x16, 0x00};
+const unsigned int AS_MAGIC = (uint32_t) 0x00051600;
 
 static uint32_t as_field32(uint32_t num)
 {
@@ -20,7 +20,11 @@ static uint16_t as_field16(uint16_t num)
  */
 bool ASIsAppleSingle(unsigned char *buf)
 {
-  return memcmp(&buf, &AS_MAGIC, sizeof(AS_MAGIC));
+  int buf_magic;
+  memcpy(&buf_magic, buf, sizeof(AS_MAGIC));
+  buf_magic = as_field32(buf_magic);
+
+  return buf_magic == AS_MAGIC;
 }
 
 /**
@@ -165,7 +169,7 @@ void ASDecorateProdosFile(struct prodos_file *current_file, unsigned char *data)
 struct as_from_prodos ASFromProdosFile(struct prodos_file *file)
 {
   struct as_file_header *as_header = malloc(sizeof(as_file_header));
-  memcpy(&as_header->magic, AS_MAGIC, sizeof(AS_MAGIC));
+  as_header->magic = as_field32(AS_MAGIC);
   as_header->version = as_field32(2);
   as_header->num_entries = as_field16(2);
 

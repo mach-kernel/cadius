@@ -17,9 +17,8 @@
 #include "Dc_Shared.h"
 #include "Dc_Prodos.h"
 
-const unsigned char AS_MAGIC[4];
-
-#define IS_LITTLE_ENDIAN (uint32_t) AS_MAGIC != 0x00051600
+const unsigned int AS_MAGIC;
+#define IS_LITTLE_ENDIAN true
 
 #pragma pack(1)
 
