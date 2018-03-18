@@ -18,9 +18,9 @@
 #include "Dc_Prodos.h"
 
 const unsigned int AS_MAGIC;
-#define IS_LITTLE_ENDIAN true
+#define IS_LITTLE_ENDIAN 'APPL' == (uint32_t) 0x4150504C
 
-#pragma pack(1)
+#pragma pack(push, 1)
 
 typedef struct as_file_header
 {

@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
     {
       /* Information */
       printf("  - Extract file '%s'\n",param->prodos_file_path);
-      if (output_apple_single) printf("    - Creating AppleSingle file!");
+      if (output_apple_single) printf("    - Creating AppleSingle file!\n");
 
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);

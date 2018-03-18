@@ -108,6 +108,7 @@ void ASDecorateDataFork(struct prodos_file *current_file, unsigned char *data, a
   unsigned char *data_entry = malloc(data_fork_entry->length);
   memcpy(data_entry, data + data_fork_entry->offset, data_fork_entry->length);
   current_file->data = data_entry;
+  current_file->data_length = data_fork_entry->length;
 
   return;
 }
@@ -170,13 +171,14 @@ struct as_from_prodos ASFromProdosFile(struct prodos_file *file)
 {
   struct as_file_header *as_header = malloc(sizeof(as_file_header));
   as_header->magic = as_field32(AS_MAGIC);
-  as_header->version = as_field32(2);
+  for (int i = 0; i < 4; ++i) as_header->filler[i] = 0;
+  as_header->version = as_field32(0x00020000);
   as_header->num_entries = as_field16(2);
 
-  int header_offset = sizeof(as_file_header) + 2 * sizeof(as_file_entry);
+  int header_offset = sizeof(as_file_header) + (2 * sizeof(as_file_entry));
   struct as_file_entry *data_entry = malloc(sizeof(as_file_entry));
   data_entry->entry_id = as_field32(data_fork);
-  data_entry->length = as_field32(sizeof(file->data));
+  data_entry->length = as_field32(file->data_length);
   data_entry->offset = as_field32(header_offset);
 
   int prodos_entry_offset = header_offset + file->data_length;
@@ -186,15 +188,13 @@ struct as_from_prodos ASFromProdosFile(struct prodos_file *file)
   prodos_entry->offset = as_field32(prodos_entry_offset);
 
   struct as_prodos_info *prodos_info = malloc(sizeof(as_prodos_info));
-  prodos_info->access = file->access;
-  prodos_info->filetype = file->type;
-  prodos_info->auxtype = file->aux_type;
+  prodos_info->access = as_field32(file->access);
+  prodos_info->filetype = as_field32(file->type);
+  prodos_info->auxtype = as_field32(file->aux_type);
 
-  char *payload = malloc(
-    prodos_entry_offset + \
-    sizeof(as_prodos_info) + \
-    file->data_length
-  );
+  int payload_size = prodos_entry_offset + sizeof(as_prodos_info);
+
+  char *payload = malloc(payload_size);
   char *seek = payload;
 
   memcpy(seek, as_header, sizeof(as_file_header));
@@ -206,13 +206,13 @@ struct as_from_prodos ASFromProdosFile(struct prodos_file *file)
   memcpy(seek, prodos_entry, sizeof(as_file_entry));
   seek += sizeof(as_file_entry);
 
-  memcpy(seek, &file->data, file->data_length);
+  memcpy(seek, file->data, file->data_length);
   seek += file->data_length;
 
   memcpy(seek, prodos_info, sizeof(as_prodos_info));
 
   struct as_from_prodos as_file; 
-  as_file.length = (seek + sizeof(as_prodos_info)) - payload;
+  as_file.length = payload_size;
   as_file.data = payload;
 
   return as_file;
