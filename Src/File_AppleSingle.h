@@ -18,6 +18,7 @@
 #include "Dc_Prodos.h"
 
 const unsigned char AS_MAGIC[4];
+const unsigned char AS_VERSION[4];
 
 #define IS_LITTLE_ENDIAN (uint32_t) AS_MAGIC != 0x00051600
 
@@ -75,3 +76,4 @@ void ASDecorateDataFork(struct prodos_file *current_file, unsigned char *data, a
 void ASDeocrateProdosFileInfo(struct prodos_file *current_file, unsigned char *data, as_file_entry *prodos_entry);
 void ASDecorateProdosFile(struct prodos_file *current_file, unsigned char *data);
 
+char *ASFromProdosFile(struct prodos_file *file);

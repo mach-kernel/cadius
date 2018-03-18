@@ -1,6 +1,17 @@
 #include "File_AppleSingle.h"
 
 const unsigned char AS_MAGIC[] = {0x00, 0x05, 0x16, 0x00};
+const unsigned char AS_VERSION[] = {0x00, 0x02, 0x00, 0x00};
+
+static uint32_t as_field32(uint32_t num)
+{
+  return IS_LITTLE_ENDIAN ? swap32(num) : num;
+}
+
+static uint16_t as_field16(uint16_t num)
+{
+  return IS_LITTLE_ENDIAN ? swap16(num) : num;
+}
 
 /**
  * Is this an AppleSingle file?
@@ -22,13 +33,11 @@ bool ASIsAppleSingle(unsigned char *buf)
 struct as_file_header *ASParseHeader(unsigned char *buf)
 {
   struct as_file_header *header = malloc(sizeof(as_file_header));
-  memcpy(header, buf, sizeof(as_file_header));
+  struct as_file_header *buf_header = (as_file_header *) buf;
 
-  if (IS_LITTLE_ENDIAN) {
-    header->magic = swap32(header->magic);
-    header->version = swap32(header->version);
-    header->num_entries = swap16(header->num_entries);
-  }
+  header->magic = as_field32(buf_header->magic);
+  header->version = as_field32(buf_header->version);
+  header->num_entries = as_field16(buf_header->num_entries);
 
   return header;
 }
@@ -41,14 +50,11 @@ struct as_file_header *ASParseHeader(unsigned char *buf)
 struct as_prodos_info *ASParseProdosEntry(unsigned char *entry_buf, DWORD length)
 {
   struct as_prodos_info *prodos_entry = malloc(sizeof(as_prodos_info));
-  memcpy(prodos_entry, entry_buf, length);
+  struct as_prodos_info *buf_prodos_entry = (as_prodos_info *) entry_buf;
 
-  if (IS_LITTLE_ENDIAN) 
-  {
-    prodos_entry->access = swap16(prodos_entry->access);
-    prodos_entry->filetype = swap16(prodos_entry->filetype);
-    prodos_entry->auxtype = swap32(prodos_entry->auxtype);
-  }
+  prodos_entry->access = as_field16(buf_prodos_entry->access);
+  prodos_entry->filetype = as_field16(buf_prodos_entry->filetype);
+  prodos_entry->auxtype = as_field32(buf_prodos_entry->auxtype);
 
   return prodos_entry;
 }
@@ -155,4 +161,48 @@ void ASDecorateProdosFile(struct prodos_file *current_file, unsigned char *data)
           break;
       }
     return;
+}
+
+char *ASFromProdosFile(struct prodos_file *file)
+{
+  struct as_file_header *as_header = malloc(sizeof(as_file_header));
+  as_header->magic = as_field32(AS_MAGIC);
+  as_header->version = as_field32(AS_VERSION);
+  as_header->num_entries = as_field16(2);
+
+  int header_offset = sizeof(as_file_header) + 2 * sizeof(as_file_entry);
+  struct as_file_entry *data_entry = malloc(sizeof(as_file_entry));
+  data_entry->entry_id = as_field_32(as_data_fork);
+  data_entry->length = as_field_32(sizeof(file->data));
+  data_entry->offset = as_field_32(header_offset);
+
+  int prodos_entry_offset = header_offset + sizeof(file->data);
+  struct as_file_entry *prodos_entry = malloc(sizeof(as_file_entry));
+  prodos_entry->entry_id = as_field_32(prodos_file_info);
+  prodos_entry->length = as_field_32(sizeof(as_prodos_info));
+  prodos_entry->offset = as_field_32(prodos_entry_offset);
+
+  struct as_prodos_info *prodos_info = malloc(sizeof(as_prodos_info));
+  prodos_info->access = file->access;
+  prodos_info->filetype = file->type;
+  prodos_info->auxtype = file->aux_type;
+
+  char *payload = malloc(prodos_entry_offset + sizeof(as_prodos_info));
+  char *seek = payload;
+
+  memcpy(seek, as_header, sizeof(as_file_header));
+  seek += sizeof(as_file_header);
+
+  memcpy(seek, data_entry, sizeof(as_file_entry));
+  seek += sizeof(as_file_entry);
+
+  memcpy(seek, prodos_entry, sizeof(as_file_entry));
+  seek += sizeof(as_file_entry);
+
+  memcpy(seek, &file->data, sizeof(file->data));
+  seek += sizeof(file->data);
+
+  memcpy(seek, prodos_info, sizeof(as_prodos_info));
+
+  return payload;
 }

@@ -6,8 +6,10 @@
 /*  Auteur : Olivier ZARDINI  *  Brutal Deluxe Software  *  Dec 2011   */
 /***********************************************************************/
 
-void ExtractOneFile(struct prodos_image *,char *,char *);
-void ExtractFolderFiles(struct prodos_image *,struct file_descriptive_entry *,char *);
-void ExtractVolumeFiles(struct prodos_image *,char *);
+#include <stdbool.h>
+
+void ExtractOneFile(struct prodos_image *, char *, char *, bool);
+void ExtractFolderFiles(struct prodos_image *, struct file_descriptive_entry *, char *, bool);
+void ExtractVolumeFiles(struct prodos_image *, char *, bool);
 
 /***********************************************************************/

@@ -18,14 +18,22 @@
 #include "Dc_Prodos.h"
 #include "os/os.h"
 #include "Prodos_Extract.h"
+#include "File_AppleSingle.h"
 
-static int CreateOutputFile(struct prodos_file *,char *);
+static int CreateOutputFile(struct prodos_file *,char *, bool);
 static void SetFileInformation(char *,struct prodos_file *);
 
-/**************************************************************/
-/*  ExtractOneFile() :  Extrait un fichier Prodos sur disque. */
-/**************************************************************/
-void ExtractOneFile(struct prodos_image *current_image, char *prodos_file_path, char *output_directory_path)
+/**
+ * Extracts one file
+ * 
+ * @brief ExtractOneFile
+ * 
+ * @param current_image 
+ * @param prodos_file_path 
+ * @param output_directory_path 
+ * @param output_apple_single 
+ */
+void ExtractOneFile(struct prodos_image *current_image, char *prodos_file_path, char *output_directory_path, bool output_apple_single)
 {
   int error;
   struct file_descriptive_entry *current_entry;
@@ -55,7 +63,7 @@ void ExtractOneFile(struct prodos_image *current_image, char *prodos_file_path, 
     }
 
   /** Création du fichier sur disque **/
-  error = CreateOutputFile(current_file,output_directory_path);
+  error = CreateOutputFile(current_file,output_directory_path,output_apple_single);
 
   /* Libération mémoire */
   mem_free_file(current_file);
@@ -65,7 +73,7 @@ void ExtractOneFile(struct prodos_image *current_image, char *prodos_file_path, 
 /************************************************************************/
 /*  ExtractFolderFiles() :  Fonction récursive d'extraction de fichier. */
 /************************************************************************/
-void ExtractFolderFiles(struct prodos_image *current_image, struct file_descriptive_entry *folder_entry, char *output_directory_path)
+void ExtractFolderFiles(struct prodos_image *current_image, struct file_descriptive_entry *folder_entry, char *output_directory_path, bool output_apple_single)
 {
   int i, error;
   char *windows_folder_path;
@@ -130,7 +138,7 @@ void ExtractFolderFiles(struct prodos_image *current_image, struct file_descript
         }
 
       /** Création du fichier sur disque **/
-      error = CreateOutputFile(current_file,windows_folder_path);
+      error = CreateOutputFile(current_file,windows_folder_path,output_apple_single);
 
       /* Libération mémoire */
       mem_free_file(current_file);
@@ -153,7 +161,7 @@ void ExtractFolderFiles(struct prodos_image *current_image, struct file_descript
       printf("      + Extract Folder : %s\n",current_entry->file_path);
 
       /** Récursivité **/
-      ExtractFolderFiles(current_image,current_entry,windows_folder_path);
+      ExtractFolderFiles(current_image,current_entry,windows_folder_path,output_apple_single);
     }
 
   /** Libération mémoire **/
@@ -164,7 +172,7 @@ void ExtractFolderFiles(struct prodos_image *current_image, struct file_descript
 /****************************************************************************/
 /*  ExtractVolumeFiles() :  Fonction d'extraction des fichiers d'un volume. */
 /****************************************************************************/
-void ExtractVolumeFiles(struct prodos_image *current_image, char *output_directory_path)
+void ExtractVolumeFiles(struct prodos_image *current_image, char *output_directory_path, bool output_apple_single)
 {
   int i, error;
   char *windows_folder_path;
@@ -228,7 +236,7 @@ void ExtractVolumeFiles(struct prodos_image *current_image, char *output_directo
         }
 
       /** Création du fichier sur disque **/
-      error = CreateOutputFile(current_file,windows_folder_path);
+      error = CreateOutputFile(current_file,windows_folder_path, output_apple_single);
 
       /* Libération mémoire */
       mem_free_file(current_file);
@@ -251,7 +259,7 @@ void ExtractVolumeFiles(struct prodos_image *current_image, char *output_directo
       printf("      + Extract Folder : %s\n",current_entry->file_path);
 
       /** Récursivité **/
-      ExtractFolderFiles(current_image,current_entry,windows_folder_path);
+      ExtractFolderFiles(current_image,current_entry,windows_folder_path,output_apple_single);
     }
 
   /** Libération mémoire **/
@@ -266,7 +274,7 @@ void ExtractVolumeFiles(struct prodos_image *current_image, char *output_directo
  * @param output_directory_path
  * @return
  */
-static int CreateOutputFile(struct prodos_file *current_file, char *output_directory_path)
+static int CreateOutputFile(struct prodos_file *current_file, char *output_directory_path, bool output_apple_single)
 {
   int error;
   char directory_path[1024];
@@ -291,10 +299,13 @@ static int CreateOutputFile(struct prodos_file *current_file, char *output_direc
   strcat(file_data_path,current_file->entry->file_name_case);
 
   // Append the file type and auxtype extension
-  char extension[7];
-  strcat(file_data_path, "#");
-  sprintf(extension, "%02hhX%04hX", current_file->entry->file_type, current_file->entry->file_aux_type);
-  strcat(file_data_path, extension);
+  if (!output_apple_single)
+  {
+    char extension[7];
+    strcat(file_data_path, "#");
+    sprintf(extension, "%02hhX%04hX", current_file->entry->file_type, current_file->entry->file_aux_type);
+    strcat(file_data_path, extension);
+  }
 
   // ResourceFork path
   strcpy(file_resource_path,file_data_path);
