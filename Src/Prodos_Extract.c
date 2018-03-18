@@ -314,7 +314,15 @@ static int CreateOutputFile(struct prodos_file *current_file, char *output_direc
   /**********************************/
   /**  Création du Fichier : Data  **/
   /**********************************/
-  error = CreateBinaryFile(file_data_path,current_file->data,current_file->data_length);
+
+  if (output_apple_single)
+  {
+    struct as_from_prodos as_file = ASFromProdosFile(current_file);
+    error = CreateBinaryFile(file_data_path, as_file.data, as_file.length);
+  }
+  else
+    error = CreateBinaryFile(file_data_path,current_file->data,current_file->data_length);
+  
   if(error)
     {
       printf("  Error : Can't create file '%s' on disk at location '%s'.\n",current_file->entry->file_name_case,file_data_path);

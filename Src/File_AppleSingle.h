@@ -18,7 +18,6 @@
 #include "Dc_Prodos.h"
 
 const unsigned char AS_MAGIC[4];
-const unsigned char AS_VERSION[4];
 
 #define IS_LITTLE_ENDIAN (uint32_t) AS_MAGIC != 0x00051600
 
@@ -64,6 +63,12 @@ typedef struct as_prodos_info
   DWORD auxtype;
 } as_prodos_info;
 
+typedef struct as_from_prodos
+{
+  uint16_t length;
+  char *data;
+} as_from_prodos;
+
 #pragma pack(pop)
 
 bool ASIsAppleSingle(unsigned char *buf);
@@ -76,4 +81,4 @@ void ASDecorateDataFork(struct prodos_file *current_file, unsigned char *data, a
 void ASDeocrateProdosFileInfo(struct prodos_file *current_file, unsigned char *data, as_file_entry *prodos_entry);
 void ASDecorateProdosFile(struct prodos_file *current_file, unsigned char *data);
 
-char *ASFromProdosFile(struct prodos_file *file);
+struct as_from_prodos ASFromProdosFile(struct prodos_file *file);
