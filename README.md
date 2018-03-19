@@ -41,6 +41,7 @@ Any and all contributions are welcome. Included is also a `cadius.pro` file you 
 - Adds AppleSingle file format support, with initial support for data and ProDOS file info IDs 1 & 11 ([#7](https://github.com/mach-kernel/cadius/issues/7)).
 - Fix path bugs on Windows ([#9](https://github.com/mach-kernel/cadius/issues/9)).
 - Fix buffer overflow from [#12](https://github.com/mach-kernel/cadius/issues/12).
+- Fix segfault when using `EXTRACTVOLUME`.
 
 #### 1.3.2
 - Maintenance release / macro cleanup.

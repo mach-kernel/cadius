@@ -429,6 +429,8 @@ static void SetFileInformation(char *file_information_path, struct prodos_file *
   /** Ajouts des lignes existantes **/
   for(i=0; i<nb_line; i++)
     {
+      if (line_tab == NULL) break;
+
       /* Isole le nom du fichier */
       next_sep = strchr(line_tab[i],'=');
       if(next_sep == NULL)
