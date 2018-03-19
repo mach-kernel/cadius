@@ -37,8 +37,13 @@ Any and all contributions are welcome. Included is also a `cadius.pro` file you 
 
 ## Changelog
 
+#### 1.4.0
+- Adds AppleSingle file format support, with initial support for data and ProDOS file info IDs 1 & 11 ([#7](https://github.com/mach-kernel/cadius/issues/7)).
+- Fix path bugs on Windows ([#9](https://github.com/mach-kernel/cadius/issues/9)).
+- Fix buffer overflow from [#12](https://github.com/mach-kernel/cadius/issues/12).
+
 #### 1.3.2
-- Maintenance release / macro cleanup
+- Maintenance release / macro cleanup.
 
 #### 1.3.1
 - Resolves timestamp bugs in [#10](https://github.com/mach-kernel/cadius/issues/10). Thanks, @a2-4am!
@@ -48,17 +53,17 @@ Any and all contributions are welcome. Included is also a `cadius.pro` file you 
 - `REPLACEFILE` command, `DELETEFILE` support for type/auxtype suffix. 
 
 #### 1.2-b3
-- Fix Windows build issues, make some shared OS methods static / remove from `os.c` ([@mach-kernel](https://github.com/mach-kernel))
+- Fix Windows build issues, make some shared OS methods static / remove from `os.c` ([@mach-kernel](https://github.com/mach-kernel)).
 
 #### 1.2-b2
-- Clean up OS macros, explicit `win32` and `posix` modules ([@mach-kernel](https://github.com/mach-kernel))
+- Clean up OS macros, explicit `win32` and `posix` modules ([@mach-kernel](https://github.com/mach-kernel)).
 
 #### 1.2-b1
-- UTF-8 encode all source files
-- Initial POSIX support ([@mach-kernel](https://github.com/mach-kernel))
+- UTF-8 encode all source files.
+- Initial POSIX support ([@mach-kernel](https://github.com/mach-kernel)).
 
 #### 1.1
-- Initial fork from BrutalDeluxe
+- Initial fork from BrutalDeluxe.
 
 ## License
 
