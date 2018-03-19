@@ -175,25 +175,24 @@ struct as_from_prodos ASFromProdosFile(struct prodos_file *file)
   as_header->version = as_field32(0x00020000);
   as_header->num_entries = as_field16(2);
 
-  int header_offset = sizeof(as_file_header) + (2 * sizeof(as_file_entry));
+  uint32_t header_offset = sizeof(as_file_header) + (2 * sizeof(as_file_entry));
   struct as_file_entry *data_entry = malloc(sizeof(as_file_entry));
   data_entry->entry_id = as_field32(data_fork);
   data_entry->length = as_field32(file->data_length);
   data_entry->offset = as_field32(header_offset);
 
-  int prodos_entry_offset = header_offset + file->data_length;
+  uint32_t prodos_entry_offset = header_offset + file->data_length;
   struct as_file_entry *prodos_entry = malloc(sizeof(as_file_entry));
   prodos_entry->entry_id = as_field32(prodos_file_info);
   prodos_entry->length = as_field32(sizeof(as_prodos_info));
   prodos_entry->offset = as_field32(prodos_entry_offset);
 
   struct as_prodos_info *prodos_info = malloc(sizeof(as_prodos_info));
-  prodos_info->access = as_field32(file->access);
-  prodos_info->filetype = as_field32(file->type);
-  prodos_info->auxtype = as_field32(file->aux_type);
+  prodos_info->access = as_field16(file->entry->access);
+  prodos_info->filetype = as_field16(file->entry->file_type);
+  prodos_info->auxtype = as_field32(file->entry->file_aux_type);
 
-  int payload_size = prodos_entry_offset + sizeof(as_prodos_info);
-
+  uint32_t payload_size = prodos_entry_offset + sizeof(as_prodos_info);
   char *payload = malloc(payload_size);
   char *seek = payload;
 
