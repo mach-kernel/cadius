@@ -163,6 +163,7 @@ int main(int argc, char *argv[])
     {
       /* Information */
       printf("  - Extract folder '%s' :\n",param->prodos_folder_path);
+      if (output_apple_single) printf("    - Creating AppleSingle files!\n");
 
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
@@ -197,6 +198,7 @@ int main(int argc, char *argv[])
 
       /* Information */
       printf("  - Extract volume '%s' :\n",current_image->volume_header->volume_name_case);
+      if (output_apple_single) printf("    - Creating AppleSingle files!\n");
 
       /** Extrait les fichiers du volume **/
       ExtractVolumeFiles(
@@ -647,7 +649,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** EXTRACTFOLDER <image_path> <prodos_folder_path> <output_directory> **/
-  if(!my_stricmp(argv[1],"EXTRACTFOLDER") && argc == 5)
+  if(!my_stricmp(argv[1],"EXTRACTFOLDER") && argc >= 5)
     {
       param->action = ACTION_EXTRACT_FOLDER;
 
@@ -673,7 +675,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** EXTRACTVOLUME <image_path> <output_directory> **/
-  if(!my_stricmp(argv[1],"EXTRACTVOLUME") && argc == 4)
+  if(!my_stricmp(argv[1],"EXTRACTVOLUME") && argc >= 4)
     {
       param->action = ACTION_EXTRACT_VOLUME;
 
