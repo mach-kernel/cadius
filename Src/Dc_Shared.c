@@ -12,8 +12,9 @@
 #include <ctype.h>
 
 #include "Dc_Shared.h"
-#include "os/os.h"
 #include "Dc_Memory.h"
+#include "File_AppleSingle.h"
+#include "os/os.h"
 
 #ifdef IS_WINDOWS
 #include <malloc.h>
@@ -64,6 +65,7 @@ unsigned char *LoadBinaryFile(char *file_path, int *data_length_rtn)
 
   /* Renvoi les données et la taille */
   *data_length_rtn = nb_read;
+
   return(data);
 }
 

@@ -172,11 +172,21 @@ void os_GetFileCreationModificationDate(char *path, struct prodos_file *file) {
 
 char *my_strcpy(char *s1, char *s2) 
 {
-	return strcpy(s1, s2);
+  return strcpy(s1, s2);
 }
 
 char *my_strdup(const char *s)
 {
-	return strdup(s);
+  return strdup(s);
+}
+
+uint32_t swap32(uint32_t num)
+{
+  return __builtin_bswap32(num);
+}
+
+uint16_t swap16(uint16_t num)
+{
+  return __builtin_bswap16(num);
 }
 #endif

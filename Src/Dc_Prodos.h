@@ -249,7 +249,6 @@ struct file_descriptive_entry
   struct file_descriptive_entry *next;
 };
 
-
 struct prodos_file
 {
   int entry_type;          /* Seedling, Sapling, Tree, Extended */

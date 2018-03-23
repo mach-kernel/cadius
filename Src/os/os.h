@@ -73,4 +73,7 @@ int my_mkdir(char *path);
 char *my_strcpy(char *s1, char *s2);
 char *my_strdup(const char *s);
 
+uint32_t swap32(uint32_t num);
+uint16_t swap16(uint16_t num);
+
 /***********************************************************************/

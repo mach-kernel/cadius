@@ -18,12 +18,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include "os/os.h"
 #include "Dc_Shared.h"
 #include "Dc_Memory.h"
 #include "Dc_Prodos.h"
-#include "os/os.h"
 #include "Prodos_Create.h"
 #include "Prodos_Add.h"
+#include "File_AppleSingle.h"
 
 static struct prodos_file *LoadFile(char *);
 static int GetFileInformation(char *,char *,struct prodos_file *);
@@ -309,7 +310,7 @@ static struct prodos_file *LoadFile(char *file_path_data)
   // Start from end of string until we arrive to path delimiter
   strcpy(folder_path,file_path_data);
   for(i=strlen(folder_path); i>=0; i--)
-    if(!strncmp(&folder_path[i], FOLDER_CHARACTER, sizeof(FOLDER_CHARACTER)))
+    if(!strncmp(&folder_path[i], &FOLDER_CHARACTER, strlen(FOLDER_CHARACTER)))
       {
         folder_path[i+1] = '\0';
         break;
@@ -318,7 +319,7 @@ static struct prodos_file *LoadFile(char *file_path_data)
   // Similarly, also extract the filename
   strcpy(file_name,file_path_data);
   for(i=strlen(file_path_data); i>=0; i--)
-    if(!strncmp(&folder_path[i], FOLDER_CHARACTER, sizeof(FOLDER_CHARACTER)))
+    if(!strncmp(&folder_path[i], &FOLDER_CHARACTER, strlen(FOLDER_CHARACTER)))
       {
         strcpy(file_name,&file_path_data[i+1]);
         break;
@@ -347,9 +348,28 @@ static struct prodos_file *LoadFile(char *file_path_data)
     current_file->file_name[i] = toupper(current_file->file_name[i]);
   /* Proper Case */
   current_file->name_case = BuildProdosCase(current_file->file_name_case);
-    
-  /*** Chargement des Data ***/
-  current_file->data = LoadBinaryFile(file_path_data,&current_file->data_length);
+
+  // Load data. If an AppleSingle file, parse it.
+  unsigned char *data = LoadBinaryFile(file_path_data, &current_file->data_length);
+
+  if (data == NULL) 
+  {
+    printf("  Error : Cannot load file %s\n", file_path_data);
+    return NULL;
+  }
+
+  bool is_apple_single = ASIsAppleSingle(data);
+
+  if (is_apple_single)
+  {
+    printf("      AppleSingle format detected!\n");
+    ASDecorateProdosFile(current_file, data);
+  }
+  else
+  {
+    current_file->data = data;
+  }
+
   if(current_file->data != NULL && current_file->data_length == 0)
     {
       free(current_file->data);
@@ -369,7 +389,7 @@ static struct prodos_file *LoadFile(char *file_path_data)
   /** Chargement des Informations du fichier contenue dans _FileInformation.txt **/
   sprintf(file_path,"%s_FileInformation.txt",folder_path);
   found = GetFileInformation(file_path,file_name,current_file);
-  if(!found)
+  if(!found && !is_apple_single)
     {
       /* Valeurs par défaut */
       current_file->type = 0x00;

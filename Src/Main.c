@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #if IS_WINDOWS
 #include <malloc.h>
@@ -78,7 +79,7 @@ int main(int argc, char *argv[])
   verbose = 0;
 
   /* Message Information */
-  printf("%s v 1.3.1, (c) Brutal Deluxe 2011-2013.\n",argv[0]);
+  printf("%s v 1.4.0 (c) Brutal Deluxe 2011-2013.\n",argv[0]);
 
   /* Vérification des paramètres */
   if(argc < 3)
@@ -93,6 +94,9 @@ int main(int argc, char *argv[])
   /* Verbose */
   if(!my_stricmp(argv[argc-1],"-V"))
     verbose = 1;
+
+  /* AppleSingle */
+  bool output_apple_single = !my_stricmp(argv[argc - 1], "-A");
 
   /** Décode les paramètres **/
   param = GetParamLine(argc-verbose,argv);
@@ -137,6 +141,7 @@ int main(int argc, char *argv[])
     {
       /* Information */
       printf("  - Extract file '%s'\n",param->prodos_file_path);
+      if (output_apple_single) printf("    - Creating AppleSingle file!\n");
 
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
@@ -144,7 +149,12 @@ int main(int argc, char *argv[])
         return(3);
 
       /** Extrait le fichier sur disque **/
-      ExtractOneFile(current_image,param->prodos_file_path,param->output_directory_path);
+      ExtractOneFile(
+        current_image,
+        param->prodos_file_path,
+        param->output_directory_path,
+        output_apple_single
+      );
 
       /* Libération mémoire */
       mem_free_image(current_image);
@@ -153,6 +163,7 @@ int main(int argc, char *argv[])
     {
       /* Information */
       printf("  - Extract folder '%s' :\n",param->prodos_folder_path);
+      if (output_apple_single) printf("    - Creating AppleSingle files!\n");
 
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
@@ -165,7 +176,12 @@ int main(int argc, char *argv[])
         return(4);
 
       /** Extrait les fichiers du répertoire **/
-      ExtractFolderFiles(current_image,folder_entry,param->output_directory_path);
+      ExtractFolderFiles(
+        current_image,
+        folder_entry,
+        param->output_directory_path,
+        output_apple_single
+      );
 
       /* Stat */
       printf("    => File(s) : %d,  Folder(s) : %d,  Error(s) : %d\n",current_image->nb_extract_file,current_image->nb_extract_folder,current_image->nb_extract_error);
@@ -182,9 +198,14 @@ int main(int argc, char *argv[])
 
       /* Information */
       printf("  - Extract volume '%s' :\n",current_image->volume_header->volume_name_case);
+      if (output_apple_single) printf("    - Creating AppleSingle files!\n");
 
       /** Extrait les fichiers du volume **/
-      ExtractVolumeFiles(current_image,param->output_directory_path);
+      ExtractVolumeFiles(
+        current_image,
+        param->output_directory_path,
+        output_apple_single
+      );
 
       /* Stat */
       printf("    => File(s) : %d,  Folder(s) : %d,  Error(s) : %d\n",current_image->nb_extract_file,current_image->nb_extract_folder,current_image->nb_extract_error);
@@ -393,9 +414,9 @@ int main(int argc, char *argv[])
 
       int fcharloc = 0;
       for (int i=strlen(param->file_path); i >= 0; --i) {
-        if (!strncmp(&param->file_path[i], FOLDER_CHARACTER, sizeof(FOLDER_CHARACTER))) 
+        if (!strncmp(&param->file_path[i], &FOLDER_CHARACTER, 1))
         {
-          fcharloc = i;
+          fcharloc = i + 1;
           break;
         }
       }
@@ -403,10 +424,15 @@ int main(int argc, char *argv[])
       // Prepare parameters for delete
       char *file_name = param->file_path + fcharloc;
       char *prodos_file_name = strdup(param->prodos_folder_path);
-      strcat(prodos_file_name, &FOLDER_CHARACTER);
+
+      // The tool does not use Windows path conventions
+      if (strncmp(&prodos_file_name[strlen(prodos_file_name) - 1], \
+                  &FOLDER_CHARACTER, strlen(FOLDER_CHARACTER)))
+        strcat(prodos_file_name, "/");
+
       strcat(prodos_file_name, file_name);
 
-      printf("  - Replacing file '%s' :\n",param->file_path);
+      printf("  - Replacing file '%s' :\n",prodos_file_name);
 
       DeleteProdosFile(current_image, prodos_file_name);
       AddFile(current_image, param->file_path, param->prodos_folder_path,1);
@@ -495,7 +521,8 @@ void usage(char *program_path)
   printf("        ----\n");
   printf("        %s EXTRACTFILE   <[2mg|hdv|po]_image_path>   <prodos_file_path>    <output_directory>\n",program_path);
   printf("        %s EXTRACTFOLDER <[2mg|hdv|po]_image_path>   <prodos_folder_path>  <output_directory>\n",program_path);
-  printf("        %s EXTRACTVOLUME <[2mg|hdv|po]_image_path>   <output_directory>\n",program_path);
+  printf("        %s EXTRACTVOLUME <[2mg|hdv|po]_image_path>   <output_directory>\n\n",program_path);
+  printf("        [-A] Extract as AppleSingle\n");
   printf("        ----\n");
   printf("        %s RENAMEFILE    <[2mg|hdv|po]_image_path>   <prodos_file_path>    <new_file_name>\n",program_path);
   printf("        %s RENAMEFOLDER  <[2mg|hdv|po]_image_path>   <prodos_folder_path>  <new_folder_name>\n",program_path);
@@ -536,6 +563,13 @@ struct parameter *GetParamLine(int argc, char *argv[])
 {
   struct parameter *param;
   char local_buffer[256];
+
+  for (int i = 0; i < argc; ++i)
+    if (strlen(argv[i]) > 256)
+    {
+      printf("  Error: Argument too long!\n");
+      return(NULL);
+    }
 
   /* Vérifications */
   if(argc < 3)
@@ -589,7 +623,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** EXTRACTFILE <image_path> <prodos_file_path> <output_directory> **/
-  if(!my_stricmp(argv[1],"EXTRACTFILE") && argc == 5)
+  if(!my_stricmp(argv[1],"EXTRACTFILE") && argc >= 5)
     {
       param->action = ACTION_EXTRACT_FILE;
 
@@ -615,7 +649,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** EXTRACTFOLDER <image_path> <prodos_folder_path> <output_directory> **/
-  if(!my_stricmp(argv[1],"EXTRACTFOLDER") && argc == 5)
+  if(!my_stricmp(argv[1],"EXTRACTFOLDER") && argc >= 5)
     {
       param->action = ACTION_EXTRACT_FOLDER;
 
@@ -641,7 +675,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** EXTRACTVOLUME <image_path> <output_directory> **/
-  if(!my_stricmp(argv[1],"EXTRACTVOLUME") && argc == 4)
+  if(!my_stricmp(argv[1],"EXTRACTVOLUME") && argc >= 4)
     {
       param->action = ACTION_EXTRACT_VOLUME;
 
