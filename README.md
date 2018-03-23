@@ -43,6 +43,8 @@ Any and all contributions are welcome. Included is also a `cadius.pro` file you 
 - Fix buffer overflow from [#12](https://github.com/mach-kernel/cadius/issues/12).
 - Fix segfault when using `EXTRACTVOLUME`.
 
+A big thank you to [@oliverschmidt](https://github.com/oliverschmidt) for helping test this release!
+
 #### 1.3.2
 - Maintenance release / macro cleanup.
 

@@ -340,9 +340,13 @@ static int CreateOutputFile(struct prodos_file *current_file, char *output_direc
   #endif
 
   /** Ajoute des informations du fichier dans le fichier FileInformation.txt **/
-  strcpy(file_information_path,directory_path);
-  strcat(file_information_path,"_FileInformation.txt");
-  SetFileInformation(file_information_path,current_file);
+
+  if (!output_apple_single)
+  {
+    strcpy(file_information_path,directory_path);
+    strcat(file_information_path,"_FileInformation.txt");
+    SetFileInformation(file_information_path,current_file);
+  }
 
   /**************************************/
   /**  Création du Fichier : Resource  **/
