@@ -938,7 +938,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
         param->new_volume_size_kb = 0;
       if(param->new_volume_size_kb == 0)
         {
-          printf("  Error : Invalide volume size : '%s'.\n",argv[4]);
+          printf("  Error : Invalid volume size : '%s'.\n",argv[4]);
           mem_free_param(param);
           return(NULL);
         }
