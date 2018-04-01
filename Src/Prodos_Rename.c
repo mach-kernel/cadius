@@ -34,7 +34,7 @@ void RenameProdosFile(struct prodos_image *current_image, char *prodos_file_path
   unsigned char directory_block[BLOCK_SIZE];
 
   /* Recherche l'entrée Prodos */
-  current_entry = GetProdosFile(current_image,prodos_file_path);
+  current_entry = GetProdosFile(current_image,prodos_file_path,false);
   if(current_entry == NULL)
     {
       printf("  Error : Invalid Prodos File path '%s'.\n",prodos_file_path);

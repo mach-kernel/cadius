@@ -29,8 +29,9 @@ static int compare_folder(const void *,const void *);
  *
  * @param      current_image     The current image
  * @param      prodos_file_path  The prodos file path
+ * @param      silent            Print error message?
  */
-void DeleteProdosFile(struct prodos_image *current_image, char *prodos_file_path)
+void DeleteProdosFile(struct prodos_image *current_image, char *prodos_file_path, bool silent)
 {
   int error;
   struct file_descriptive_entry *current_entry;
@@ -40,10 +41,12 @@ void DeleteProdosFile(struct prodos_image *current_image, char *prodos_file_path
   if (suffix && strlen(suffix + 1) == 6) *suffix = '\0'; 
 
   /* Recherche l'entrée Prodos */
-  current_entry = GetProdosFile(current_image,prodos_file_path);
+  current_entry = GetProdosFile(current_image,prodos_file_path, silent);
   if(current_entry == NULL)
     {
-      printf("  Error : Invalid Prodos File path '%s'.\n",prodos_file_path);
+      if (!silent) {
+        printf("  Error : Invalid Prodos File path '%s'.\n",prodos_file_path);
+      }
       return;
     }
 

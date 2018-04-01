@@ -1442,7 +1442,7 @@ int compare_entry(const void *data_1, const void *data_2)
 /***************************************************************/
 /*  GetProdosFile() :  Recherche l'entrée d'un fichier Prodos. */
 /***************************************************************/
-struct file_descriptive_entry *GetProdosFile(struct prodos_image *current_image, char *prodos_file_path)
+struct file_descriptive_entry *GetProdosFile(struct prodos_image *current_image, char *prodos_file_path, bool silent)
 {
   struct file_descriptive_entry *current_entry;
   struct file_descriptive_entry *current_directory_entry;
@@ -1483,7 +1483,10 @@ struct file_descriptive_entry *GetProdosFile(struct prodos_image *current_image,
           /* Première partie : Volume Name */
           if(my_stricmp(name,current_image->volume_header->volume_name))
             {
-              printf("  Error : Can't get file from Image, Wrong volume name.\n");
+              if (!silent) 
+                {
+                  printf("  Error : Can't get file from Image, Wrong volume name.\n");
+                }
               return(NULL);
             }
           is_volume_name = 0;
@@ -1515,7 +1518,10 @@ struct file_descriptive_entry *GetProdosFile(struct prodos_image *current_image,
           /* Rien trouvé : Erreur */
           if(current_entry == NULL)
             {
-              printf("  Error : Can't get file from Image, File not found.\n");
+              if (!silent) 
+                {
+                  printf("  Error : Can't get file from Image, File not found.\n");
+                }
               return(NULL);
             }
           is_root_name = 0;
@@ -1550,7 +1556,10 @@ struct file_descriptive_entry *GetProdosFile(struct prodos_image *current_image,
           /* Rien trouvé : Erreur */
           if(current_entry == NULL)
             {
-              printf("  Error : Can't get file from Image.\n");
+              if (!silent) 
+                {
+                  printf("  Error : Can't get file from Image.\n");
+                }
               return(NULL);
             }
         }
@@ -1559,14 +1568,20 @@ struct file_descriptive_entry *GetProdosFile(struct prodos_image *current_image,
   /* Rien trouvé */
   if(current_entry == NULL)
     {
-      printf("  Error : Can't get file from Image.\n");
+      if (!silent) 
+        {
+          printf("  Error : Can't get file from Image.\n");
+        }
       return(NULL);
     }
 
   /* Le fichier est un répertoire */
   if((current_entry->storage_type & 0x0F) == 0x0D)
     {
-      printf("  Error : Can't get file from Image : Directory name.\n");
+      if (!silent) 
+        {
+          printf("  Error : Can't get file from Image : Directory name.\n");
+        }
       return(NULL);
     }
 

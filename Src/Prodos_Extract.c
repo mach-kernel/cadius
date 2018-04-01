@@ -40,7 +40,7 @@ void ExtractOneFile(struct prodos_image *current_image, char *prodos_file_path, 
   struct prodos_file *current_file;
 
   /** Recherche l'entrée du fichier **/
-  current_entry = GetProdosFile(current_image,prodos_file_path);
+  current_entry = GetProdosFile(current_image,prodos_file_path,false);
   if(current_entry == NULL)
     return;
 

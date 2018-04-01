@@ -39,7 +39,7 @@ void MoveProdosFile(struct prodos_image *current_image, char *prodos_file_path, 
   struct file_descriptive_entry *target_folder;
 
   /* Recherche l'entrée Prodos */
-  current_entry = GetProdosFile(current_image,prodos_file_path);
+  current_entry = GetProdosFile(current_image,prodos_file_path,false);
   if(current_entry == NULL)
     {
       printf("  Error : Invalid Prodos File path '%s'.\n",prodos_file_path);

@@ -304,7 +304,7 @@ int main(int argc, char *argv[])
       printf("  - Delete file '%s' :\n",param->prodos_file_path);
 
       /** Supprime le fichier **/
-      DeleteProdosFile(current_image,param->prodos_file_path);
+      DeleteProdosFile(current_image,param->prodos_file_path,false);
 
       /* Libération mémoire */
       mem_free_image(current_image);
@@ -435,7 +435,7 @@ int main(int argc, char *argv[])
 
       printf("  - Replacing file '%s' :\n",prodos_file_name);
 
-      DeleteProdosFile(current_image, prodos_file_name);
+      DeleteProdosFile(current_image, prodos_file_name, true);
       AddFile(current_image, param->file_path, param->prodos_folder_path,1);
 
       free(prodos_file_name);

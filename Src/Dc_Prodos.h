@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <stdbool.h>
+
 #define IMG_HEADER_SIZE  0x40   /* 2MG Header Size */
 #define HDV_HEADER_SIZE  0x00   /* HDV Header Size */
 #define  PO_HEADER_SIZE  0x00   /*  PO Header Size */
@@ -299,7 +301,7 @@ struct prodos_file
 struct prodos_image *LoadProdosImage(char *);
 struct file_descriptive_entry *ODSReadFileDescriptiveEntry(struct prodos_image *,char *,unsigned char *);
 int UpdateProdosImage(struct prodos_image *);
-struct file_descriptive_entry *GetProdosFile(struct prodos_image *,char *);
+struct file_descriptive_entry *GetProdosFile(struct prodos_image *,char *,bool);
 struct file_descriptive_entry *GetProdosFolder(struct prodos_image *,char *,int);
 int *GetEntryBlock(struct prodos_image *,int,int,int,int *,int **,int *);
 int GetDataFile(struct prodos_image *,struct file_descriptive_entry *,struct prodos_file *);
