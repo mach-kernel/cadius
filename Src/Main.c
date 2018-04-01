@@ -414,7 +414,7 @@ int main(int argc, char *argv[])
 
       int fcharloc = 0;
       for (int i=strlen(param->file_path); i >= 0; --i) {
-        if (!strncmp(&param->file_path[i], &FOLDER_CHARACTER, 1))
+        if (!strncmp(&param->file_path[i], FOLDER_CHARACTER, 1))
         {
           fcharloc = i + 1;
           break;
@@ -428,7 +428,7 @@ int main(int argc, char *argv[])
 
       // The tool does not use Windows path conventions
       if (strncmp(&prodos_file_name[strlen(prodos_file_name) - 1], \
-                  &FOLDER_CHARACTER, strlen(FOLDER_CHARACTER)))
+                  FOLDER_CHARACTER, strlen(FOLDER_CHARACTER)))
         strcat(prodos_file_name, "/");
 
       strcat(prodos_file_name, file_name);
