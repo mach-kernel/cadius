@@ -414,7 +414,7 @@ int main(int argc, char *argv[])
 
       int fcharloc = 0;
       for (int i=strlen(param->file_path); i >= 0; --i) {
-        if (!strncmp(&param->file_path[i], &FOLDER_CHARACTER, 1))
+        if (!strncmp(&param->file_path[i], FOLDER_CHARACTER, 1))
         {
           fcharloc = i + 1;
           break;
@@ -423,11 +423,12 @@ int main(int argc, char *argv[])
 
       // Prepare parameters for delete
       char *file_name = param->file_path + fcharloc;
-      char *prodos_file_name = strdup(param->prodos_folder_path);
+      char *prodos_file_name = calloc(1024, 1);
+      strcat(prodos_file_name, param->prodos_folder_path);
 
       // The tool does not use Windows path conventions
       if (strncmp(&prodos_file_name[strlen(prodos_file_name) - 1], \
-                  &FOLDER_CHARACTER, strlen(FOLDER_CHARACTER)))
+                  FOLDER_CHARACTER, strlen(FOLDER_CHARACTER)))
         strcat(prodos_file_name, "/");
 
       strcat(prodos_file_name, file_name);
@@ -437,6 +438,7 @@ int main(int argc, char *argv[])
       DeleteProdosFile(current_image, prodos_file_name);
       AddFile(current_image, param->file_path, param->prodos_folder_path,1);
 
+      free(prodos_file_name);
       mem_free_image(current_image);
     }
   else if(param->action == ACTION_CLEAR_HIGH_BIT)
@@ -981,7 +983,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       return(param);
     }
 
-  /** ADDFILE <2mg_image_path> <target_folder_path> <file_path> **/
+  /** REPLACEFILE <2mg_image_path> <target_folder_path> <file_path> **/
   if(!my_stricmp(argv[1],"REPLACEFILE") && argc == 5)
     {
       param->action = ACTION_REPLACE_FILE;
