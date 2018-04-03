@@ -15,6 +15,7 @@
 #include "Dc_Memory.h"
 #include "File_AppleSingle.h"
 #include "os/os.h"
+#include "log.h"
 
 #ifdef IS_WINDOWS
 #include <malloc.h>

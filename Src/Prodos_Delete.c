@@ -18,6 +18,7 @@
 #include "Dc_Memory.h"
 #include "Dc_Prodos.h"
 #include "Prodos_Delete.h"
+#include "log.h"
 
 static void DeleteEntryFile(struct prodos_image *,struct file_descriptive_entry *);
 static int EmptyEntryFolder(struct prodos_image *,struct file_descriptive_entry *,int);
@@ -43,7 +44,7 @@ void DeleteProdosFile(struct prodos_image *current_image, char *prodos_file_path
   current_entry = GetProdosFile(current_image,prodos_file_path);
   if(current_entry == NULL)
     {
-      printf("  Error : Invalid Prodos File path '%s'.\n",prodos_file_path);
+      logf("  Error : Invalid Prodos File path '%s'.\n",prodos_file_path);
       return;
     }
 
@@ -189,7 +190,7 @@ void DeleteProdosFolder(struct prodos_image *current_image, char *prodos_folder_
   current_entry = GetProdosFolder(current_image,prodos_folder_path,0);
   if(current_entry == NULL)
     {
-      printf("  Error : Invalid Prodos Folder path '%s'.\n",prodos_folder_path);
+      logf("  Error : Invalid Prodos Folder path '%s'.\n",prodos_folder_path);
       return;
     }
 
@@ -200,7 +201,7 @@ void DeleteProdosFolder(struct prodos_image *current_image, char *prodos_folder_
   tab_folder = (struct file_descriptive_entry **) calloc(nb_folder,sizeof(struct file_descriptive_entry *));
   if(tab_folder == NULL)
     {
-      printf("  Error : Impossible to allocate memory for table 'tab_folder'.\n");
+      logf("  Error : Impossible to allocate memory for table 'tab_folder'.\n");
       return;
     }
   my_Memory(MEMORY_GET_DIRECTORY_NB,&nb_directory,NULL);

@@ -19,6 +19,7 @@
 #include "Dc_Memory.h"
 #include "os/os.h"
 #include "Prodos_Check.h"
+#include "log.h"
 
 static char *GetObjectInfo(int,struct file_descriptive_entry *);
 
@@ -39,9 +40,9 @@ void CheckProdosImage(struct prodos_image *current_image, int verbose)
   /** Blocs de Boot **/
   if(verbose)
     {
-      printf("; ---------------------  Boot  ----------------------\n");
-      printf("Boot;0000\n");
-      printf("Boot;0001\n");
+      logf("; ---------------------  Boot  ----------------------\n");
+      logf("Boot;0000\n");
+      logf("Boot;0001\n");
     }
   current_image->block_usage_type[0x0000] = BLOCK_TYPE_BOOT;
   current_image->block_usage_type[0x0001] = BLOCK_TYPE_BOOT;
@@ -49,11 +50,11 @@ void CheckProdosImage(struct prodos_image *current_image, int verbose)
   /** Volume directory Blocs **/
   if(verbose)
     {
-      printf("; ---------------  Volume Directory  ----------------\n");
-      printf("Volume;0002\n");
-      printf("Volume;0003\n");
-      printf("Volume;0004\n");
-      printf("Volume;0005\n");
+      logf("; ---------------  Volume Directory  ----------------\n");
+      logf("Volume;0002\n");
+      logf("Volume;0003\n");
+      logf("Volume;0004\n");
+      logf("Volume;0005\n");
     }
   current_image->block_usage_type[0x0002] = BLOCK_TYPE_VOLUME;
   current_image->block_usage_type[0x0003] = BLOCK_TYPE_VOLUME;
@@ -62,24 +63,24 @@ void CheckProdosImage(struct prodos_image *current_image, int verbose)
 
   /** Bitmap Blocs **/
   if(verbose)
-    printf("; --------------------  Bitmap  ---------------------\n");
+    logf("; --------------------  Bitmap  ---------------------\n");
   nb_bitmap_block = GetContainerNumber(current_image->nb_block,BLOCK_SIZE*8);
   for(i=0; i<nb_bitmap_block; i++)
     {
       if(verbose)
-        printf("Bitmap;%04X;\n",0x0006+i);
+        logf("Bitmap;%04X;\n",0x0006+i);
       current_image->block_usage_type[0x0006+i] = BLOCK_TYPE_BITMAP;
     }
 
   /** Liste des Folders **/
   if(verbose)
-    printf("; ------------------  Folder List  ------------------\n");
+    logf("; ------------------  Folder List  ------------------\n");
   my_Memory(MEMORY_GET_DIRECTORY_NB,&nb_directory,NULL);
   for(i=1; i<=nb_directory; i++)
     {
       my_Memory(MEMORY_GET_DIRECTORY,&i,&current_directory);
       if(verbose)
-        printf("Folder;%s",current_directory->file_path);
+        logf("Folder;%s",current_directory->file_path);
       for(j=0; j<current_directory->nb_used_block; j++)
         if(current_directory->tab_used_block[j] != 0)
           {
@@ -98,21 +99,21 @@ void CheckProdosImage(struct prodos_image *current_image, int verbose)
               }
             /* Numéro du block */
             if(verbose)
-              printf(";%04X",current_directory->tab_used_block[j]);
+              logf(";%04X",current_directory->tab_used_block[j]);
           }
       if(verbose)
-        printf("\n");
+        logf("\n");
     }
 
   /** Liste des Fichiers **/
   if(verbose)
-    printf("; -------------------  File List  -------------------\n");
+    logf("; -------------------  File List  -------------------\n");
   my_Memory(MEMORY_GET_ENTRY_NB,&nb_file,NULL);
   for(i=1; i<=nb_file; i++)
     {
       my_Memory(MEMORY_GET_ENTRY,&i,&current_file);
       if(verbose)
-        printf("File;%s",current_file->file_path);
+        logf("File;%s",current_file->file_path);
       for(j=0; j<current_file->nb_used_block; j++)
         if(current_file->tab_used_block[j] != 0)
           {
@@ -132,15 +133,15 @@ void CheckProdosImage(struct prodos_image *current_image, int verbose)
 
             /* Numéro du block */
             if(verbose)
-              printf(";%04X",current_file->tab_used_block[j]);
+              logf(";%04X",current_file->tab_used_block[j]);
           }
       if(verbose)
-        printf("\n");
+        logf("\n");
     }
   
   /** Liste des Blocks **/
   if(verbose)
-    printf("; ------------------  Block List  -------------------\n");
+    logf("; ------------------  Block List  -------------------\n");
   for(i=0, first_block_number=-1; i<current_image->nb_block; i++)
     {
       /** Décode le block **/
@@ -184,9 +185,9 @@ void CheckProdosImage(struct prodos_image *current_image, int verbose)
               if(verbose)
                 {
                   if(i == first_block_number+1)
-                    printf("%04X     ;%s\n",first_block_number,first_block_info);
+                    logf("%04X     ;%s\n",first_block_number,first_block_info);
                   else
-                    printf("%04X-%04X;%s\n",first_block_number,i-1,first_block_info);
+                    logf("%04X-%04X;%s\n",first_block_number,i-1,first_block_info);
                 }
 
               /* On stocke les infos pour la série suivante */
@@ -199,19 +200,19 @@ void CheckProdosImage(struct prodos_image *current_image, int verbose)
   if(verbose)
     {
       if(current_image->nb_block == first_block_number+1)
-        printf("%04X     ;%s\n",first_block_number,first_block_info);
+        logf("%04X     ;%s\n",first_block_number,first_block_info);
       else
-        printf("%04X-%04X;%s\n",first_block_number,current_image->nb_block-1,first_block_info);
+        logf("%04X-%04X;%s\n",first_block_number,current_image->nb_block-1,first_block_info);
     }
 
   /** Liste des erreurs **/
   if(verbose)
-    printf("; ------------------  Error List  -------------------\n");
+    logf("; ------------------  Error List  -------------------\n");
   my_Memory(MEMORY_GET_ERROR_NB,&nb_error,NULL);
   for(i=1; i<=nb_error; i++)
     {
       my_Memory(MEMORY_GET_ERROR,&i,&current_error);
-      printf("    => %s\n",current_error->message);
+      logf("    => %s\n",current_error->message);
     }
 }
 

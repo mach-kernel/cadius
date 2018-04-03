@@ -28,6 +28,7 @@
 #include "Prodos_Create.h"
 #include "Prodos_Add.h"
 #include "Prodos_Source.h"
+#include "log.h"
 
 #define ACTION_CATALOG           10
 #define ACTION_CHECK_VOLUME      11
@@ -62,6 +63,7 @@
 void usage(char *);
 struct parameter *GetParamLine(int,char *[]);
 
+
 // EXTRACTFILE C:\AppleIIgs\D3.2mg /D3/Divers/Merlin/Sources/Chaine.s c:\AppleIIgs\D3\
 
 /****************************************************/
@@ -79,7 +81,7 @@ int main(int argc, char *argv[])
   verbose = 0;
 
   /* Message Information */
-  printf("%s v 1.4.0 (c) Brutal Deluxe 2011-2013.\n",argv[0]);
+   logf("%s v 1.4.0 (c) Brutal Deluxe 2011-2013.\n",argv[0]);
 
   /* Vérification des paramètres */
   if(argc < 3)
@@ -108,7 +110,7 @@ int main(int argc, char *argv[])
   if(param->action == ACTION_CATALOG)
     {
       /* Information */
-      printf("  - Catalog volume '%s'\n",param->image_file_path);
+      logf("  - Catalog volume '%s'\n",param->image_file_path);
 
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
@@ -124,7 +126,7 @@ int main(int argc, char *argv[])
   else if(param->action == ACTION_CHECK_VOLUME)
     {
       /* Information */
-      printf("  - Check volume '%s'\n",param->image_file_path);
+      logf("  - Check volume '%s'\n",param->image_file_path);
 
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
@@ -140,8 +142,8 @@ int main(int argc, char *argv[])
   else if(param->action == ACTION_EXTRACT_FILE)
     {
       /* Information */
-      printf("  - Extract file '%s'\n",param->prodos_file_path);
-      if (output_apple_single) printf("    - Creating AppleSingle file!\n");
+      logf("  - Extract file '%s'\n",param->prodos_file_path);
+      if (output_apple_single)logf("    - Creating AppleSingle file!\n");
 
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
@@ -162,8 +164,8 @@ int main(int argc, char *argv[])
   else if(param->action == ACTION_EXTRACT_FOLDER)
     {
       /* Information */
-      printf("  - Extract folder '%s' :\n",param->prodos_folder_path);
-      if (output_apple_single) printf("    - Creating AppleSingle files!\n");
+      logf("  - Extract folder '%s' :\n",param->prodos_folder_path);
+      if (output_apple_single)logf("    - Creating AppleSingle files!\n");
 
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
@@ -184,7 +186,7 @@ int main(int argc, char *argv[])
       );
 
       /* Stat */
-      printf("    => File(s) : %d,  Folder(s) : %d,  Error(s) : %d\n",current_image->nb_extract_file,current_image->nb_extract_folder,current_image->nb_extract_error);
+      logf("    => File(s) : %d,  Folder(s) : %d,  Error(s) : %d\n",current_image->nb_extract_file,current_image->nb_extract_folder,current_image->nb_extract_error);
 
       /* Libération mémoire */
       mem_free_image(current_image);
@@ -197,8 +199,8 @@ int main(int argc, char *argv[])
         return(3);
 
       /* Information */
-      printf("  - Extract volume '%s' :\n",current_image->volume_header->volume_name_case);
-      if (output_apple_single) printf("    - Creating AppleSingle files!\n");
+      logf("  - Extract volume '%s' :\n",current_image->volume_header->volume_name_case);
+      if (output_apple_single)logf("    - Creating AppleSingle files!\n");
 
       /** Extrait les fichiers du volume **/
       ExtractVolumeFiles(
@@ -208,7 +210,7 @@ int main(int argc, char *argv[])
       );
 
       /* Stat */
-      printf("    => File(s) : %d,  Folder(s) : %d,  Error(s) : %d\n",current_image->nb_extract_file,current_image->nb_extract_folder,current_image->nb_extract_error);
+      logf("    => File(s) : %d,  Folder(s) : %d,  Error(s) : %d\n",current_image->nb_extract_file,current_image->nb_extract_folder,current_image->nb_extract_error);
 
       /* Libération mémoire */
       mem_free_image(current_image);
@@ -221,7 +223,7 @@ int main(int argc, char *argv[])
         return(3);
 
       /* Information */
-      printf("  - Rename file '%s' as '%s' :\n",param->prodos_file_path,param->new_file_name);
+      logf("  - Rename file '%s' as '%s' :\n",param->prodos_file_path,param->new_file_name);
 
       /** Renome le fichier **/
       RenameProdosFile(current_image,param->prodos_file_path,param->new_file_name);
@@ -237,7 +239,7 @@ int main(int argc, char *argv[])
         return(3);
 
       /* Information */
-      printf("  - Rename folder '%s' as '%s' :\n",param->prodos_folder_path,param->new_folder_name);
+      logf("  - Rename folder '%s' as '%s' :\n",param->prodos_folder_path,param->new_folder_name);
 
       /** Renome le dossier **/
       RenameProdosFolder(current_image,param->prodos_folder_path,param->new_folder_name);
@@ -253,7 +255,7 @@ int main(int argc, char *argv[])
         return(3);
 
       /* Information */
-      printf("  - Rename volume '%s' as '%s' :\n",current_image->volume_header->volume_name_case,param->new_volume_name);
+      logf("  - Rename volume '%s' as '%s' :\n",current_image->volume_header->volume_name_case,param->new_volume_name);
 
       /** Renome le volume **/
       RenameProdosVolume(current_image,param->new_volume_name);
@@ -269,7 +271,7 @@ int main(int argc, char *argv[])
         return(3);
 
       /* Information */
-      printf("  - Move file '%s' to folder '%s' :\n",param->prodos_file_path,param->new_file_path);
+      logf("  - Move file '%s' to folder '%s' :\n",param->prodos_file_path,param->new_file_path);
 
       /** Déplace le fichier **/
       MoveProdosFile(current_image,param->prodos_file_path,param->new_file_path);
@@ -285,7 +287,7 @@ int main(int argc, char *argv[])
         return(3);
 
       /* Information */
-      printf("  - Move folder '%s' to '%s' :\n",param->prodos_folder_path,param->new_folder_path);
+      logf("  - Move folder '%s' to '%s' :\n",param->prodos_folder_path,param->new_folder_path);
 
       /** Déplace le dossier **/
       MoveProdosFolder(current_image,param->prodos_folder_path,param->new_folder_path);
@@ -301,7 +303,7 @@ int main(int argc, char *argv[])
         return(3);
 
       /* Information */
-      printf("  - Delete file '%s' :\n",param->prodos_file_path);
+      logf("  - Delete file '%s' :\n",param->prodos_file_path);
 
       /** Supprime le fichier **/
       DeleteProdosFile(current_image,param->prodos_file_path);
@@ -317,7 +319,7 @@ int main(int argc, char *argv[])
         return(3);
 
       /* Information */
-      printf("  - Delete folder '%s' :\n",param->prodos_folder_path);
+      logf("  - Delete folder '%s' :\n",param->prodos_folder_path);
 
       /** Supprime le dossier **/
       DeleteProdosFolder(current_image,param->prodos_folder_path);
@@ -333,7 +335,7 @@ int main(int argc, char *argv[])
         return(3);
 
       /* Information */
-      printf("  - Delete volume '%s' :\n",current_image->volume_header->volume_name_case);
+      logf("  - Delete volume '%s' :\n",current_image->volume_header->volume_name_case);
 
       /** Supprime le volume **/
       DeleteProdosVolume(current_image);
@@ -349,7 +351,7 @@ int main(int argc, char *argv[])
         return(3);
 
       /* Information */
-      printf("  - Create folder '%s' :\n",param->prodos_folder_path);
+      logf("  - Create folder '%s' :\n",param->prodos_folder_path);
 
       /** Création du Folder **/
       CreateProdosFolder(current_image,param->prodos_folder_path);
@@ -360,7 +362,7 @@ int main(int argc, char *argv[])
   else if(param->action == ACTION_CREATE_VOLUME)
     {
       /* Information */
-      printf("  - Create volume '%s' :\n",param->image_file_path);
+      logf("  - Create volume '%s' :\n",param->image_file_path);
 
       /** Création de l'image 2mg **/
       current_image = CreateProdosVolume(param->image_file_path,param->new_volume_name,param->new_volume_size_kb);
@@ -378,7 +380,7 @@ int main(int argc, char *argv[])
         return(3);
 
       /* Information */
-      printf("  - Add file '%s' :\n",param->file_path);
+      logf("  - Add file '%s' :\n",param->file_path);
 
       /** Ajoute le fichier dans l'archive **/
       AddFile(current_image,param->file_path,param->prodos_folder_path,1);
@@ -394,13 +396,13 @@ int main(int argc, char *argv[])
         return(3);
 
       /* Information */
-      printf("  - Add folder '%s' :\n",param->folder_path);
+      logf("  - Add folder '%s' :\n",param->folder_path);
 
       /** Ajoute l'ensemble des fichiers du répertoire dans l'archive **/
       AddFolder(current_image,param->folder_path,param->prodos_folder_path);
 
       /* Stat */
-      printf("    => File(s) : %d,  Folder(s) : %d,  Error(s) : %d\n",current_image->nb_add_file,current_image->nb_add_folder,current_image->nb_add_error);
+      logf("    => File(s) : %d,  Folder(s) : %d,  Error(s) : %d\n",current_image->nb_add_file,current_image->nb_add_folder,current_image->nb_add_error);
 
       /* Libération mémoire */
       mem_free_image(current_image);
@@ -433,7 +435,7 @@ int main(int argc, char *argv[])
 
       strcat(prodos_file_name, file_name);
 
-      printf("  - Replacing file '%s' :\n",prodos_file_name);
+      logf("  - Replacing file '%s' :\n",prodos_file_name);
 
       DeleteProdosFile(current_image, prodos_file_name);
       AddFile(current_image, param->file_path, param->prodos_folder_path,1);
@@ -449,7 +451,7 @@ int main(int argc, char *argv[])
       /** Met à 0 le bit 7 des octets du fichier **/
       for(i=0; i<nb_filepath; i++)
         {
-          printf("  - Clear High bit for file '%s'\n",filepath_tab[i]);
+          logf("  - Clear High bit for file '%s'\n",filepath_tab[i]);
           ClearFileHighBit(filepath_tab[i]);
         }
 
@@ -464,7 +466,7 @@ int main(int argc, char *argv[])
       /** Met à 1 le bit 7 des octets du fichier **/
       for(i=0; i<nb_filepath; i++)
         {
-          printf("  - Set High bit for file '%s'\n",filepath_tab[i]);
+          logf("  - Set High bit for file '%s'\n",filepath_tab[i]);
           SetFileHighBit(filepath_tab[i]);
         }
 
@@ -479,7 +481,7 @@ int main(int argc, char *argv[])
       /** Indente les lignes de code du fichier **/
       for(i=0; i<nb_filepath; i++)
         {
-          printf("  - Indent file '%s'\n",filepath_tab[i]);
+          logf("  - Indent file '%s'\n",filepath_tab[i]);
           IndentFile(filepath_tab[i]);
         }
 
@@ -494,7 +496,7 @@ int main(int argc, char *argv[])
       /** Dé-Indente les lignes de code du fichier **/
       for(i=0; i<nb_filepath; i++)
         {
-          printf("  - Outdent file '%s'\n",filepath_tab[i]);
+          logf("  - Outdent file '%s'\n",filepath_tab[i]);
           OutdentFile(filepath_tab[i]);
         }
 
@@ -516,45 +518,45 @@ int main(int argc, char *argv[])
 /************************************************************/
 void usage(char *program_path)
 {
-  printf("Usage : %s COMMAND <param_1> <param_2> <param_3>... [-V] : \n",program_path);
-  printf("        ----\n");
-  printf("        %s CATALOG       <[2mg|hdv|po]_image_path>   [-V]\n",program_path);
-  printf("        %s CHECKVOLUME   <[2mg|hdv|po]_image_path>   [-V]\n",program_path);
-  printf("        ----\n");
-  printf("        %s EXTRACTFILE   <[2mg|hdv|po]_image_path>   <prodos_file_path>    <output_directory>\n",program_path);
-  printf("        %s EXTRACTFOLDER <[2mg|hdv|po]_image_path>   <prodos_folder_path>  <output_directory>\n",program_path);
-  printf("        %s EXTRACTVOLUME <[2mg|hdv|po]_image_path>   <output_directory>\n\n",program_path);
-  printf("        [-A] Extract as AppleSingle\n");
-  printf("        ----\n");
-  printf("        %s RENAMEFILE    <[2mg|hdv|po]_image_path>   <prodos_file_path>    <new_file_name>\n",program_path);
-  printf("        %s RENAMEFOLDER  <[2mg|hdv|po]_image_path>   <prodos_folder_path>  <new_folder_name>\n",program_path);
-  printf("        %s RENAMEVOLUME  <[2mg|hdv|po]_image_path>   <new_volume_name>\n",program_path);
-  printf("        ----\n");
-  printf("        %s MOVEFILE      <[2mg|hdv|po]_image_path>   <prodos_file_path>    <target_folder_path>\n",program_path);
-  printf("        %s MOVEFOLDER    <[2mg|hdv|po]_image_path>   <prodos_folder_path>  <target_folder_path>\n",program_path);
-  printf("        ----\n");
-  printf("        %s DELETEFILE    <[2mg|hdv|po]_image_path>   <prodos_file_path>\n",program_path);
-  printf("        %s DELETEFOLDER  <[2mg|hdv|po]_image_path>   <prodos_folder_path>\n",program_path);
-  printf("        %s DELETEVOLUME  <[2mg|hdv|po]_image_path>\n",program_path);
-  printf("        ----\n");
-  printf("        %s ADDFILE       <[2mg|hdv|po]_image_path>   <prodos_folder_path>  <file_path>\n",program_path);
-  printf("        Specify a file's type and auxtype by formatting the file name: THING.S16#B30000\n");
-  printf("        Delimiter must be '#'. Also works with REPLACEFILE, DELETEFILE, etc.\n");
-  printf("        ----\n");
-  printf("        %s REPLACEFILE   <[2mg|hdv|po]_image_path>   <prodos_folder_path>  <file_path>\n",program_path);
-  printf("        You may also specify a different type/auxtype for the file you intend to replace\n");
-  printf("        (i.e. by changing the suffix) \n");
-  printf("        ----\n");
-  printf("        %s ADDFOLDER     <[2mg|hdv|po]_image_path>   <prodos_folder_path>  <folder_path>\n",program_path);
-  printf("        ----\n");
-  printf("        %s CREATEFOLDER  <[2mg|hdv|po]_image_path>   <prodos_folder_path>\n",program_path);
-  printf("        %s CREATEVOLUME  <[2mg|hdv|po]_image_path>   <volume_name>         <volume_size>\n",program_path);
-  printf("        ----\n");
-  printf("        %s CLEARHIGHBIT  <source_file_path>\n",program_path);
-  printf("        %s SETHIGHBIT    <source_file_path>\n",program_path);
-  printf("        %s INDENTFILE    <source_file_path>\n",program_path);
-  printf("        %s OUTDENTFILE   <source_file_path>\n",program_path);
-  printf("        ----\n");
+  logf("Usage : %s COMMAND <param_1> <param_2> <param_3>... [-V] : \n",program_path);
+  logf("        ----\n");
+  logf("        %s CATALOG       <[2mg|hdv|po]_image_path>   [-V]\n",program_path);
+  logf("        %s CHECKVOLUME   <[2mg|hdv|po]_image_path>   [-V]\n",program_path);
+  logf("        ----\n");
+  logf("        %s EXTRACTFILE   <[2mg|hdv|po]_image_path>   <prodos_file_path>    <output_directory>\n",program_path);
+  logf("        %s EXTRACTFOLDER <[2mg|hdv|po]_image_path>   <prodos_folder_path>  <output_directory>\n",program_path);
+  logf("        %s EXTRACTVOLUME <[2mg|hdv|po]_image_path>   <output_directory>\n\n",program_path);
+  logf("        [-A] Extract as AppleSingle\n");
+  logf("        ----\n");
+  logf("        %s RENAMEFILE    <[2mg|hdv|po]_image_path>   <prodos_file_path>    <new_file_name>\n",program_path);
+  logf("        %s RENAMEFOLDER  <[2mg|hdv|po]_image_path>   <prodos_folder_path>  <new_folder_name>\n",program_path);
+  logf("        %s RENAMEVOLUME  <[2mg|hdv|po]_image_path>   <new_volume_name>\n",program_path);
+  logf("        ----\n");
+  logf("        %s MOVEFILE      <[2mg|hdv|po]_image_path>   <prodos_file_path>    <target_folder_path>\n",program_path);
+  logf("        %s MOVEFOLDER    <[2mg|hdv|po]_image_path>   <prodos_folder_path>  <target_folder_path>\n",program_path);
+  logf("        ----\n");
+  logf("        %s DELETEFILE    <[2mg|hdv|po]_image_path>   <prodos_file_path>\n",program_path);
+  logf("        %s DELETEFOLDER  <[2mg|hdv|po]_image_path>   <prodos_folder_path>\n",program_path);
+  logf("        %s DELETEVOLUME  <[2mg|hdv|po]_image_path>\n",program_path);
+  logf("        ----\n");
+  logf("        %s ADDFILE       <[2mg|hdv|po]_image_path>   <prodos_folder_path>  <file_path>\n",program_path);
+  logf("        Specify a file's type and auxtype by formatting the file name: THING.S16#B30000\n");
+  logf("        Delimiter must be '#'. Also works with REPLACEFILE, DELETEFILE, etc.\n");
+  logf("        ----\n");
+  logf("        %s REPLACEFILE   <[2mg|hdv|po]_image_path>   <prodos_folder_path>  <file_path>\n",program_path);
+  logf("        You may also specify a different type/auxtype for the file you intend to replace\n");
+  logf("        (i.e. by changing the suffix) \n");
+  logf("        ----\n");
+  logf("        %s ADDFOLDER     <[2mg|hdv|po]_image_path>   <prodos_folder_path>  <folder_path>\n",program_path);
+  logf("        ----\n");
+  logf("        %s CREATEFOLDER  <[2mg|hdv|po]_image_path>   <prodos_folder_path>\n",program_path);
+  logf("        %s CREATEVOLUME  <[2mg|hdv|po]_image_path>   <volume_name>         <volume_size>\n",program_path);
+  logf("        ----\n");
+  logf("        %s CLEARHIGHBIT  <source_file_path>\n",program_path);
+  logf("        %s SETHIGHBIT    <source_file_path>\n",program_path);
+  logf("        %s INDENTFILE    <source_file_path>\n",program_path);
+  logf("        %s OUTDENTFILE   <source_file_path>\n",program_path);
+  logf("        ----\n");
 }
 
 
@@ -569,7 +571,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
   for (int i = 0; i < argc; ++i)
     if (strlen(argv[i]) > 256)
     {
-      printf("  Error: Argument too long!\n");
+      logf("  Error: Argument too long!\n");
       return(NULL);
     }
 
@@ -584,7 +586,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
   param = (struct parameter *) calloc(1,sizeof(struct parameter));
   if(param == NULL)
     {
-      printf("  Error : Impossible to allocate memory for structure Param.\n");
+      logf("  Error : Impossible to allocate memory for structure Param.\n");
       return(NULL);
     }
 
@@ -597,7 +599,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       param->image_file_path = strdup(argv[2]);
       if(param->image_file_path == NULL)
         {
-          printf("  Error : Impossible to allocate memory for structure Param.\n");
+          logf("  Error : Impossible to allocate memory for structure Param.\n");
           mem_free_param(param);
           return(NULL);
         }
@@ -615,7 +617,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       param->image_file_path = strdup(argv[2]);
       if(param->image_file_path == NULL)
         {
-          printf("  Error : Impossible to allocate memory for structure Param.\n");
+          logf("  Error : Impossible to allocate memory for structure Param.\n");
           mem_free_param(param);
           return(NULL);
         }
@@ -641,7 +643,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Vérification */
       if(param->image_file_path == NULL || param->prodos_file_path == NULL || param->output_directory_path == NULL)
         {
-          printf("  Error : Impossible to allocate memory for structure Param.\n");
+          logf("  Error : Impossible to allocate memory for structure Param.\n");
           mem_free_param(param);
           return(NULL);
         }
@@ -667,7 +669,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Vérification */
       if(param->image_file_path == NULL || param->prodos_folder_path == NULL || param->output_directory_path == NULL)
         {
-          printf("  Error : Impossible to allocate memory for structure Param.\n");
+          logf("  Error : Impossible to allocate memory for structure Param.\n");
           mem_free_param(param);
           return(NULL);
         }
@@ -690,7 +692,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Vérification */
       if(param->image_file_path == NULL || param->output_directory_path == NULL)
         {
-          printf("  Error : Impossible to allocate memory for structure Param.\n");
+          logf("  Error : Impossible to allocate memory for structure Param.\n");
           mem_free_param(param);
           return(NULL);
         }
@@ -716,7 +718,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Vérification */
       if(param->image_file_path == NULL || param->prodos_file_path == NULL || param->new_file_name == NULL)
         {
-          printf("  Error : Impossible to allocate memory for structure Param.\n");
+          logf("  Error : Impossible to allocate memory for structure Param.\n");
           mem_free_param(param);
           return(NULL);
         }
@@ -742,7 +744,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Vérification */
       if(param->image_file_path == NULL || param->prodos_folder_path == NULL || param->new_folder_name == NULL)
         {
-          printf("  Error : Impossible to allocate memory for structure Param.\n");
+          logf("  Error : Impossible to allocate memory for structure Param.\n");
           mem_free_param(param);
           return(NULL);
         }
@@ -765,7 +767,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Vérification */
       if(param->image_file_path == NULL || param->new_volume_name == NULL)
         {
-          printf("  Error : Impossible to allocate memory for structure Param.\n");
+          logf("  Error : Impossible to allocate memory for structure Param.\n");
           mem_free_param(param);
           return(NULL);
         }
@@ -791,7 +793,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Vérification */
       if(param->image_file_path == NULL || param->prodos_file_path == NULL || param->new_file_path == NULL)
         {
-          printf("  Error : Impossible to allocate memory for structure Param.\n");
+          logf("  Error : Impossible to allocate memory for structure Param.\n");
           mem_free_param(param);
           return(NULL);
         }
@@ -817,7 +819,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Vérification */
       if(param->image_file_path == NULL || param->prodos_folder_path == NULL || param->new_folder_path == NULL)
         {
-          printf("  Error : Impossible to allocate memory for structure Param.\n");
+          logf("  Error : Impossible to allocate memory for structure Param.\n");
           mem_free_param(param);
           return(NULL);
         }
@@ -840,7 +842,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Vérification */
       if(param->image_file_path == NULL || param->prodos_file_path == NULL)
         {
-          printf("  Error : Impossible to allocate memory for structure Param.\n");
+          logf("  Error : Impossible to allocate memory for structure Param.\n");
           mem_free_param(param);
           return(NULL);
         }
@@ -863,7 +865,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Vérification */
       if(param->image_file_path == NULL || param->prodos_folder_path == NULL)
         {
-          printf("  Error : Impossible to allocate memory for structure Param.\n");
+          logf("  Error : Impossible to allocate memory for structure Param.\n");
           mem_free_param(param);
           return(NULL);
         }
@@ -883,7 +885,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Vérification */
       if(param->image_file_path == NULL)
         {
-          printf("  Error : Impossible to allocate memory for structure Param.\n");
+          logf("  Error : Impossible to allocate memory for structure Param.\n");
           mem_free_param(param);
           return(NULL);
         }
@@ -906,7 +908,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Vérification */
       if(param->image_file_path == NULL || param->prodos_folder_path == NULL)
         {
-          printf("  Error : Impossible to allocate memory for structure Param.\n");
+          logf("  Error : Impossible to allocate memory for structure Param.\n");
           mem_free_param(param);
           return(NULL);
         }
@@ -940,7 +942,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
         param->new_volume_size_kb = 0;
       if(param->new_volume_size_kb == 0)
         {
-          printf("  Error : Invalid volume size : '%s'.\n",argv[4]);
+          logf("  Error : Invalid volume size : '%s'.\n",argv[4]);
           mem_free_param(param);
           return(NULL);
         }
@@ -948,7 +950,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Vérification */
       if(param->image_file_path == NULL || param->new_volume_name == NULL)
         {
-          printf("  Error : Impossible to allocate memory for structure Param.\n");
+          logf("  Error : Impossible to allocate memory for structure Param.\n");
           mem_free_param(param);
           return(NULL);
         }
@@ -974,7 +976,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Vérification */
       if(param->image_file_path == NULL || param->file_path == NULL || param->prodos_folder_path == NULL)
         {
-          printf("  Error : Impossible to allocate memory for structure Param.\n");
+          logf("  Error : Impossible to allocate memory for structure Param.\n");
           mem_free_param(param);
           return(NULL);
         }
@@ -1000,7 +1002,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Vérification */
       if(param->image_file_path == NULL || param->file_path == NULL || param->prodos_folder_path == NULL)
         {
-          printf("  Error : Impossible to allocate memory for structure Param.\n");
+          logf("  Error : Impossible to allocate memory for structure Param.\n");
           mem_free_param(param);
           return(NULL);
         }
@@ -1026,7 +1028,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Vérification */
       if(param->image_file_path == NULL || param->prodos_folder_path == NULL || param->folder_path == NULL)
         {
-          printf("  Error : Impossible to allocate memory for structure Param.\n");
+          logf("  Error : Impossible to allocate memory for structure Param.\n");
           mem_free_param(param);
           return(NULL);
         }
@@ -1046,7 +1048,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Vérification */
       if(param->file_path == NULL)
         {
-          printf("  Error : Impossible to allocate memory for structure Param.\n");
+          logf("  Error : Impossible to allocate memory for structure Param.\n");
           mem_free_param(param);
           return(NULL);
         }
@@ -1066,7 +1068,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Vérification */
       if(param->file_path == NULL)
         {
-          printf("  Error : Impossible to allocate memory for structure Param.\n");
+          logf("  Error : Impossible to allocate memory for structure Param.\n");
           mem_free_param(param);
           return(NULL);
         }
@@ -1086,7 +1088,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Vérification */
       if(param->file_path == NULL)
         {
-          printf("  Error : Impossible to allocate memory for structure Param.\n");
+          logf("  Error : Impossible to allocate memory for structure Param.\n");
           mem_free_param(param);
           return(NULL);
         }
@@ -1106,7 +1108,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Vérification */
       if(param->file_path == NULL)
         {
-          printf("  Error : Impossible to allocate memory for structure Param.\n");
+          logf("  Error : Impossible to allocate memory for structure Param.\n");
           mem_free_param(param);
           return(NULL);
         }

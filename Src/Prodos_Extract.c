@@ -19,6 +19,7 @@
 #include "os/os.h"
 #include "Prodos_Extract.h"
 #include "File_AppleSingle.h"
+#include "log.h"
 
 static int CreateOutputFile(struct prodos_file *,char *, bool);
 static void SetFileInformation(char *,struct prodos_file *);
@@ -48,7 +49,7 @@ void ExtractOneFile(struct prodos_image *current_image, char *prodos_file_path, 
   current_file = (struct prodos_file *) calloc(1,sizeof(struct prodos_file));
   if(current_file == NULL)
     {
-      printf("  Error : Can't get file from Image : Memory Allocation impossible.\n");
+      logf("  Error : Can't get file from Image : Memory Allocation impossible.\n");
       return;
     }
   current_file->entry = current_entry;
@@ -57,7 +58,7 @@ void ExtractOneFile(struct prodos_image *current_image, char *prodos_file_path, 
   error = GetDataFile(current_image,current_entry,current_file);
   if(error)
     {
-      printf("  Error : Can't get file from Image : Memory Allocation impossible.\n");
+      logf("  Error : Can't get file from Image : Memory Allocation impossible.\n");
       mem_free_file(current_file);
       return;
     }
@@ -85,7 +86,7 @@ void ExtractFolderFiles(struct prodos_image *current_image, struct file_descript
   windows_folder_path = (char *) calloc(strlen(output_directory_path) + strlen(folder_entry->file_name_case) + 256,sizeof(char));
   if(windows_folder_path == NULL)
     {
-      printf("  Error : Can't extract folder files from Image : Memory Allocation impossible.\n");
+      logf("  Error : Can't extract folder files from Image : Memory Allocation impossible.\n");
       current_image->nb_extract_error++;
       return;
     }
@@ -100,7 +101,7 @@ void ExtractFolderFiles(struct prodos_image *current_image, struct file_descript
   error = os_CreateDirectory(windows_folder_path);
   if(error)
     {
-      printf("  Error : Can't create folder : '%s'.\n",windows_folder_path);
+      logf("  Error : Can't create folder : '%s'.\n",windows_folder_path);
       current_image->nb_extract_error++;
       free(windows_folder_path);
       return;
@@ -115,13 +116,13 @@ void ExtractFolderFiles(struct prodos_image *current_image, struct file_descript
       current_entry = folder_entry->tab_file[i];
 
       /* Information */
-      printf("      o Extract File   : %s\n",current_entry->file_path);
+      logf("      o Extract File   : %s\n",current_entry->file_path);
 
       /** Allocation mémoire **/
       current_file = (struct prodos_file *) calloc(1,sizeof(struct prodos_file));
       if(current_file == NULL)
         {
-          printf("  Error : Can't get file from Image : Memory Allocation impossible.\n");
+          logf("  Error : Can't get file from Image : Memory Allocation impossible.\n");
           current_image->nb_extract_error++;
           continue;
         }
@@ -131,7 +132,7 @@ void ExtractFolderFiles(struct prodos_image *current_image, struct file_descript
       error = GetDataFile(current_image,current_entry,current_file);
       if(error)
         {
-          printf("  Error : Can't get file from Image : Memory Allocation impossible.\n");
+          logf("  Error : Can't get file from Image : Memory Allocation impossible.\n");
           current_image->nb_extract_error++;
           mem_free_file(current_file);
           continue;
@@ -158,7 +159,7 @@ void ExtractFolderFiles(struct prodos_image *current_image, struct file_descript
       current_entry = folder_entry->tab_directory[i];
 
       /* Information */
-      printf("      + Extract Folder : %s\n",current_entry->file_path);
+      logf("      + Extract Folder : %s\n",current_entry->file_path);
 
       /** Récursivité **/
       ExtractFolderFiles(current_image,current_entry,windows_folder_path,output_apple_single);
@@ -184,7 +185,7 @@ void ExtractVolumeFiles(struct prodos_image *current_image, char *output_directo
   windows_folder_path = (char *) calloc(strlen(output_directory_path) + strlen(current_image->volume_header->volume_name_case) + 256,sizeof(char));
   if(windows_folder_path == NULL)
     {
-      printf("  Error : Can't extract files from Image : Memory Allocation impossible.\n");
+      logf("  Error : Can't extract files from Image : Memory Allocation impossible.\n");
       current_image->nb_extract_error++;
       return;
     }
@@ -199,7 +200,7 @@ void ExtractVolumeFiles(struct prodos_image *current_image, char *output_directo
   error = os_CreateDirectory(windows_folder_path);
   if(error)
     {
-      printf("  Error : Can't create folder : '%s'.\n",windows_folder_path);
+      logf("  Error : Can't create folder : '%s'.\n",windows_folder_path);
       free(windows_folder_path);
       current_image->nb_extract_error++;
       return;
@@ -213,13 +214,13 @@ void ExtractVolumeFiles(struct prodos_image *current_image, char *output_directo
       current_entry = current_image->tab_file[i];
 
       /* Information */
-      printf("      o Extract File   : %s\n",current_entry->file_path);
+      logf("      o Extract File   : %s\n",current_entry->file_path);
 
       /** Allocation mémoire **/
       current_file = (struct prodos_file *) calloc(1,sizeof(struct prodos_file));
       if(current_file == NULL)
         {
-          printf("  Error : Can't get file from Image : Memory Allocation impossible.\n");
+          logf("  Error : Can't get file from Image : Memory Allocation impossible.\n");
           current_image->nb_extract_error++;
           continue;
         }
@@ -229,7 +230,7 @@ void ExtractVolumeFiles(struct prodos_image *current_image, char *output_directo
       error = GetDataFile(current_image,current_entry,current_file);
       if(error)
         {
-          printf("  Error : Can't get file from Image : Memory Allocation impossible.\n");
+          logf("  Error : Can't get file from Image : Memory Allocation impossible.\n");
           current_image->nb_extract_error++;
           mem_free_file(current_file);
           continue;
@@ -256,7 +257,7 @@ void ExtractVolumeFiles(struct prodos_image *current_image, char *output_directo
       current_entry = current_image->tab_directory[i];
 
       /* Information */
-      printf("      + Extract Folder : %s\n",current_entry->file_path);
+      logf("      + Extract Folder : %s\n",current_entry->file_path);
 
       /** Récursivité **/
       ExtractFolderFiles(current_image,current_entry,windows_folder_path,output_apple_single);
@@ -286,7 +287,7 @@ static int CreateOutputFile(struct prodos_file *current_file, char *output_direc
   error = os_CreateDirectory(output_directory_path);
   if(error)
     {
-      printf("  Error : Can't create output folder '%s'.\n",output_directory_path);
+      logf("  Error : Can't create output folder '%s'.\n",output_directory_path);
       return(1);
     }
   strcpy(directory_path,output_directory_path);
@@ -325,7 +326,7 @@ static int CreateOutputFile(struct prodos_file *current_file, char *output_direc
   
   if(error)
     {
-      printf("  Error : Can't create file '%s' on disk at location '%s'.\n",current_file->entry->file_name_case,file_data_path);
+      logf("  Error : Can't create file '%s' on disk at location '%s'.\n",current_file->entry->file_name_case,file_data_path);
       return(1);
     }
 
@@ -356,7 +357,7 @@ static int CreateOutputFile(struct prodos_file *current_file, char *output_direc
       error = CreateBinaryFile(file_resource_path,current_file->resource,current_file->resource_length);
       if(error)
         {
-          printf("  Error : Can't create resource file '%s' on disk at location '%s'.\n",current_file->entry->file_name_case,file_resource_path);
+          logf("  Error : Can't create resource file '%s' on disk at location '%s'.\n",current_file->entry->file_name_case,file_resource_path);
           return(1);
         }
 
@@ -446,11 +447,11 @@ static void SetFileInformation(char *file_information_path, struct prodos_file *
 
       /* On ne recopie pas la ligne du fichier */
       if(my_stricmp(file_name,current_file->entry->file_name_case))
-        fprintf(fd,"%s\n",line_tab[i]);
+         logf(fd,"%s\n",line_tab[i]);
     }
 
   /* Nouvelle ligne */
-  fprintf(fd,"%s\n",local_buffer);
+   logf(fd,"%s\n",local_buffer);
 
   /* Fermeture */
   fclose(fd);
