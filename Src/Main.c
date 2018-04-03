@@ -437,7 +437,10 @@ int main(int argc, char *argv[])
 
       logf("  - Replacing file '%s' :\n",prodos_file_name);
 
+      log_off();
       DeleteProdosFile(current_image, prodos_file_name);
+      log_on();
+
       AddFile(current_image, param->file_path, param->prodos_folder_path,1);
 
       free(prodos_file_name);
