@@ -37,6 +37,12 @@ Any and all contributions are welcome. Included is also a `cadius.pro` file you 
 
 ## Changelog
 
+#### 1.4.1
+- `REPLACEFILE`
+  - Buffer overflow resolved [#17](https://github.com/mach-kernel/cadius/issues/17). Thanks [@sicklittlemonkey](https://github.com/sicklittlemonkey)!
+  - Error on replacing a file that does not exist silenced [#16](https://github.com/mach-kernel/cadius/issues/16).
+- Typo fixed. Thanks [@a2sheppy](https://github.com/a2sheppy)
+
 #### 1.4.0
 - Adds AppleSingle file format support, with initial support for data and ProDOS file info IDs 1 & 11 ([#7](https://github.com/mach-kernel/cadius/issues/7)).
 - Fix path bugs on Windows ([#9](https://github.com/mach-kernel/cadius/issues/9)).

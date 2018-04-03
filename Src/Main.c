@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
   verbose = 0;
 
   /* Message Information */
-   logf("%s v 1.4.0 (c) Brutal Deluxe 2011-2013.\n",argv[0]);
+   logf("%s v 1.4.1 (c) Brutal Deluxe 2011-2013.\n",argv[0]);
 
   /* Vérification des paramètres */
   if(argc < 3)
