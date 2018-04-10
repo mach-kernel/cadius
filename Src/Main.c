@@ -104,6 +104,8 @@ int main(int argc, char *argv[])
     return(2);
   param->verbose = verbose;
 
+  int exit_code = 0;
+
   /** Actions **/
   if(param->action == ACTION_CATALOG)
     {
@@ -381,7 +383,7 @@ int main(int argc, char *argv[])
       printf("  - Add file '%s' :\n",param->file_path);
 
       /** Ajoute le fichier dans l'archive **/
-      AddFile(current_image,param->file_path,param->prodos_folder_path,1);
+      exit_code = AddFile(current_image,param->file_path,param->prodos_folder_path,1);
 
       /* Libération mémoire */
       mem_free_image(current_image);
@@ -436,7 +438,7 @@ int main(int argc, char *argv[])
       printf("  - Replacing file '%s' :\n",prodos_file_name);
 
       DeleteProdosFile(current_image, prodos_file_name);
-      AddFile(current_image, param->file_path, param->prodos_folder_path,1);
+      exit_code = AddFile(current_image, param->file_path, param->prodos_folder_path,1);
 
       free(prodos_file_name);
       mem_free_image(current_image);
@@ -450,7 +452,9 @@ int main(int argc, char *argv[])
       for(i=0; i<nb_filepath; i++)
         {
           printf("  - Clear High bit for file '%s'\n",filepath_tab[i]);
-          ClearFileHighBit(filepath_tab[i]);
+          int result = ClearFileHighBit(filepath_tab[i]);
+          if (!exit_code && result)
+            exit_code = result;
         }
 
       /* Libération mémoire */
@@ -465,8 +469,10 @@ int main(int argc, char *argv[])
       for(i=0; i<nb_filepath; i++)
         {
           printf("  - Set High bit for file '%s'\n",filepath_tab[i]);
-          SetFileHighBit(filepath_tab[i]);
-        }
+          int result = SetFileHighBit(filepath_tab[i]);
+          if (!exit_code && result)
+            exit_code = result;
+      }
 
       /* Libération mémoire */
       mem_free_list(nb_filepath,filepath_tab);
@@ -480,8 +486,10 @@ int main(int argc, char *argv[])
       for(i=0; i<nb_filepath; i++)
         {
           printf("  - Indent file '%s'\n",filepath_tab[i]);
-          IndentFile(filepath_tab[i]);
-        }
+          int result = IndentFile(filepath_tab[i]);
+          if (!exit_code && result)
+            exit_code = result;
+      }
 
       /* Libération mémoire */
       mem_free_list(nb_filepath,filepath_tab);
@@ -495,8 +503,10 @@ int main(int argc, char *argv[])
       for(i=0; i<nb_filepath; i++)
         {
           printf("  - Outdent file '%s'\n",filepath_tab[i]);
-          OutdentFile(filepath_tab[i]);
-        }
+          int result = OutdentFile(filepath_tab[i]);
+          if (!exit_code && result)
+            exit_code = result;
+      }
 
       /* Libération mémoire */
       mem_free_list(nb_filepath,filepath_tab);
@@ -507,7 +517,7 @@ int main(int argc, char *argv[])
   my_Memory(MEMORY_FREE,NULL,NULL);
 
   /* OK */              
-  return(0);
+  return(exit_code);
 }
 
 
