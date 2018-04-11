@@ -60,7 +60,7 @@ int ExtractOneFile(struct prodos_image *current_image, char *prodos_file_path, c
       printf("  Error : Can't get file from Image : Memory Allocation impossible.\n");
       current_image->nb_extract_error++;
       mem_free_file(current_file);
-      return(1);
+      return(error);
     }
 
   /** Création du fichier sur disque **/
