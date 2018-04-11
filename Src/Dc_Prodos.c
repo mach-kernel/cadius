@@ -47,13 +47,13 @@ struct prodos_image *LoadProdosImage(char *file_path)
   current_image = (struct prodos_image *) calloc(1,sizeof(struct prodos_image));
   if(current_image == NULL)
     {
-      logf("  Error, Impossible to allocate memory to process image file.\n");
+      logf_error("  Error, Impossible to allocate memory to process image file.\n");
       return(NULL);
     }
   current_image->image_file_path = strdup(file_path);
   if(current_image->image_file_path == NULL)
     {
-      logf("  Error, Impossible to allocate memory to process image file.\n");
+      logf_error("  Error, Impossible to allocate memory to process image file.\n");
       mem_free_image(current_image);
       return(NULL);
     }
@@ -82,7 +82,7 @@ struct prodos_image *LoadProdosImage(char *file_path)
       }
   if(current_image->image_format == IMAGE_UNKNOWN)
     {
-      logf("  Error, Unknown image file format : '%s'.\n",current_image->image_file_path);
+      logf_error("  Error, Unknown image file format : '%s'.\n",current_image->image_file_path);
       mem_free_image(current_image);
       return(NULL);
     }
@@ -91,7 +91,7 @@ struct prodos_image *LoadProdosImage(char *file_path)
   data_file = LoadBinaryFile(file_path,&data_length);
   if(data_file == NULL)
     {
-      logf("  Error, Impossible to load Image file : '%s'\n",file_path);
+      logf_error("  Error, Impossible to load Image file : '%s'\n",file_path);
       mem_free_image(current_image);
       return(NULL);
     }
@@ -111,7 +111,7 @@ struct prodos_image *LoadProdosImage(char *file_path)
   current_image->block_allocation_table = (int *) calloc(current_image->nb_block+8,sizeof(int));
   if(current_image->block_allocation_table == NULL)
     {
-      logf("  Error, Impossible to allocate memory to process image file.\n");
+      logf_error("  Error, Impossible to allocate memory to process image file.\n");
       mem_free_image(current_image);
       return(NULL);
     }
@@ -120,7 +120,7 @@ struct prodos_image *LoadProdosImage(char *file_path)
   current_image->block_modified = (unsigned char *) calloc(current_image->nb_block,sizeof(unsigned char));
   if(current_image->block_modified == NULL)
     {
-      logf("  Error, Impossible to allocate memory to process image file.\n");
+      logf_error("  Error, Impossible to allocate memory to process image file.\n");
       mem_free_image(current_image);
       return(NULL);
     }
@@ -129,14 +129,14 @@ struct prodos_image *LoadProdosImage(char *file_path)
   current_image->block_usage_type = (int *) calloc(current_image->nb_block,sizeof(int));
   if(current_image->block_usage_type == NULL)
     {
-      logf("  Error, Impossible to allocate memory to process image file.\n");
+      logf_error("  Error, Impossible to allocate memory to process image file.\n");
       mem_free_image(current_image);
       return(NULL);
     }
   current_image->block_usage_object = (void **) calloc(current_image->nb_block,sizeof(void *));
   if(current_image->block_usage_object == NULL)
     {
-      logf("  Error, Impossible to allocate memory to process image file.\n");
+      logf_error("  Error, Impossible to allocate memory to process image file.\n");
       mem_free_image(current_image);
       return(NULL);
     }
@@ -174,7 +174,7 @@ int UpdateProdosImage(struct prodos_image *current_image)
   fd = fopen(current_image->image_file_path,"r+b");
   if(fd == NULL)
     {
-      logf("  Error : Impossible to open Prodos image '%s' for writing.\n",current_image->image_file_path);
+      logf_error("  Error : Impossible to open Prodos image '%s' for writing.\n",current_image->image_file_path);
       return(1);
     }
 
@@ -216,7 +216,7 @@ static struct volume_directory_header *ODSReadVolumeDirectoryHeader(unsigned cha
   volume_header = (struct volume_directory_header *) calloc(1,sizeof(struct volume_directory_header));
   if(volume_header == NULL)
     {
-      logf("  Error, Impossible to allocate memory to process volume directory header.\n");
+      logf_error("  Error, Impossible to allocate memory to process volume directory header.\n");
       return(NULL);
     }
   offset = 0;
@@ -292,7 +292,7 @@ static struct sub_directory_header *ODSReadSubDirectoryHeader(unsigned char *blo
   directory_header = (struct sub_directory_header *) calloc(1,sizeof(struct sub_directory_header));
   if(directory_header == NULL)
     {
-      logf("  Error, Impossible to allocate memory to process sub directory header.\n");
+      logf_error("  Error, Impossible to allocate memory to process sub directory header.\n");
       return(NULL);
     }
   offset = 0;
@@ -364,7 +364,7 @@ struct file_descriptive_entry *ODSReadFileDescriptiveEntry(struct prodos_image *
   file_entry = (struct file_descriptive_entry *) calloc(1,sizeof(struct file_descriptive_entry));
   if(file_entry == NULL)
     {
-      logf("  Error : Impossible to allocate memory to process file descriptive entry.\n");
+      logf_error("  Error : Impossible to allocate memory to process file descriptive entry.\n");
       return(NULL);
     }
   offset = 0;
@@ -423,7 +423,7 @@ struct file_descriptive_entry *ODSReadFileDescriptiveEntry(struct prodos_image *
   file_entry->file_path = (char *) calloc(strlen(folder_path) + 1 + strlen(file_entry->file_name_case) + 1,sizeof(char));
   if(file_entry->file_path == NULL)
     {
-      logf("  Error : Impossible to allocate memory for 'file_path' value.\n");
+      logf_error("  Error : Impossible to allocate memory for 'file_path' value.\n");
       mem_free_entry(file_entry);
       return(NULL);
     }
@@ -1014,7 +1014,7 @@ static int GetFileDataResourceSize(struct prodos_image *current_image, struct fi
       file_entry->tab_used_block = BuildDirectoryUsedBlockTable(current_image,file_entry,&file_entry->nb_used_block);
       if(file_entry->tab_used_block == NULL)
         {
-          logf("  Error : Impossible to allocate memory for 'tab_used_block' table.\n");
+          logf_error("  Error : Impossible to allocate memory for 'tab_used_block' table.\n");
           return(1);
         }
 
@@ -1260,7 +1260,7 @@ static int GetFileDataResourceSize(struct prodos_image *current_image, struct fi
           file_entry->tab_used_block = (int *) calloc(1+nb_used_block_data+nb_used_block_resource,sizeof(int));
           if(file_entry->tab_used_block == NULL)
             {
-              logf("  Error : Impossible to allocate memory for 'tab_used_block' table.\n");
+              logf_error("  Error : Impossible to allocate memory for 'tab_used_block' table.\n");
               free(tab_used_block_data);
               free(tab_used_block_resource);
               return(1);
@@ -1298,7 +1298,7 @@ static int *BuildUsedBlockTable(int nb_data_block, int *tab_data_block, int nb_i
   tab_used_block = (int *) calloc(nb_data_block+nb_index_block,sizeof(int));
   if(tab_used_block == NULL)
     {
-      logf("  Error : Impossible to allocate memory for 'tab_used_block' table.\n");
+      logf_error("  Error : Impossible to allocate memory for 'tab_used_block' table.\n");
       return(NULL);
     }
 
@@ -1341,7 +1341,7 @@ static int *BuildDirectoryUsedBlockTable(struct prodos_image *current_image, str
   tab_used_block = (int *) calloc(nb_used_block,sizeof(int *));
   if(tab_used_block == NULL)
     {
-      logf("  Error : Impossible to allocate memory for 'tab_used_block' table.\n");
+      logf_error("  Error : Impossible to allocate memory for 'tab_used_block' table.\n");
       return(NULL);
     }
 
@@ -1484,7 +1484,7 @@ struct file_descriptive_entry *GetProdosFile(struct prodos_image *current_image,
           /* Première partie : Volume Name */
           if(my_stricmp(name,current_image->volume_header->volume_name))
             {
-              logf("  Error : Can't get file from Image, Wrong volume name.\n");
+              logf_error("  Error : Can't get file from Image, Wrong volume name.\n");
               return(NULL);
             }
           is_volume_name = 0;
@@ -1516,7 +1516,7 @@ struct file_descriptive_entry *GetProdosFile(struct prodos_image *current_image,
           /* Rien trouvé : Erreur */
           if(current_entry == NULL)
             {
-              logf("  Error : Can't get file from Image, File not found.\n");
+              logf_error("  Error : Can't get file from Image, File not found.\n");
               return(NULL);
             }
           is_root_name = 0;
@@ -1551,7 +1551,7 @@ struct file_descriptive_entry *GetProdosFile(struct prodos_image *current_image,
           /* Rien trouvé : Erreur */
           if(current_entry == NULL)
             {
-              logf("  Error : Can't get file from Image.\n");
+              logf_error("  Error : Can't get file from Image.\n");
               return(NULL);
             }
         }
@@ -1560,14 +1560,14 @@ struct file_descriptive_entry *GetProdosFile(struct prodos_image *current_image,
   /* Rien trouvé */
   if(current_entry == NULL)
     {
-      logf("  Error : Can't get file from Image.\n");
+      logf_error("  Error : Can't get file from Image.\n");
       return(NULL);
     }
 
   /* Le fichier est un répertoire */
   if((current_entry->storage_type & 0x0F) == 0x0D)
     {
-      logf("  Error : Can't get file from Image : Directory name.\n");
+      logf_error("  Error : Can't get file from Image : Directory name.\n");
       return(NULL);
     }
 
@@ -1621,7 +1621,7 @@ struct file_descriptive_entry *GetProdosFolder(struct prodos_image *current_imag
           if(my_stricmp(name,current_image->volume_header->volume_name))
             {
               if(show_error == 1)
-                logf("  Error : Can't get folder from Image, Wrong volume name.\n");
+                logf_error("  Error : Can't get folder from Image, Wrong volume name.\n");
               return(NULL);
             }
           is_volume_name = 0;
@@ -1641,7 +1641,7 @@ struct file_descriptive_entry *GetProdosFolder(struct prodos_image *current_imag
           if(current_entry == NULL)
             {
               if(show_error == 1)
-                logf("  Error : Can't get folder from Image, Folder not found.\n");
+                logf_error("  Error : Can't get folder from Image, Folder not found.\n");
               return(NULL);
             }
           is_root_name = 0;
@@ -1664,7 +1664,7 @@ struct file_descriptive_entry *GetProdosFolder(struct prodos_image *current_imag
           if(current_entry == NULL)
             {
               if(show_error == 1)
-                logf("  Error : Can't get folder from Image.\n");
+                logf_error("  Error : Can't get folder from Image.\n");
               return(NULL);
             }
         }
@@ -1674,7 +1674,7 @@ struct file_descriptive_entry *GetProdosFolder(struct prodos_image *current_imag
   if(current_entry == NULL)
     {
       if(show_error == 1)
-        logf("  Error : Can't get folder from Image.\n");
+        logf_error("  Error : Can't get folder from Image.\n");
       return(NULL);
     }
 
@@ -1682,7 +1682,7 @@ struct file_descriptive_entry *GetProdosFolder(struct prodos_image *current_imag
   if((current_entry->storage_type & 0x0F) != 0x0D)
     {
       if(show_error == 1)
-        logf("  Error : Can't get folder from Image : File name.\n");
+        logf_error("  Error : Can't get folder from Image : File name.\n");
       return(NULL);
     }
 
@@ -1866,7 +1866,7 @@ int *GetEntryBlock(struct prodos_image *current_image, int type_entry, int key_b
   tab_index_block = (int *) calloc(256+1,sizeof(int));
   if(tab_index_block == NULL)
     {
-      logf("  Error : Impossible to allocate memory for 'tab_index_block' table.\n");
+      logf_error("  Error : Impossible to allocate memory for 'tab_index_block' table.\n");
       return(NULL);
     }
 
@@ -1874,7 +1874,7 @@ int *GetEntryBlock(struct prodos_image *current_image, int type_entry, int key_b
   tab_data_block = (int *) calloc(nb_data_block+1,sizeof(int));
   if(tab_data_block == NULL)
     {
-      logf("  Error : Impossible to allocate memory for 'tab_data_block' table.\n");
+      logf_error("  Error : Impossible to allocate memory for 'tab_data_block' table.\n");
       free(tab_index_block);
       return(NULL);
     }
@@ -1952,7 +1952,7 @@ int *AllocateImageBlock(struct prodos_image *current_image, int nb_block)
   /* Pas assez de place ! */
   if(current_image->nb_free_block < nb_block)
     {
-      logf("  Error : Impossible to allocate %d blocks. No space left on image.\n",nb_block);  
+      logf_error("  Error : Impossible to allocate %d blocks. No space left on image.\n",nb_block);  
       return(NULL);
     }
 
@@ -1960,7 +1960,7 @@ int *AllocateImageBlock(struct prodos_image *current_image, int nb_block)
   tab_block = (int *) calloc(nb_block,sizeof(int));
   if(tab_block == NULL)
     {
-      logf("  Error : Impossible to allocate memory.\n");
+      logf_error("  Error : Impossible to allocate memory.\n");
       return(NULL);
     }
 
@@ -2109,7 +2109,7 @@ int AllocateFolderEntry(struct prodos_image *current_image, struct file_descript
   /* Si on est sur le Volume Directory, on ne peut plus allouer de bloc supplémentaire */
   if(folder_entry == NULL)
     {
-      logf("  Error : Volume Directory is full.\n");
+      logf_error("  Error : Volume Directory is full.\n");
       return(1);
     }
 

@@ -38,7 +38,7 @@ void RenameProdosFile(struct prodos_image *current_image, char *prodos_file_path
   current_entry = GetProdosFile(current_image,prodos_file_path);
   if(current_entry == NULL)
     {
-      logf("  Error : Invalid Prodos File path '%s'.\n",prodos_file_path);
+      logf_error("  Error : Invalid Prodos File path '%s'.\n",prodos_file_path);
       return;
     }
 
@@ -46,7 +46,7 @@ void RenameProdosFile(struct prodos_image *current_image, char *prodos_file_path
   is_valid = CheckProdosName(new_file_name);
   if(is_valid == 0)
     {
-      logf("  Error : Invalid Prodos name '%s'.\n",new_file_name);
+      logf_error("  Error : Invalid Prodos name '%s'.\n",new_file_name);
       return;
     }
 
@@ -113,7 +113,7 @@ void RenameProdosFolder(struct prodos_image *current_image, char *prodos_folder_
   current_entry = GetProdosFolder(current_image,prodos_folder_path,0);
   if(current_entry == NULL)
     {
-      logf("  Error : Invalid Prodos Folder path '%s'.\n",prodos_folder_path);
+      logf_error("  Error : Invalid Prodos Folder path '%s'.\n",prodos_folder_path);
       return;
     }
 
@@ -121,7 +121,7 @@ void RenameProdosFolder(struct prodos_image *current_image, char *prodos_folder_
   is_valid = CheckProdosName(new_folder_name);
   if(is_valid == 0)
     {
-      logf("  Error : Invalid Prodos name '%s'.\n",new_folder_name);
+      logf_error("  Error : Invalid Prodos name '%s'.\n",new_folder_name);
       return;
     }
 
@@ -198,7 +198,7 @@ void RenameProdosVolume(struct prodos_image *current_image, char *new_volume_nam
   is_valid = CheckProdosName(new_volume_name);
   if(is_valid == 0)
     {
-      logf("  Error : Invalid Prodos name '%s'.\n",new_volume_name);
+      logf_error("  Error : Invalid Prodos name '%s'.\n",new_volume_name);
       return;
     }
 

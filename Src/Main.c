@@ -63,9 +63,6 @@
 void usage(char *);
 struct parameter *GetParamLine(int,char *[]);
 
-
-// EXTRACTFILE C:\AppleIIgs\D3.2mg /D3/Divers/Merlin/Sources/Chaine.s c:\AppleIIgs\D3\
-
 /****************************************************/
 /*  main() :  Fonction principale de l'application. */
 /****************************************************/
@@ -81,7 +78,7 @@ int main(int argc, char *argv[])
   verbose = 0;
 
   /* Message Information */
-   logf("%s v 1.4.1 (c) Brutal Deluxe 2011-2013.\n",argv[0]);
+  logf("%s v 1.4.1 (c) Brutal Deluxe 2011-2013.\n",argv[0]);
 
   /* Vérification des paramètres */
   if(argc < 3)
@@ -110,7 +107,7 @@ int main(int argc, char *argv[])
   if(param->action == ACTION_CATALOG)
     {
       /* Information */
-      logf("  - Catalog volume '%s'\n",param->image_file_path);
+      logf_info("  - Catalog volume '%s'\n",param->image_file_path);
 
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
@@ -126,7 +123,7 @@ int main(int argc, char *argv[])
   else if(param->action == ACTION_CHECK_VOLUME)
     {
       /* Information */
-      logf("  - Check volume '%s'\n",param->image_file_path);
+      logf_info("  - Check volume '%s'\n",param->image_file_path);
 
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
@@ -142,7 +139,7 @@ int main(int argc, char *argv[])
   else if(param->action == ACTION_EXTRACT_FILE)
     {
       /* Information */
-      logf("  - Extract file '%s'\n",param->prodos_file_path);
+      logf_info("  - Extract file '%s'\n",param->prodos_file_path);
       if (output_apple_single)logf("    - Creating AppleSingle file!\n");
 
       /** Charge l'image 2mg **/
@@ -164,7 +161,7 @@ int main(int argc, char *argv[])
   else if(param->action == ACTION_EXTRACT_FOLDER)
     {
       /* Information */
-      logf("  - Extract folder '%s' :\n",param->prodos_folder_path);
+      logf_info("  - Extract folder '%s' :\n",param->prodos_folder_path);
       if (output_apple_single)logf("    - Creating AppleSingle files!\n");
 
       /** Charge l'image 2mg **/
@@ -199,7 +196,7 @@ int main(int argc, char *argv[])
         return(3);
 
       /* Information */
-      logf("  - Extract volume '%s' :\n",current_image->volume_header->volume_name_case);
+      logf_info("  - Extract volume '%s' :\n",current_image->volume_header->volume_name_case);
       if (output_apple_single)logf("    - Creating AppleSingle files!\n");
 
       /** Extrait les fichiers du volume **/
@@ -223,7 +220,7 @@ int main(int argc, char *argv[])
         return(3);
 
       /* Information */
-      logf("  - Rename file '%s' as '%s' :\n",param->prodos_file_path,param->new_file_name);
+      logf_info("  - Rename file '%s' as '%s' :\n",param->prodos_file_path,param->new_file_name);
 
       /** Renome le fichier **/
       RenameProdosFile(current_image,param->prodos_file_path,param->new_file_name);
@@ -239,7 +236,7 @@ int main(int argc, char *argv[])
         return(3);
 
       /* Information */
-      logf("  - Rename folder '%s' as '%s' :\n",param->prodos_folder_path,param->new_folder_name);
+      logf_info("  - Rename folder '%s' as '%s' :\n",param->prodos_folder_path,param->new_folder_name);
 
       /** Renome le dossier **/
       RenameProdosFolder(current_image,param->prodos_folder_path,param->new_folder_name);
@@ -255,7 +252,7 @@ int main(int argc, char *argv[])
         return(3);
 
       /* Information */
-      logf("  - Rename volume '%s' as '%s' :\n",current_image->volume_header->volume_name_case,param->new_volume_name);
+      logf_info("  - Rename volume '%s' as '%s' :\n",current_image->volume_header->volume_name_case,param->new_volume_name);
 
       /** Renome le volume **/
       RenameProdosVolume(current_image,param->new_volume_name);
@@ -271,7 +268,7 @@ int main(int argc, char *argv[])
         return(3);
 
       /* Information */
-      logf("  - Move file '%s' to folder '%s' :\n",param->prodos_file_path,param->new_file_path);
+      logf_info("  - Move file '%s' to folder '%s' :\n",param->prodos_file_path,param->new_file_path);
 
       /** Déplace le fichier **/
       MoveProdosFile(current_image,param->prodos_file_path,param->new_file_path);
@@ -287,7 +284,7 @@ int main(int argc, char *argv[])
         return(3);
 
       /* Information */
-      logf("  - Move folder '%s' to '%s' :\n",param->prodos_folder_path,param->new_folder_path);
+      logf_info("  - Move folder '%s' to '%s' :\n",param->prodos_folder_path,param->new_folder_path);
 
       /** Déplace le dossier **/
       MoveProdosFolder(current_image,param->prodos_folder_path,param->new_folder_path);
@@ -303,7 +300,7 @@ int main(int argc, char *argv[])
         return(3);
 
       /* Information */
-      logf("  - Delete file '%s' :\n",param->prodos_file_path);
+      logf_info("  - Delete file '%s' :\n",param->prodos_file_path);
 
       /** Supprime le fichier **/
       DeleteProdosFile(current_image,param->prodos_file_path);
@@ -319,7 +316,7 @@ int main(int argc, char *argv[])
         return(3);
 
       /* Information */
-      logf("  - Delete folder '%s' :\n",param->prodos_folder_path);
+      logf_info("  - Delete folder '%s' :\n",param->prodos_folder_path);
 
       /** Supprime le dossier **/
       DeleteProdosFolder(current_image,param->prodos_folder_path);
@@ -335,7 +332,7 @@ int main(int argc, char *argv[])
         return(3);
 
       /* Information */
-      logf("  - Delete volume '%s' :\n",current_image->volume_header->volume_name_case);
+      logf_info("  - Delete volume '%s' :\n",current_image->volume_header->volume_name_case);
 
       /** Supprime le volume **/
       DeleteProdosVolume(current_image);
@@ -351,7 +348,7 @@ int main(int argc, char *argv[])
         return(3);
 
       /* Information */
-      logf("  - Create folder '%s' :\n",param->prodos_folder_path);
+      logf_info("  - Create folder '%s' :\n",param->prodos_folder_path);
 
       /** Création du Folder **/
       CreateProdosFolder(current_image,param->prodos_folder_path);
@@ -362,7 +359,7 @@ int main(int argc, char *argv[])
   else if(param->action == ACTION_CREATE_VOLUME)
     {
       /* Information */
-      logf("  - Create volume '%s' :\n",param->image_file_path);
+      logf_info("  - Create volume '%s' :\n",param->image_file_path);
 
       /** Création de l'image 2mg **/
       current_image = CreateProdosVolume(param->image_file_path,param->new_volume_name,param->new_volume_size_kb);
@@ -380,7 +377,7 @@ int main(int argc, char *argv[])
         return(3);
 
       /* Information */
-      logf("  - Add file '%s' :\n",param->file_path);
+      logf_info("  - Add file '%s' :\n",param->file_path);
 
       /** Ajoute le fichier dans l'archive **/
       AddFile(current_image,param->file_path,param->prodos_folder_path,1);
@@ -396,7 +393,7 @@ int main(int argc, char *argv[])
         return(3);
 
       /* Information */
-      logf("  - Add folder '%s' :\n",param->folder_path);
+      logf_info("  - Add folder '%s' :\n",param->folder_path);
 
       /** Ajoute l'ensemble des fichiers du répertoire dans l'archive **/
       AddFolder(current_image,param->folder_path,param->prodos_folder_path);
@@ -435,7 +432,7 @@ int main(int argc, char *argv[])
 
       strcat(prodos_file_name, file_name);
 
-      logf("  - Replacing file '%s' :\n",prodos_file_name);
+      logf_info("  - Replacing file '%s' :\n",prodos_file_name);
 
       log_off();
       DeleteProdosFile(current_image, prodos_file_name);
@@ -454,7 +451,7 @@ int main(int argc, char *argv[])
       /** Met à 0 le bit 7 des octets du fichier **/
       for(i=0; i<nb_filepath; i++)
         {
-          logf("  - Clear High bit for file '%s'\n",filepath_tab[i]);
+          logf_info("  - Clear High bit for file '%s'\n",filepath_tab[i]);
           ClearFileHighBit(filepath_tab[i]);
         }
 
@@ -469,7 +466,7 @@ int main(int argc, char *argv[])
       /** Met à 1 le bit 7 des octets du fichier **/
       for(i=0; i<nb_filepath; i++)
         {
-          logf("  - Set High bit for file '%s'\n",filepath_tab[i]);
+          logf_info("  - Set High bit for file '%s'\n",filepath_tab[i]);
           SetFileHighBit(filepath_tab[i]);
         }
 
@@ -484,7 +481,7 @@ int main(int argc, char *argv[])
       /** Indente les lignes de code du fichier **/
       for(i=0; i<nb_filepath; i++)
         {
-          logf("  - Indent file '%s'\n",filepath_tab[i]);
+          logf_info("  - Indent file '%s'\n",filepath_tab[i]);
           IndentFile(filepath_tab[i]);
         }
 
@@ -499,7 +496,7 @@ int main(int argc, char *argv[])
       /** Dé-Indente les lignes de code du fichier **/
       for(i=0; i<nb_filepath; i++)
         {
-          logf("  - Outdent file '%s'\n",filepath_tab[i]);
+          logf_info("  - Outdent file '%s'\n",filepath_tab[i]);
           OutdentFile(filepath_tab[i]);
         }
 

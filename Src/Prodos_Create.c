@@ -112,7 +112,7 @@ struct prodos_image *CreateProdosVolume(char *image_file_path, char *volume_name
       }
   if(image_format == IMAGE_UNKNOWN)
     {
-      logf("  Error, Unknown image file format : '%s'.\n",image_file_path);
+      logf_error("  Error, Unknown image file format : '%s'.\n",image_file_path);
       return(NULL);
     }
 
@@ -120,7 +120,7 @@ struct prodos_image *CreateProdosVolume(char *image_file_path, char *volume_name
   is_valid = CheckProdosName(volume_name);
   if(is_valid == 0)
     {
-      logf("  Error : Invalid Prodos name '%s'.\n",volume_name);
+      logf_error("  Error : Invalid Prodos name '%s'.\n",volume_name);
       return(NULL);
     }
 
@@ -142,7 +142,7 @@ struct prodos_image *CreateProdosVolume(char *image_file_path, char *volume_name
   image_data = (unsigned char *) calloc(1,1024*volume_size_kb + image_header_size);
   if(image_data == NULL)
     {
-      logf("  Error : Impossible to allocate memory.\n");
+      logf_error("  Error : Impossible to allocate memory.\n");
       return(NULL);
     }
 
@@ -245,7 +245,7 @@ struct prodos_image *CreateProdosVolume(char *image_file_path, char *volume_name
   if(error)
     {
       free(image_data);
-      logf("  Error : Impossible to create file '%s' on disk.\n",image_file_path);
+      logf_error("  Error : Impossible to create file '%s' on disk.\n",image_file_path);
       return(NULL);
     }
 
@@ -295,7 +295,7 @@ struct file_descriptive_entry *BuildProdosFolderPath(struct prodos_image *curren
   volume_name[name_length] = '\0';
   if(my_stricmp(current_image->volume_header->volume_name,volume_name))
     {
-      logf("  Error : Invalid Prodos Volume name : %s\n",volume_name);
+      logf_error("  Error : Invalid Prodos Volume name : %s\n",volume_name);
       return(NULL);
     }
 
@@ -386,7 +386,7 @@ struct file_descriptive_entry *CreateOneProdosFolder(struct prodos_image *curren
   is_valid = CheckProdosName(folder_name);
   if(is_valid == 0)
     {
-      logf("  Error : Invalid Prodos Folder name '%s'.\n",folder_name);
+      logf_error("  Error : Invalid Prodos Folder name '%s'.\n",folder_name);
       return(NULL);
     }
 
@@ -397,7 +397,7 @@ struct file_descriptive_entry *CreateOneProdosFolder(struct prodos_image *curren
       for(i=0; i<current_image->nb_file; i++)
         if(!my_stricmp(folder_name,current_image->tab_file[i]->file_name))
           {
-            logf("  Error : Invalid Prodos Folder name. The name is already used by a File '%s'.\n",folder_name);
+            logf_error("  Error : Invalid Prodos Folder name. The name is already used by a File '%s'.\n",folder_name);
             return(NULL);
           }
     }
@@ -407,7 +407,7 @@ struct file_descriptive_entry *CreateOneProdosFolder(struct prodos_image *curren
       for(i=0; i<current_folder->nb_file; i++)
         if(!my_stricmp(folder_name,current_folder->tab_file[i]->file_name))
           {
-            logf("  Error : Invalid Prodos Folder name. The name is already used by a File '%s'.\n",folder_name);
+            logf_error("  Error : Invalid Prodos Folder name. The name is already used by a File '%s'.\n",folder_name);
             return(NULL);
           }
     }
@@ -583,7 +583,7 @@ struct file_descriptive_entry *CreateOneProdosFolder(struct prodos_image *curren
   new_tab_directory = (struct file_descriptive_entry **) calloc(nb_directory,sizeof(struct file_descriptive_entry *));
   if(new_tab_directory == NULL)
     {
-      logf("  Error : Impossible to allocate memory.\n");
+      logf_error("  Error : Impossible to allocate memory.\n");
       return(NULL);
     }
   for(i=0; i<nb_directory-1; i++)
@@ -611,7 +611,7 @@ struct file_descriptive_entry *CreateOneProdosFolder(struct prodos_image *curren
 
   /* Stat */
   if(verbose)
-    logf("      + Add Folder : %s\n",new_folder->file_path);
+    logf_info("      + Add Folder : %s\n",new_folder->file_path);
   current_image->nb_add_folder++;
 
   /* Renvoie la nouvelle structure */
