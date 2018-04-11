@@ -1,11 +1,14 @@
 #include "log.h"
 #include <stdarg.h>
 
-static struct logconf LCF = { true };
+static struct logconf LCF = { 
+  true,
+  INFO
+};
 
-int logf(const char *fmt, ...)
+int logf_impl(loglevel level, const char *fmt, ...)
 {
-  if (!LCF.enabled) return 0;
+  if (!LCF.enabled || level > LCF.level) return 0;
 
   va_list varargs;
   va_start(varargs, fmt);
@@ -21,4 +24,9 @@ void log_off()
 void log_on()
 {
   LCF.enabled = true;
+}
+
+void set_level(loglevel level) 
+{
+  LCF.level = level;
 }
