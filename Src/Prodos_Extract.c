@@ -33,7 +33,7 @@ static void SetFileInformation(char *,struct prodos_file *);
  * @param output_directory_path 
  * @param output_apple_single 
  */
-void ExtractOneFile(struct prodos_image *current_image, char *prodos_file_path, char *output_directory_path, bool output_apple_single)
+int ExtractOneFile(struct prodos_image *current_image, char *prodos_file_path, char *output_directory_path, bool output_apple_single)
 {
   int error;
   struct file_descriptive_entry *current_entry;
@@ -42,14 +42,14 @@ void ExtractOneFile(struct prodos_image *current_image, char *prodos_file_path, 
   /** Recherche l'entrée du fichier **/
   current_entry = GetProdosFile(current_image,prodos_file_path);
   if(current_entry == NULL)
-    return;
+    return(1);
 
   /** Allocation mémoire **/
   current_file = (struct prodos_file *) calloc(1,sizeof(struct prodos_file));
   if(current_file == NULL)
     {
       printf("  Error : Can't get file from Image : Memory Allocation impossible.\n");
-      return;
+      return(1);
     }
   current_file->entry = current_entry;
 
@@ -58,8 +58,9 @@ void ExtractOneFile(struct prodos_image *current_image, char *prodos_file_path, 
   if(error)
     {
       printf("  Error : Can't get file from Image : Memory Allocation impossible.\n");
+      current_image->nb_extract_error++;
       mem_free_file(current_file);
-      return;
+      return(1);
     }
 
   /** Création du fichier sur disque **/
@@ -67,6 +68,8 @@ void ExtractOneFile(struct prodos_image *current_image, char *prodos_file_path, 
 
   /* Libération mémoire */
   mem_free_file(current_file);
+
+  return (error);
 }
 
 

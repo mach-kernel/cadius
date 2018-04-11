@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
         return(3);
 
       /** Extrait le fichier sur disque **/
-      ExtractOneFile(
+      exit_code = ExtractOneFile(
         current_image,
         param->prodos_file_path,
         param->output_directory_path,

@@ -8,7 +8,7 @@
 
 #include <stdbool.h>
 
-void ExtractOneFile(struct prodos_image *, char *, char *, bool);
+int ExtractOneFile(struct prodos_image *, char *, char *, bool);
 void ExtractFolderFiles(struct prodos_image *, struct file_descriptive_entry *, char *, bool);
 void ExtractVolumeFiles(struct prodos_image *, char *, bool);
 
