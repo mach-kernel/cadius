@@ -25,4 +25,4 @@ int logf_impl(loglevel level, const char *fmt, ...);
 
 void log_off();
 void log_on();
-void set_level(loglevel level);
+void log_set_level(loglevel level);

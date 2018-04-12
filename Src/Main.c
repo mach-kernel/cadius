@@ -60,6 +60,17 @@
 #define ACTION_INDENT_FILE       82
 #define ACTION_OUTDENT_FILE      83
 
+typedef struct global_toggles {
+  int verbose;
+  bool output_apple_single;
+} global_toggles;
+
+static struct global_toggles TOGGLES = {
+  0,
+  false
+};
+
+int apply_global_flags(int, char**);
 void usage(char *);
 struct parameter *GetParamLine(int,char *[]);
 
@@ -68,14 +79,11 @@ struct parameter *GetParamLine(int,char *[]);
 /****************************************************/
 int main(int argc, char *argv[])
 {
-  int i, nb_filepath, verbose;
+  int i, nb_filepath;
   char **filepath_tab;
   struct parameter *param;
   struct prodos_image *current_image;
   struct file_descriptive_entry *folder_entry;
-
-  /* Init */
-  verbose = 0;
 
   /* Message Information */
   logf("%s v 1.4.1 (c) Brutal Deluxe 2011-2013.\n",argv[0]);
@@ -87,21 +95,16 @@ int main(int argc, char *argv[])
       return(1);
     }
 
+  argc = apply_global_flags(argc, argv);
+
   /* Initialisation */
   my_Memory(MEMORY_INIT,NULL,NULL);
 
-  /* Verbose */
-  if(!my_stricmp(argv[argc-1],"-V"))
-    verbose = 1;
-
-  /* AppleSingle */
-  bool output_apple_single = !my_stricmp(argv[argc - 1], "-A");
-
   /** Décode les paramètres **/
-  param = GetParamLine(argc-verbose,argv);
+  param = GetParamLine(argc-TOGGLES.verbose,argv);
   if(param == NULL)
     return(2);
-  param->verbose = verbose;
+  param->verbose = TOGGLES.verbose;
 
   /** Actions **/
   if(param->action == ACTION_CATALOG)
@@ -140,7 +143,7 @@ int main(int argc, char *argv[])
     {
       /* Information */
       logf_info("  - Extract file '%s'\n",param->prodos_file_path);
-      if (output_apple_single)logf("    - Creating AppleSingle file!\n");
+      if (TOGGLES.output_apple_single)logf_info("    - Creating AppleSingle file!\n");
 
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
@@ -152,7 +155,7 @@ int main(int argc, char *argv[])
         current_image,
         param->prodos_file_path,
         param->output_directory_path,
-        output_apple_single
+        TOGGLES.output_apple_single
       );
 
       /* Libération mémoire */
@@ -162,7 +165,7 @@ int main(int argc, char *argv[])
     {
       /* Information */
       logf_info("  - Extract folder '%s' :\n",param->prodos_folder_path);
-      if (output_apple_single)logf("    - Creating AppleSingle files!\n");
+      if (TOGGLES.output_apple_single)logf_info("    - Creating AppleSingle files!\n");
 
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
@@ -179,7 +182,7 @@ int main(int argc, char *argv[])
         current_image,
         folder_entry,
         param->output_directory_path,
-        output_apple_single
+        TOGGLES.output_apple_single
       );
 
       /* Stat */
@@ -197,13 +200,13 @@ int main(int argc, char *argv[])
 
       /* Information */
       logf_info("  - Extract volume '%s' :\n",current_image->volume_header->volume_name_case);
-      if (output_apple_single)logf("    - Creating AppleSingle files!\n");
+      if (TOGGLES.output_apple_single)logf_info("    - Creating AppleSingle files!\n");
 
       /** Extrait les fichiers du volume **/
       ExtractVolumeFiles(
         current_image,
         param->output_directory_path,
-        output_apple_single
+        TOGGLES.output_apple_single
       );
 
       /* Stat */
@@ -512,6 +515,39 @@ int main(int argc, char *argv[])
   return(0);
 }
 
+/**
+ * Parse tail end of args and toggle global settings
+ * 
+ * @param argc 
+ * @param args 
+ */
+int apply_global_flags(int argc, char **args) 
+{
+  int found = 0;
+
+  for (int i=3; i < argc; ++i) 
+  {
+    if (!my_stricmp(args[i], "--quiet")) 
+    {
+      log_set_level(ERROR);
+      found += 1;
+    }
+
+    if(!my_stricmp(args[i], "-V"))
+    {
+      TOGGLES.verbose = 1;
+      found += 1;
+    }
+
+    if (!my_stricmp(args[i], "-A")) 
+    {
+      TOGGLES.output_apple_single = true;
+      found += 1;
+    }
+  }
+
+  return argc-found;
+}
 
 /************************************************************/
 /*  usage() :  Indique les différentes options du logiciel. */

@@ -26,7 +26,7 @@ void log_on()
   LCF.enabled = true;
 }
 
-void set_level(loglevel level) 
+void log_set_level(loglevel level) 
 {
   LCF.level = level;
 }
