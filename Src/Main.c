@@ -554,7 +554,7 @@ int apply_global_flags(int argc, char **args)
 /************************************************************/
 void usage(char *program_path)
 {
-  logf("Usage : %s COMMAND <param_1> <param_2> <param_3>... [-V] : \n",program_path);
+  logf("Usage : %s COMMAND <param_1> <param_2> <param_3>... [-V --quiet] : \n",program_path);
   logf("        ----\n");
   logf("        %s CATALOG       <[2mg|hdv|po]_image_path>   [-V]\n",program_path);
   logf("        %s CHECKVOLUME   <[2mg|hdv|po]_image_path>   [-V]\n",program_path);
