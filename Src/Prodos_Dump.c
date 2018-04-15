@@ -19,6 +19,7 @@
 #include "Dc_Memory.h"
 #include "os/os.h"
 #include "Prodos_Dump.h"
+#include "log.h"
 
 static void DumpVolumeFooter(struct prodos_image *,int);
 static void DumpOneDirectory(struct file_descriptive_entry *,int);
@@ -45,13 +46,13 @@ void DumpProdosImage(struct prodos_image *current_image, int dump_structure)
     }
 
   /* Ligne de Label */
-  printf("  Name");
+  logf("  Name");
   for(i=strlen("  Name"); i<max_depth*2+20; i++)
-    printf(" ");
-  printf("Type   Aux      Size     Data     Res  Data   Res  Sparse Index  Struct  Access    Creation Date     Modification Date\n");
+    logf(" ");
+  logf("Type   Aux      Size     Data     Res  Data   Res  Sparse Index  Struct  Access    Creation Date     Modification Date\n");
 
   /* Volume Name */
-  printf("/%s/\n",current_image->volume_header->volume_name);
+  logf("/%s/\n",current_image->volume_header->volume_name);
 
   /** Volume : Files **/
   for(i=0; i<current_image->nb_file; i++)
@@ -68,7 +69,7 @@ void DumpProdosImage(struct prodos_image *current_image, int dump_structure)
   if(dump_structure == 1)
     {
       /* Début */
-      printf("----------------------------------------------------------------------\n");
+      logf("----------------------------------------------------------------------\n");
 
       /** All Entries **/
       for(i=0; i<current_image->nb_file; i++)
@@ -90,10 +91,10 @@ static void DumpOneDirectory(struct file_descriptive_entry *current_file, int ma
 
   /* Profondeur */
   for(i=0; i<current_file->depth; i++)
-    printf("  ");
+    logf("  ");
 
   /* Directory Name */
-  printf("/%s/\n",current_file->file_name);
+  logf("/%s/\n",current_file->file_name);
 
   /** All File **/
   for(i=0; i<current_file->nb_file; i++)
@@ -155,7 +156,7 @@ static void DumpOneFile(struct file_descriptive_entry *current_file, int max_dep
   /* Modification Date */
   sprintf(&buffer[strlen(buffer)],"%s %s  ",current_file->file_modification_date.ascii,current_file->file_modification_time.ascii);
 
-  printf("%s\n",buffer);
+  logf("%s\n",buffer);
 }
 
 
@@ -181,7 +182,7 @@ static void DumpVolumeFooter(struct prodos_image *current_image, int max_depth)
   sprintf(&buffer[strlen(buffer)],"Directory : %d",nb_directory);
 
   /* Affichage */
-  printf("%s\n",buffer);
+  logf("%s\n",buffer);
 }
 
 
@@ -219,64 +220,64 @@ static void DumpOneEntry(struct prodos_image *current_image, struct file_descrip
   prefix[2*current_file->depth] = '\0';
 
   /* Path */
-  printf("%sFile Path                  : %s\n",prefix,current_file->file_path);
-  printf("%sName Length                : %d\n",prefix,current_file->name_length);
-  printf("%sFile Name                  : %s\n",prefix,current_file->file_name);
-  printf("%sFile Name Case             : %s\n",prefix,current_file->file_name_case);
-  printf("%sLower Case                 : %04X\n",prefix,current_file->lowercase);
-  printf("-----\n");
+  logf("%sFile Path                  : %s\n",prefix,current_file->file_path);
+  logf("%sName Length                : %d\n",prefix,current_file->name_length);
+  logf("%sFile Name                  : %s\n",prefix,current_file->file_name);
+  logf("%sFile Name Case             : %s\n",prefix,current_file->file_name_case);
+  logf("%sLower Case                 : %04X\n",prefix,current_file->lowercase);
+  logf("-----\n");
 
   /* Storage Type */
-  printf("%sStorage Type               : %02X\n",prefix,current_file->storage_type);
-  printf("%sStorage Type Ascii         : %s\n",prefix,current_file->storage_type_ascii);
-  printf("%sStorage Type Ascii Short   : %s\n",prefix,current_file->storage_type_ascii_short);
-  printf("-----\n");
+  logf("%sStorage Type               : %02X\n",prefix,current_file->storage_type);
+  logf("%sStorage Type Ascii         : %s\n",prefix,current_file->storage_type_ascii);
+  logf("%sStorage Type Ascii Short   : %s\n",prefix,current_file->storage_type_ascii_short);
+  logf("-----\n");
 
   /* File Type */
-  printf("%sFile Type                  : %02X\n",prefix,current_file->file_type);
-  printf("%sFile Aux Type              : %04X\n",prefix,current_file->file_aux_type);
-  printf("%sFile Type Ascii            : %s\n",prefix,current_file->file_type_ascii);
-  printf("-----\n");
+  logf("%sFile Type                  : %02X\n",prefix,current_file->file_type);
+  logf("%sFile Aux Type              : %04X\n",prefix,current_file->file_aux_type);
+  logf("%sFile Type Ascii            : %s\n",prefix,current_file->file_type_ascii);
+  logf("-----\n");
 
   /* Création / Modification Date + Version */
-  printf("%sFile Creation Date         : %s\n",prefix,current_file->file_creation_date.ascii);
-  printf("%sFile Creation Time         : %s\n",prefix,current_file->file_creation_time.ascii);
-  printf("%sFile Modification Date     : %s\n",prefix,current_file->file_modification_date.ascii);
-  printf("%sFile Modification Time     : %s\n",prefix,current_file->file_modification_time.ascii);
-  printf("%sVersion Created            : %d\n",prefix,current_file->version_created);
-  printf("%sMin Version                : %d\n",prefix,current_file->min_version);
-  printf("-----\n");
+  logf("%sFile Creation Date         : %s\n",prefix,current_file->file_creation_date.ascii);
+  logf("%sFile Creation Time         : %s\n",prefix,current_file->file_creation_time.ascii);
+  logf("%sFile Modification Date     : %s\n",prefix,current_file->file_modification_date.ascii);
+  logf("%sFile Modification Time     : %s\n",prefix,current_file->file_modification_time.ascii);
+  logf("%sVersion Created            : %d\n",prefix,current_file->version_created);
+  logf("%sMin Version                : %d\n",prefix,current_file->min_version);
+  logf("-----\n");
 
   /* Access */
-  printf("%sAccess                     : %02X\n",prefix,current_file->access);
-  printf("%sAccess Ascii               : %s\n",prefix,current_file->access_ascii);
-  printf("-----\n");
+  logf("%sAccess                     : %02X\n",prefix,current_file->access);
+  logf("%sAccess Ascii               : %s\n",prefix,current_file->access_ascii);
+  logf("-----\n");
 
   /* Size */
-  printf("%sBlocks Used                : %d\n",prefix,current_file->blocks_used);
-  printf("%sEOF Location               : %d\n",prefix,current_file->eof_location);
-  printf("%sData Block                 : %d\n",prefix,current_file->data_block);
-  printf("%sData Size                  : %d\n",prefix,current_file->data_size);
-  printf("%sResource Block             : %d\n",prefix,current_file->resource_block);
-  printf("%sResource Size              : %d\n",prefix,current_file->resource_size);
-  printf("%sSparse Block               : %d\n",prefix,current_file->nb_sparse);
-  printf("%sIndex Block                : %d\n",prefix,current_file->index_block);
-  printf("-----\n");
+  logf("%sBlocks Used                : %d\n",prefix,current_file->blocks_used);
+  logf("%sEOF Location               : %d\n",prefix,current_file->eof_location);
+  logf("%sData Block                 : %d\n",prefix,current_file->data_block);
+  logf("%sData Size                  : %d\n",prefix,current_file->data_size);
+  logf("%sResource Block             : %d\n",prefix,current_file->resource_block);
+  logf("%sResource Size              : %d\n",prefix,current_file->resource_size);
+  logf("%sSparse Block               : %d\n",prefix,current_file->nb_sparse);
+  logf("%sIndex Block                : %d\n",prefix,current_file->index_block);
+  logf("-----\n");
 
   /* Divers */
-  printf("%sDepth                      : %d\n",prefix,current_file->depth);
-  printf("%sStruct Size                : %d\n",prefix,current_file->struct_size);
-  printf("%sEntry Offset [this block]  : %d\n",prefix,current_file->entry_offset);
-  printf("%sKey Pointer Block [Data]   : %d  %04X\n",prefix,current_file->key_pointer_block,current_file->key_pointer_block);
-  printf("%sHeader Pointer Block [Dir] : %d  %04X\n",prefix,current_file->header_pointer_block,current_file->header_pointer_block);
-  printf("%sBlock Location [Entry]     : %d  %04X\n",prefix,current_file->block_location,current_file->block_location);
+  logf("%sDepth                      : %d\n",prefix,current_file->depth);
+  logf("%sStruct Size                : %d\n",prefix,current_file->struct_size);
+  logf("%sEntry Offset [this block]  : %d\n",prefix,current_file->entry_offset);
+  logf("%sKey Pointer Block [Data]   : %d  %04X\n",prefix,current_file->key_pointer_block,current_file->key_pointer_block);
+  logf("%sHeader Pointer Block [Dir] : %d  %04X\n",prefix,current_file->header_pointer_block,current_file->header_pointer_block);
+  logf("%sBlock Location [Entry]     : %d  %04X\n",prefix,current_file->block_location,current_file->block_location);
   if(current_file->parent_directory == NULL)
-    printf("%sParent Directory           : /%s\n",prefix,current_image->volume_header->volume_name_case);
+    logf("%sParent Directory           : /%s\n",prefix,current_image->volume_header->volume_name_case);
   else
-    printf("%sParent Directory           : %s\n",prefix,current_file->parent_directory->file_path);
+    logf("%sParent Directory           : %s\n",prefix,current_file->parent_directory->file_path);
 
   /* Fin */
-  printf("----------------------------------------------------------------------\n");
+  logf("----------------------------------------------------------------------\n");
 }
 
 /*************************************************************************/

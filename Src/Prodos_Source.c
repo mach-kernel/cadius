@@ -17,6 +17,7 @@
 #include "Dc_Shared.h"
 #include "os/os.h"
 #include "Prodos_Source.h"
+#include "log.h"
 
 #define TYPE_LINE_CODE    1
 #define TYPE_LINE_COMMENT 2
@@ -61,7 +62,7 @@ int ClearFileHighBit(char *file_path)
   data = LoadBinaryFile(file_path,&length);
   if(data == NULL)
     {
-      printf("  Error : Impossible to open file '%s'.\n",file_path);
+      logf_error("  Error : Impossible to open file '%s'.\n",file_path);
       return(1);
     }
 
@@ -79,7 +80,7 @@ int ClearFileHighBit(char *file_path)
   result = CreateTextFile(file_path,data,length);
   if(result)
     {
-      printf("  Error : Impossible to update file '%s'.\n",file_path);
+      logf_error("  Error : Impossible to update file '%s'.\n",file_path);
       return(1);
     }
 
@@ -104,7 +105,7 @@ int SetFileHighBit(char *file_path)
   data = LoadTextFile(file_path,&length);
   if(data == NULL)
     {
-      printf("  Error : Impossible to open file '%s'.\n",file_path);
+      logf_error("  Error : Impossible to open file '%s'.\n",file_path);
       return(1);
     }
 
@@ -126,7 +127,7 @@ int SetFileHighBit(char *file_path)
   result = CreateBinaryFile(file_path,data,length);
   if(result)
     {
-      printf("  Error : Impossible to update file '%s'.\n",file_path);
+      logf_error("  Error : Impossible to update file '%s'.\n",file_path);
       return(1);
     }
 
@@ -152,7 +153,7 @@ int IndentFile(char *file_path)
   data = LoadTextFile(file_path,&length_src);
   if(data == NULL)
     {
-      printf("  Error : Impossible to open file '%s'.\n",file_path);
+      logf_error("  Error : Impossible to open file '%s'.\n",file_path);
       return(1);
     }
 
@@ -184,7 +185,7 @@ int IndentFile(char *file_path)
   result = CreateTextFile(file_path,data,length_dst);
   if(result)
     {
-      printf("  Error : Impossible to update file '%s'.\n",file_path);
+      logf_error("  Error : Impossible to update file '%s'.\n",file_path);
       return(4);
     }
 
@@ -210,7 +211,7 @@ int OutdentFile(char *file_path)
   data = LoadTextFile(file_path,&length);
   if(data == NULL)
     {
-      printf("  Error : Impossible to open file '%s'.\n",file_path);
+      logf_error("  Error : Impossible to open file '%s'.\n",file_path);
       return(1);
     }
 
@@ -241,7 +242,7 @@ int OutdentFile(char *file_path)
   result = CreateTextFile(file_path,data,strlen(data));
   if(result)
     {
-      printf("  Error : Impossible to update file '%s'.\n",file_path);
+      logf_error("  Error : Impossible to update file '%s'.\n",file_path);
       return(4);
     }
 
@@ -305,7 +306,7 @@ static char *BuildIndentBuffer(int nb_line, struct line **tab_line)
   data = (char *) calloc(nb_line,line_length+1);
   if(data == NULL)
     {
-      printf("  Error : Impossible to allocate memory to process the file.\n");
+      logf_error("  Error : Impossible to allocate memory to process the file.\n");
       return(NULL);
     }
 
@@ -433,7 +434,7 @@ static char *BuildOutdentBuffer(int nb_line, struct line **tab_line)
   data = (char *) calloc(nb_line,line_length+1);
   if(data == NULL)
     {
-      printf("  Error : Impossible to allocate memory to process the file.\n");
+      logf_error("  Error : Impossible to allocate memory to process the file.\n");
       return(NULL);
     }
 
@@ -516,7 +517,7 @@ static struct line **BuildLineTab(unsigned char *data, int length, int *nb_line_
   tab_line = (struct line **) calloc(nb_line,sizeof(struct line *));
   if(tab_line == NULL)
     {
-      printf("  Error : Impossible to allocate memory to process the file.\n");
+      logf_error("  Error : Impossible to allocate memory to process the file.\n");
       return(NULL);
     }
 
@@ -566,7 +567,7 @@ static struct line *BuildOneLine(char *line, int line_nb)
   current_line = (struct line *) calloc(1,sizeof(struct line));
   if(current_line == NULL)
     {
-      printf("  Error processing line %d (%s) : %s\n",line_nb,line,ERR_MEMORY_ALLOC);
+      logf_error("  Error processing line %d (%s) : %s\n",line_nb,line,ERR_MEMORY_ALLOC);
       return(NULL);
     }
   current_line->number = line_nb;
@@ -586,7 +587,7 @@ static struct line *BuildOneLine(char *line, int line_nb)
       current_line->comment = strdup(line);
       if(current_line->comment == NULL)
         {
-          printf("  Error processing line %d (%s) : %s\n",line_nb,line,ERR_MEMORY_ALLOC);
+          logf_error("  Error processing line %d (%s) : %s\n",line_nb,line,ERR_MEMORY_ALLOC);
           mem_free_line(current_line);
           return(NULL);
         }
@@ -601,7 +602,7 @@ static struct line *BuildOneLine(char *line, int line_nb)
   length = GetLineValue(&line[offset],0,&current_line->label);
   if(length < 0)
     {
-      printf("  Error processing line %d (%s) : %s\n",line_nb,line,(length == -1)?ERR_MEMORY_ALLOC:ERR_LINE_FORMAT);
+      logf_error("  Error processing line %d (%s) : %s\n",line_nb,line,(length == -1)?ERR_MEMORY_ALLOC:ERR_LINE_FORMAT);
       mem_free_line(current_line);
       return(NULL);
     }
@@ -611,7 +612,7 @@ static struct line *BuildOneLine(char *line, int line_nb)
   length = GetLineValue(&line[offset],0,&current_line->opcode);
   if(length < 0)
     {
-      printf("  Error processing line %d (%s) : %s\n",line_nb,line,(length == -1)?ERR_MEMORY_ALLOC:ERR_LINE_FORMAT);
+      logf_error("  Error processing line %d (%s) : %s\n",line_nb,line,(length == -1)?ERR_MEMORY_ALLOC:ERR_LINE_FORMAT);
       mem_free_line(current_line);
       return(NULL);
     }
@@ -621,7 +622,7 @@ static struct line *BuildOneLine(char *line, int line_nb)
   length = GetLineValue(&line[offset],0,&current_line->operand);
   if(length < 0)
     {
-      printf("  Error processing line %d (%s) : %s\n",line_nb,line,(length == -1)?ERR_MEMORY_ALLOC:ERR_LINE_FORMAT);
+      logf_error("  Error processing line %d (%s) : %s\n",line_nb,line,(length == -1)?ERR_MEMORY_ALLOC:ERR_LINE_FORMAT);
       mem_free_line(current_line);
       return(NULL);
     }
@@ -631,7 +632,7 @@ static struct line *BuildOneLine(char *line, int line_nb)
   length = GetLineValue(&line[offset],1,&current_line->comment);
   if(length < 0)
     {
-      printf("  Error processing line %d (%s) : %s\n",line_nb,line,(length == -1)?ERR_MEMORY_ALLOC:ERR_LINE_FORMAT);
+      logf_error("  Error processing line %d (%s) : %s\n",line_nb,line,(length == -1)?ERR_MEMORY_ALLOC:ERR_LINE_FORMAT);
       mem_free_line(current_line);
       return(NULL);
     }

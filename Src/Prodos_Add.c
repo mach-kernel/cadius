@@ -25,6 +25,7 @@
 #include "Prodos_Create.h"
 #include "Prodos_Add.h"
 #include "File_AppleSingle.h"
+#include "log.h"
 
 static struct prodos_file *LoadFile(char *);
 static int GetFileInformation(char *,char *,struct prodos_file *);
@@ -64,7 +65,7 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
   is_valid = CheckProdosName(current_file->file_name);
   if(is_valid == 0)
     {
-      printf("  Error : Invalid Prodos File name '%s'.\n",current_file->file_name);
+      logf_error("  Error : Invalid Prodos File name '%s'.\n",current_file->file_name);
       current_image->nb_add_error++;
       mem_free_file(current_file);
       return(1);
@@ -72,7 +73,7 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
   /* Taille */
   if(current_file->data_length > (16*1024*1024) || current_file->resource_length > (16*1024*1024) || (current_file->data_length+current_file->resource_length) > (16*1024*1024))
     {
-      printf("  Error : Invalid Prodos File size '%d' bytes (limit is 16 MB).\n",current_file->data_length+current_file->resource_length);
+      logf_error("  Error : Invalid Prodos File size '%d' bytes (limit is 16 MB).\n",current_file->data_length+current_file->resource_length);
       current_image->nb_add_error++;
       mem_free_file(current_file);
       return(1);
@@ -82,7 +83,7 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
   ComputeFileBlockUsage(current_file);
   if(current_file->tab_data_block == NULL || current_file->tab_resource_block == NULL)
     {
-      printf("  Error : Impossible to allocate memory.\n");
+      logf_error("  Error : Impossible to allocate memory.\n");
       current_image->nb_add_error++;
       mem_free_file(current_file);
       return(1);
@@ -91,7 +92,7 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
   /** Vérifie qu'il reste suffisament de place pour stocker le fichier **/
   if(current_file->entry_disk_block > current_image->nb_free_block)
     {
-      printf("  Error : No enough space in the image : '%d' bytes required ('%d' bytes available).\n",BLOCK_SIZE*current_file->entry_disk_block,BLOCK_SIZE*current_image->nb_free_block);
+      logf_error("  Error : No enough space in the image : '%d' bytes required ('%d' bytes available).\n",BLOCK_SIZE*current_file->entry_disk_block,BLOCK_SIZE*current_image->nb_free_block);
       current_image->nb_add_error++;
       mem_free_file(current_file);
       return(1);
@@ -113,7 +114,7 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
       for(i=0; i<current_image->nb_file; i++)
         if(!my_stricmp(current_file->file_name_case,current_image->tab_file[i]->file_name))
           {
-            printf("  Error : Invalid target location. A file already exist with the same name '%s'.\n",current_image->tab_file[i]->file_name);
+            logf_error("  Error : Invalid target location. A file already exist with the same name '%s'.\n",current_image->tab_file[i]->file_name);
             current_image->nb_add_error++;
             mem_free_file(current_file);
             return(1);
@@ -121,7 +122,7 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
       for(i=0; i<current_image->nb_directory; i++)
         if(!my_stricmp(current_file->file_name_case,current_image->tab_directory[i]->file_name))
           {
-            printf("  Error : Invalid target location. A folder already exist with the same name '%s'.\n",current_image->tab_directory[i]->file_name);
+            logf_error("  Error : Invalid target location. A folder already exist with the same name '%s'.\n",current_image->tab_directory[i]->file_name);
             current_image->nb_add_error++;
             mem_free_file(current_file);
             return(1);
@@ -133,7 +134,7 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
       for(i=0; i<target_folder->nb_file; i++)
         if(!my_stricmp(current_file->file_name_case,target_folder->tab_file[i]->file_name))
           {
-            printf("  Error : Invalid target location. A file already exist with the same name '%s'.\n",target_folder->tab_file[i]->file_name);
+            logf_error("  Error : Invalid target location. A file already exist with the same name '%s'.\n",target_folder->tab_file[i]->file_name);
             current_image->nb_add_error++;
             mem_free_file(current_file);
             return(1);
@@ -141,7 +142,7 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
       for(i=0; i<target_folder->nb_directory; i++)
         if(!my_stricmp(current_file->file_name_case,target_folder->tab_directory[i]->file_name))
           {
-            printf("  Error : Invalid target location. A folder already exist with the same name '%s'.\n",target_folder->tab_directory[i]->file_name);
+            logf_error("  Error : Invalid target location. A folder already exist with the same name '%s'.\n",target_folder->tab_directory[i]->file_name);
             current_image->nb_add_error++;
             mem_free_file(current_file);
             return(1);
@@ -160,7 +161,7 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
   /** Vérifie qu'il reste suffisament de place pour stocker le fichier (la réservation du nom dans le directory a peut être consommé 1 block **/
   if(current_file->entry_disk_block > current_image->nb_free_block)
     {
-      printf("  Error : No enough space in the image : '%d' bytes required ('%d' bytes available).\n",BLOCK_SIZE*current_file->entry_disk_block,BLOCK_SIZE*current_image->nb_free_block);
+      logf_error("  Error : No enough space in the image : '%d' bytes required ('%d' bytes available).\n",BLOCK_SIZE*current_file->entry_disk_block,BLOCK_SIZE*current_image->nb_free_block);
       current_image->nb_add_error++;
       mem_free_file(current_file);
       return(1);
@@ -183,7 +184,7 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
   if(error)
     {
       current_image->nb_add_error++;
-      printf("  Error : Impossible to allocate memory.\n");
+      logf_error("  Error : Impossible to allocate memory.\n");
       mem_free_file(current_file);
       return(1);
     }
@@ -232,7 +233,7 @@ void AddFolder(struct prodos_image *current_image, char *folder_path, char *targ
   tab_file = BuildFileList(full_folder_path,&nb_file);
   if(tab_file == NULL || nb_file == 0)
     {
-      printf("  Error : Impossible to get files list from location '%s'.\n",folder_path);
+      logf_error("  Error : Impossible to get files list from location '%s'.\n",folder_path);
       mem_free_list(nb_file,tab_file);
       current_image->nb_add_error++;
       return;
@@ -262,7 +263,7 @@ void AddFolder(struct prodos_image *current_image, char *folder_path, char *targ
           prodos_folder_path[j] = '/';
 
       /* Information */
-      printf("      o Add File   : %s\n",prodos_folder_path);
+      logf_info("      o Add File   : %s\n",prodos_folder_path);
 
       /* Supprime le nom du fichier final */
       for(j=(int)strlen(prodos_folder_path); j>=0; j--)
@@ -303,7 +304,7 @@ static struct prodos_file *LoadFile(char *file_path_data)
   current_file = (struct prodos_file *) calloc(1,sizeof(struct prodos_file));
   if(current_file == NULL)
     {
-      printf("  Error : Impossible to allocate memory.\n");
+      logf_error("  Error : Impossible to allocate memory.\n");
       return(NULL);
     }
 
@@ -341,7 +342,7 @@ static struct prodos_file *LoadFile(char *file_path_data)
   if(current_file->file_name == NULL || current_file->file_name_case == NULL)
     {
       free(current_file);
-      printf("  Error : Impossible to allocate memory.\n");
+      logf_error("  Error : Impossible to allocate memory.\n");
       return(NULL);
     }
   for(i=0; i<(int)strlen(current_file->file_name); i++)
@@ -354,7 +355,7 @@ static struct prodos_file *LoadFile(char *file_path_data)
 
   if (data == NULL) 
   {
-    printf("  Error : Cannot load file %s\n", file_path_data);
+    logf_error("  Error : Cannot load file %s\n", file_path_data);
     return NULL;
   }
 
@@ -362,7 +363,7 @@ static struct prodos_file *LoadFile(char *file_path_data)
 
   if (is_apple_single)
   {
-    printf("      AppleSingle format detected!\n");
+    logf_info("      AppleSingle format detected!\n");
     ASDecorateProdosFile(current_file, data);
   }
   else

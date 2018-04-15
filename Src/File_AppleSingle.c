@@ -1,4 +1,5 @@
 #include "File_AppleSingle.h"
+#include "log.h"
 
 const unsigned int AS_MAGIC = (uint32_t) 0x00051600;
 
@@ -72,7 +73,7 @@ struct as_file_entry *ASGetEntries(struct as_file_header *header, unsigned char 
 {
   if (!header)
   {
-    printf("      Invalid AppleSingle file!\n");
+    logf_error("      Error: Invalid AppleSingle file!\n");
     return NULL;
   }
 
@@ -160,8 +161,8 @@ void ASDecorateProdosFile(struct prodos_file *current_file, unsigned char *data)
           ASDecorateProdosFileInfo(current_file, data, &entries[i]);
           break;
         default:
-          printf("        Entry ID %d unsupported, ignoring!\n", entries[i].entry_id);
-          printf("        (See https://tools.ietf.org/html/rfc1740 for ID lookup)\n");
+          logf_info("        Entry ID %d unsupported, ignoring!\n", entries[i].entry_id);
+          logf_info("        (See https://tools.ietf.org/html/rfc1740 for ID lookup)\n");
           break;
       }
     return;

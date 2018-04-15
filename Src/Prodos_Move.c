@@ -21,6 +21,7 @@
 #include "os/os.h"
 #include "Prodos_Create.h"
 #include "Prodos_Move.h"
+#include "log.h"  
 
 static int MoveProdosFileToFolder(struct prodos_image *,struct file_descriptive_entry *,struct file_descriptive_entry *);
 static int MoveProdosFolderToFolder(struct prodos_image *,struct file_descriptive_entry *,struct file_descriptive_entry *);
@@ -42,7 +43,7 @@ void MoveProdosFile(struct prodos_image *current_image, char *prodos_file_path, 
   current_entry = GetProdosFile(current_image,prodos_file_path);
   if(current_entry == NULL)
     {
-      printf("  Error : Invalid Prodos File path '%s'.\n",prodos_file_path);
+      logf_error("  Error : Invalid Prodos File path '%s'.\n",prodos_file_path);
       return;
     }
 
@@ -74,7 +75,7 @@ void MoveProdosFolder(struct prodos_image *current_image, char *prodos_folder_pa
   current_entry = GetProdosFolder(current_image,prodos_folder_path,0);
   if(current_entry == NULL)
     {
-      printf("  Error : Invalid Prodos Folder path '%s'.\n",prodos_folder_path);
+      logf_error("  Error : Invalid Prodos Folder path '%s'.\n",prodos_folder_path);
       return;
     }
 
@@ -112,13 +113,13 @@ int MoveProdosFileToFolder(struct prodos_image *current_image, struct file_descr
       for(i=0; i<current_image->nb_file; i++)
         if(!my_stricmp(current_file->file_name_case,current_image->tab_file[i]->file_name))
           {
-            printf("  Error : Invalid target location. A file already exist with the same name '%s'.\n",current_image->tab_file[i]->file_name);
+            logf_error("  Error : Invalid target location. A file already exist with the same name '%s'.\n",current_image->tab_file[i]->file_name);
             return(1);
           }
       for(i=0; i<current_image->nb_directory; i++)
         if(!my_stricmp(current_file->file_name_case,current_image->tab_directory[i]->file_name))
           {
-            printf("  Error : Invalid target location. A folder already exist with the same name '%s'.\n",current_image->tab_directory[i]->file_name);
+            logf_error("  Error : Invalid target location. A folder already exist with the same name '%s'.\n",current_image->tab_directory[i]->file_name);
             return(1);
           }
     }
@@ -128,13 +129,13 @@ int MoveProdosFileToFolder(struct prodos_image *current_image, struct file_descr
       for(i=0; i<target_folder->nb_file; i++)
         if(!my_stricmp(current_file->file_name_case,target_folder->tab_file[i]->file_name))
           {
-            printf("  Error : Invalid target location. A file already exist with the same name '%s'.\n",target_folder->tab_file[i]->file_name);
+            logf_error("  Error : Invalid target location. A file already exist with the same name '%s'.\n",target_folder->tab_file[i]->file_name);
             return(1);
           }
       for(i=0; i<target_folder->nb_directory; i++)
         if(!my_stricmp(current_file->file_name_case,target_folder->tab_directory[i]->file_name))
           {
-            printf("  Error : Invalid target location. A folder already exist with the same name '%s'.\n",target_folder->tab_directory[i]->file_name);
+            logf_error("  Error : Invalid target location. A folder already exist with the same name '%s'.\n",target_folder->tab_directory[i]->file_name);
             return(1);
           }
     }
@@ -195,7 +196,7 @@ int MoveProdosFileToFolder(struct prodos_image *current_image, struct file_descr
     error = UpdateEntryTable(UPDATE_ADD,&target_folder->nb_file,&target_folder->tab_file,current_file);
   if(error)
     {
-      printf("  Error : Memory allocation impossible.\n");
+      logf_error("  Error : Memory allocation impossible.\n");
       return(1);
     }
 
@@ -206,7 +207,7 @@ int MoveProdosFileToFolder(struct prodos_image *current_image, struct file_descr
                                                    sizeof(char));
   if(new_path == NULL)
     {
-      printf("  Error : Memory allocation impossible.\n");
+      logf_error("  Error : Memory allocation impossible.\n");
       return(1);
     }
   if(target_folder == NULL)
@@ -261,14 +262,14 @@ int MoveProdosFolderToFolder(struct prodos_image *current_image, struct file_des
   /* On ne peut pas déplacer un Dossier au même endroit */
   if(!my_stricmp(old_path,new_path))
     {
-      printf("  Error : Invalid target location. The Folder is moved at the same location : '%s'.\n",target_folder->file_name_case);
+      logf_error("  Error : Invalid target location. The Folder is moved at the same location : '%s'.\n",target_folder->file_name_case);
       return(1);
     }
   /* On ne peut pas déplacer un Dossier sous lui-même */
   if(strlen(new_path) > strlen(old_path))
     if(!my_strnicmp(old_path,new_path,strlen(old_path)))
       {
-        printf("  Error : Invalid target location. The Folder is moved under itself : '%s'.\n",target_folder->file_name_case);
+        logf_error("  Error : Invalid target location. The Folder is moved under itself : '%s'.\n",target_folder->file_name_case);
         return(1);
       }
 
@@ -279,13 +280,13 @@ int MoveProdosFolderToFolder(struct prodos_image *current_image, struct file_des
       for(i=0; i<current_image->nb_file; i++)
         if(!my_stricmp(current_folder->file_name_case,current_image->tab_file[i]->file_name))
           {
-            printf("  Error : Invalid target location. A file already exist with the same name '%s'.\n",current_image->tab_file[i]->file_name);
+            logf_error("  Error : Invalid target location. A file already exist with the same name '%s'.\n",current_image->tab_file[i]->file_name);
             return(1);
           }
       for(i=0; i<current_image->nb_directory; i++)
         if(!my_stricmp(current_folder->file_name_case,current_image->tab_directory[i]->file_name))
           {
-            printf("  Error : Invalid target location. A folder already exist with the same name '%s'.\n",current_image->tab_directory[i]->file_name);
+            logf_error("  Error : Invalid target location. A folder already exist with the same name '%s'.\n",current_image->tab_directory[i]->file_name);
             return(1);
           }
     }
@@ -295,13 +296,13 @@ int MoveProdosFolderToFolder(struct prodos_image *current_image, struct file_des
       for(i=0; i<target_folder->nb_file; i++)
         if(!my_stricmp(current_folder->file_name_case,target_folder->tab_file[i]->file_name))
           {
-            printf("  Error : Invalid target location. A file already exist with the same name '%s'.\n",target_folder->tab_file[i]->file_name);
+            logf_error("  Error : Invalid target location. A file already exist with the same name '%s'.\n",target_folder->tab_file[i]->file_name);
             return(1);
           }
       for(i=0; i<target_folder->nb_directory; i++)
         if(!my_stricmp(current_folder->file_name_case,target_folder->tab_directory[i]->file_name))
           {
-            printf("  Error : Invalid target location. A folder already exist with the same name '%s'.\n",target_folder->tab_directory[i]->file_name);
+            logf_error("  Error : Invalid target location. A folder already exist with the same name '%s'.\n",target_folder->tab_directory[i]->file_name);
             return(1);
           }
     }
@@ -368,7 +369,7 @@ int MoveProdosFolderToFolder(struct prodos_image *current_image, struct file_des
     error = UpdateEntryTable(UPDATE_ADD,&target_folder->nb_file,&target_folder->tab_file,current_folder);
   if(error)
     {
-      printf("  Error : Memory allocation impossible.\n");
+      logf_error("  Error : Memory allocation impossible.\n");
       return(1);
     }
 
@@ -451,7 +452,7 @@ static char *ChangeEntryPath(char *current_file_path, char *old_path, char *new_
   new_file_path = (char *) calloc(length+1,sizeof(char));
   if(new_file_path == NULL)
     {
-      printf("  Error : Memory allocation impossible.\n");
+      logf_error("  Error : Memory allocation impossible.\n");
       return(current_file_path);
     }
 
