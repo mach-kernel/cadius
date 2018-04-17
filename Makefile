@@ -84,7 +84,7 @@ install: export BIN_PATH := bin/release
 ifeq ($(UNAME_S),Darwin)
 	SOURCES = $(shell find $(SRC_PATH) -name '*.$(SRC_EXT)' | sort -k 1nr | cut -f2-)
 else
-	SOURCES = $(shell find $(SRC_PATH) -name '*.$(SRC_EXT)'  logf '%T@\t%p\n' \
+	SOURCES = $(shell find $(SRC_PATH) -name '*.$(SRC_EXT)' -printf '%T@\t%p\n' \
 						| sort -k 1nr | cut -f2-)
 endif
 
