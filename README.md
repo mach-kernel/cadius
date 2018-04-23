@@ -37,6 +37,9 @@ Any and all contributions are welcome. Included is also a `cadius.pro` file you 
 
 ## Changelog
 
+#### 1.4.2
+- `CREATEVOLUME` did not previously allow for the creation of 143kb images. Thanks [@inexorabletash](https://github.com/inexorabletash)!
+
 #### 1.4.1
 - `REPLACEFILE`
   - Buffer overflow resolved [#17](https://github.com/mach-kernel/cadius/issues/17). Thanks [@sicklittlemonkey](https://github.com/sicklittlemonkey)!
