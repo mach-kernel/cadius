@@ -60,17 +60,7 @@
 #define ACTION_INDENT_FILE       82
 #define ACTION_OUTDENT_FILE      83
 
-typedef struct global_toggles {
-  int verbose;
-  bool output_apple_single;
-} global_toggles;
-
-static struct global_toggles TOGGLES = {
-  0,
-  false
-};
-
-int apply_global_flags(int, char**);
+int apply_global_flags(struct parameter*, int, char**);
 void usage(char *);
 struct parameter *GetParamLine(int,char *[]);
 
@@ -95,16 +85,13 @@ int main(int argc, char *argv[])
       return(1);
     }
 
-  argc = apply_global_flags(argc, argv);
-
   /* Initialisation */
   my_Memory(MEMORY_INIT,NULL,NULL);
 
   /** Décode les paramètres **/
-  param = GetParamLine(argc-TOGGLES.verbose,argv);
+  param = GetParamLine(argc, argv);
   if(param == NULL)
     return(2);
-  param->verbose = TOGGLES.verbose;
 
   /** Actions **/
   if(param->action == ACTION_CATALOG)
@@ -143,7 +130,7 @@ int main(int argc, char *argv[])
     {
       /* Information */
       logf_info("  - Extract file '%s'\n",param->prodos_file_path);
-      if (TOGGLES.output_apple_single)logf_info("    - Creating AppleSingle file!\n");
+      if (param->output_apple_single)logf_info("    - Creating AppleSingle file!\n");
 
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
@@ -155,7 +142,7 @@ int main(int argc, char *argv[])
         current_image,
         param->prodos_file_path,
         param->output_directory_path,
-        TOGGLES.output_apple_single
+        param->output_apple_single
       );
 
       /* Libération mémoire */
@@ -165,7 +152,7 @@ int main(int argc, char *argv[])
     {
       /* Information */
       logf_info("  - Extract folder '%s' :\n",param->prodos_folder_path);
-      if (TOGGLES.output_apple_single)logf_info("    - Creating AppleSingle files!\n");
+      if (param->output_apple_single)logf_info("    - Creating AppleSingle files!\n");
 
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
@@ -182,7 +169,7 @@ int main(int argc, char *argv[])
         current_image,
         folder_entry,
         param->output_directory_path,
-        TOGGLES.output_apple_single
+        param->output_apple_single
       );
 
       /* Stat */
@@ -200,13 +187,13 @@ int main(int argc, char *argv[])
 
       /* Information */
       logf_info("  - Extract volume '%s' :\n",current_image->volume_header->volume_name_case);
-      if (TOGGLES.output_apple_single)logf_info("    - Creating AppleSingle files!\n");
+      if (param->output_apple_single)logf_info("    - Creating AppleSingle files!\n");
 
       /** Extrait les fichiers du volume **/
       ExtractVolumeFiles(
         current_image,
         param->output_directory_path,
-        TOGGLES.output_apple_single
+        param->output_apple_single
       );
 
       /* Stat */
@@ -521,27 +508,27 @@ int main(int argc, char *argv[])
  * @param argc 
  * @param args 
  */
-int apply_global_flags(int argc, char **args) 
+int apply_global_flags(struct parameter *params, int argc, char **argv) 
 {
   int found = 0;
 
   for (int i=3; i < argc; ++i) 
   {
-    if (!my_stricmp(args[i], "--quiet")) 
+    if (!my_stricmp(argv[i], "--quiet")) 
     {
       log_set_level(ERROR);
       found += 1;
     }
 
-    if(!my_stricmp(args[i], "-V"))
+    if(!my_stricmp(argv[i], "-V"))
     {
-      TOGGLES.verbose = 1;
+      params -> verbose = 1;
       found += 1;
     }
 
-    if (!my_stricmp(args[i], "-A")) 
+    if (!my_stricmp(argv[i], "-A")) 
     {
-      TOGGLES.output_apple_single = true;
+      params -> output_apple_single = true;
       found += 1;
     }
   }
@@ -625,6 +612,8 @@ struct parameter *GetParamLine(int argc, char *argv[])
       logf("  Error : Impossible to allocate memory for structure Param.\n");
       return(NULL);
     }
+
+  argc = apply_global_flags(param, argc, argv);
 
   /** CATALOG <image_path> **/
   if(!my_stricmp(argv[1],"CATALOG") && argc == 3)
