@@ -1,7 +1,8 @@
 #include "File_AppleSingle.h"
 #include "log.h"
+#include "os/os.h"
 
-const unsigned int AS_MAGIC = (uint32_t) 0x00051600;
+const unsigned static int AS_MAGIC = (uint32_t) 0x00051600;
 
 static uint32_t as_field32(uint32_t num)
 {
@@ -51,7 +52,7 @@ struct as_file_header *ASParseHeader(unsigned char *buf)
  * @param entry_buf  The entry buffer
  * @return
  */
-struct as_prodos_info *ASParseProdosEntry(unsigned char *entry_buf, DWORD length)
+struct as_prodos_info *ASParseProdosEntry(unsigned char *entry_buf)
 {
   struct as_prodos_info *prodos_entry = malloc(sizeof(as_prodos_info));
   struct as_prodos_info *buf_prodos_entry = (as_prodos_info *) entry_buf;
@@ -81,7 +82,7 @@ struct as_file_entry *ASGetEntries(struct as_file_header *header, unsigned char 
     header->num_entries * sizeof(as_file_entry)
   );
 
-  struct as_file_entry *buf_entries = buf + sizeof(as_file_header);
+  struct as_file_entry *buf_entries = (as_file_entry *) buf + sizeof(as_file_header);
   memcpy(entries, buf_entries, header->num_entries * sizeof(as_file_entry));
 
   if (IS_LITTLE_ENDIAN)
@@ -127,7 +128,7 @@ void ASDecorateProdosFileInfo(struct prodos_file *current_file, unsigned char *d
   if (prodos_entry->entry_id != prodos_file_info) return;
 
   struct as_prodos_info *info_meta = ASParseProdosEntry(
-    data + prodos_entry->offset, prodos_entry->length
+    data + prodos_entry->offset
   );
 
   if (!info_meta) return;

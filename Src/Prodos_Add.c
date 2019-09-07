@@ -456,45 +456,45 @@ static int GetFileInformation(char *file_information_path, char *file_name, stru
           GetLineValue(line_tab[i],"Type",local_buffer);
           if(strlen(local_buffer) == 2)
             {
-              sscanf(local_buffer,"%02lX",&value);
+              sscanf(local_buffer,"%2X",&value);
               current_file->type = (unsigned char) value;
             }
           GetLineValue(line_tab[i],"AuxType",local_buffer);
           if(strlen(local_buffer) == 4)
             {
-              sscanf(local_buffer,"%04lX",&value);
+              sscanf(local_buffer,"%4X",&value);
               current_file->aux_type = (WORD) value;
             }
           GetLineValue(line_tab[i],"VersionCreate",local_buffer);
           if(strlen(local_buffer) == 2)
             {
-              sscanf(local_buffer,"%02lX",&value);
+              sscanf(local_buffer,"%2X",&value);
               current_file->version_create = (unsigned char) value;
             }
           GetLineValue(line_tab[i],"MinVersion",local_buffer);
           if(strlen(local_buffer) == 2)
             {
-              sscanf(local_buffer,"%02lX",&value);
+              sscanf(local_buffer,"%2X",&value);
               current_file->min_version = (unsigned char) value;
             }
           GetLineValue(line_tab[i],"Access",local_buffer);
           if(strlen(local_buffer) == 2)
             {
-              sscanf(local_buffer,"%02lX",&value);
+              sscanf(local_buffer,"%2X",&value);
               current_file->access = (unsigned char) value;
             }
           GetLineValue(line_tab[i],"FolderInfo1",local_buffer);
           if(strlen(local_buffer) == 36)
             for(j=0; j<18; j++)
               {
-                sscanf(&local_buffer[2*j],"%02lX",&value);
+                sscanf(&local_buffer[2*j],"%2X",&value);
                 current_file->resource_finderinfo_1[j] = (unsigned char) value;
               }
           GetLineValue(line_tab[i],"FolderInfo2",local_buffer);
           if(strlen(local_buffer) == 36)
             for(j=0; j<18; j++)
               {
-                sscanf(&local_buffer[2*j],"%02lX",&value);
+                sscanf(&local_buffer[2*j],"%2X",&value);
                 current_file->resource_finderinfo_2[j] = (unsigned char) value;
               }
             

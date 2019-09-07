@@ -17,7 +17,7 @@
 #include "Dc_Shared.h"
 #include "Dc_Prodos.h"
 
-const unsigned int AS_MAGIC;
+const unsigned static int AS_MAGIC;
 #define IS_LITTLE_ENDIAN 'APPL' == (uint32_t) 0x4150504C
 
 #pragma pack(push, 1)
@@ -73,7 +73,7 @@ typedef struct as_from_prodos
 bool ASIsAppleSingle(unsigned char *buf);
 
 struct as_file_header *ASParseHeader(unsigned char *buf);
-struct as_prodos_info *ASParseProdosEntry(unsigned char *entry_buf, DWORD length);
+struct as_prodos_info *ASParseProdosEntry(unsigned char *entry_buf);
 struct as_file_entry *ASGetEntries(struct as_file_header *header, unsigned char *buf);
 
 void ASDecorateDataFork(struct prodos_file *current_file, unsigned char *data, as_file_entry *data_fork_entry);
