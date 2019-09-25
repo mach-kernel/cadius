@@ -195,8 +195,8 @@ struct as_from_prodos ASFromProdosFile(struct prodos_file *file)
   prodos_info->auxtype = as_field32(file->entry->file_aux_type);
 
   uint32_t payload_size = prodos_entry_offset + sizeof(as_prodos_info);
-  char *payload = malloc(payload_size);
-  char *seek = payload;
+  unsigned char *payload = malloc(payload_size);
+  unsigned char *seek = payload;
 
   memcpy(seek, as_header, sizeof(as_file_header));
   seek += sizeof(as_file_header);

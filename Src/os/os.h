@@ -25,6 +25,7 @@
 #include <sys/timeb.h>
 #include <sys/types.h>
 #include <time.h>
+#include <unistd.h>
 
 #ifdef BUILD_POSIX
 

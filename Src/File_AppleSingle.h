@@ -65,7 +65,7 @@ typedef struct as_prodos_info
 typedef struct as_from_prodos
 {
   uint16_t length;
-  char *data;
+  unsigned char *data;
 } as_from_prodos;
 
 #pragma pack(pop)

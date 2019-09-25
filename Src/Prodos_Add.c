@@ -704,6 +704,10 @@ static WORD CreateFileContent(struct prodos_image *current_image, struct prodos_
           if(file_block_number == 0)
             return(0);
         }
+      else
+        {
+          return(1);
+        }
     }
   else  /** Fichier Resource **/
     {
@@ -752,6 +756,10 @@ static WORD CreateFileContent(struct prodos_image *current_image, struct prodos_
           resource_block_number = CreateTreeContent(current_image,current_file,current_file->resource,current_file->resource_length,current_file->block_disk_resource,current_file->index_resource,0);
           if(resource_block_number == 0)
             return(0);
+        }
+      else
+        {
+          return(1); 
         }
 
       /** Remplissage de l'Extended block **/
