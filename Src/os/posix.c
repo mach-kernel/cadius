@@ -76,8 +76,8 @@ int os_GetFolderFiles(char *folder_path, char *hierarchy)
     struct dirent *entry = readdir(dirstream);
     if (entry == NULL) break;
 
-    // +1 for \0
-    char *heap_path = calloc(1, strlen(folder_path) + 1);
+    // +2 for \0 and a possible slash
+    char *heap_path = calloc(1, strlen(folder_path) + 2);
     strcpy(heap_path, folder_path);
 
     // If there's no trailing dir slash, we append it, and a glob
