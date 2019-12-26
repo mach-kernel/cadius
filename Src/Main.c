@@ -548,6 +548,20 @@ int apply_global_flags(struct parameter *params, int argc, char **argv)
   return argc-found;
 }
 
+void apply_command_flags(struct parameter *params, int start, int argc, char **argv)
+{
+  for (int i = start; i < argc; i++) {
+    if ((
+      params->action == ACTION_ADD_FILE ||
+      params->action == ACTION_REPLACE_FILE ||
+      params->action == ACTION_ADD_FOLDER)
+      && !my_stricmp(argv[i], "-C")
+    ) {
+      params->zero_case_bits = true;
+    }
+  }
+}
+
 /************************************************************/
 /*  usage() :  Indique les différentes options du logiciel. */
 /************************************************************/
@@ -1013,9 +1027,8 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Chemin du fichier Windows */
       param->file_path = strdup(argv[4]);
 
-      // Write zeros for case bits
-      if (!my_stricmp(argv[5], "-C")) {
-        param -> zero_case_bits = true;
+      if (argc > 4) {
+        apply_command_flags(param, 5, argc, argv);
       }
 
       /* Vérification */
@@ -1031,7 +1044,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** REPLACEFILE <2mg_image_path> <target_folder_path> <file_path> **/
-  if(!my_stricmp(argv[1],"REPLACEFILE") && argc == 5)
+  if(!my_stricmp(argv[1],"REPLACEFILE") && argc >= 5)
     {
       param->action = ACTION_REPLACE_FILE;
 
@@ -1043,6 +1056,10 @@ struct parameter *GetParamLine(int argc, char *argv[])
 
       /* Chemin du fichier Windows */
       param->file_path = strdup(argv[4]);
+
+      if (argc > 4) {
+        apply_command_flags(param, 5, argc, argv);
+      }
 
       /* Vérification */
       if(param->image_file_path == NULL || param->file_path == NULL || param->prodos_folder_path == NULL)
@@ -1070,9 +1087,8 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Chemin du fichier Windows */
       param->folder_path = strdup(argv[4]);
 
-      // Write zeros for case bits
-      if (!my_stricmp(argv[5], "-C")) {
-        param->zero_case_bits = true;
+      if (argc > 4) {
+        apply_command_flags(param, 5, argc, argv);
       }
 
       /* Vérification */
