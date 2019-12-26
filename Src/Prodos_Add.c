@@ -27,7 +27,7 @@
 #include "File_AppleSingle.h"
 #include "log.h"
 
-static struct prodos_file *LoadFile(char *);
+static struct prodos_file *LoadFile(char *, bool);
 static int GetFileInformation(char *,char *,struct prodos_file *);
 static void GetLineValue(char *,char *,char *);
 static void ComputeFileBlockUsage(struct prodos_file *);
@@ -48,8 +48,13 @@ static WORD CreateTreeContent(struct prodos_image *,struct prodos_file *,unsigne
  *
  * @return     { description_of_the_return_value }
  */
-int AddFile(struct prodos_image *current_image, char *file_path, char *target_folder_path, int update_image)
-{
+int AddFile(
+  struct prodos_image *current_image,
+  char *file_path,
+  char *target_folder_path,
+  bool zero_case_bits,
+  int update_image
+) {
   int i, is_volume_header, error, is_valid;
   WORD file_block_number, directory_block_number, directory_header_pointer;
   BYTE directory_entry_number;
@@ -57,7 +62,7 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
   struct prodos_file *current_file;
 
   /** Charge le fichier depuis le disque **/
-  current_file = LoadFile(file_path);
+  current_file = LoadFile(file_path, zero_case_bits);
   if(current_file == NULL) return(1);
 
   /** On vérifie si ce fichier est compatible Prodos **/
@@ -205,7 +210,7 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
 /********************************************************************************/
 /*  AddFolder() :  Ajoute les fichiers Windows d'un dossier à l'archive Prodos. */
 /********************************************************************************/
-void AddFolder(struct prodos_image *current_image, char *folder_path, char *target_folder_path)
+void AddFolder(struct prodos_image *current_image, char *folder_path, char *target_folder_path, bool zero_case_bits)
 {
   int i, j, error, is_volume_header;
   int nb_file;
@@ -274,7 +279,7 @@ void AddFolder(struct prodos_image *current_image, char *folder_path, char *targ
           }
       
       /** Ajoute ce fichier à l'archive **/
-      error = AddFile(current_image,tab_file[i],prodos_folder_path,0);
+      error = AddFile(current_image,tab_file[i],prodos_folder_path,zero_case_bits,0);
     }
 
   /* Libération table des fichiers */
@@ -292,7 +297,7 @@ void AddFolder(struct prodos_image *current_image, char *folder_path, char *targ
  *
  * @return     { description_of_the_return_value }
  */
-static struct prodos_file *LoadFile(char *file_path_data)
+static struct prodos_file *LoadFile(char *file_path_data, bool zero_case_bits)
 {
   int i, found;
   struct prodos_file *current_file;
@@ -348,7 +353,7 @@ static struct prodos_file *LoadFile(char *file_path_data)
   for(i=0; i<(int)strlen(current_file->file_name); i++)
     current_file->file_name[i] = toupper(current_file->file_name[i]);
   /* Proper Case */
-  current_file->name_case = BuildProdosCase(current_file->file_name_case);
+  current_file->name_case = zero_case_bits ? 0 : BuildProdosCase(current_file->file_name_case);
 
   // Load data. If an AppleSingle file, parse it.
   unsigned char *data = LoadBinaryFile(file_path_data, &current_file->data_length);

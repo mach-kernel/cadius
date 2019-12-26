@@ -60,6 +60,7 @@ struct parameter
 
   int verbose;
   bool output_apple_single;
+  bool zero_case_bits;
 };
 
 struct error

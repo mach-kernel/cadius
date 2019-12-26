@@ -370,7 +370,13 @@ int main(int argc, char *argv[])
       logf_info("  - Add file '%s' :\n",param->file_path);
 
       /** Ajoute le fichier dans l'archive **/
-      AddFile(current_image,param->file_path,param->prodos_folder_path,1);
+      AddFile(
+        current_image,
+        param->file_path,
+        param->prodos_folder_path,
+        param->zero_case_bits,
+        1
+      );
 
       /* Libération mémoire */
       mem_free_image(current_image);
@@ -386,7 +392,7 @@ int main(int argc, char *argv[])
       logf_info("  - Add folder '%s' :\n",param->folder_path);
 
       /** Ajoute l'ensemble des fichiers du répertoire dans l'archive **/
-      AddFolder(current_image,param->folder_path,param->prodos_folder_path);
+      AddFolder(current_image,param->folder_path,param->prodos_folder_path,param->zero_case_bits);
 
       /* Stat */
       logf("    => File(s) : %d,  Folder(s) : %d,  Error(s) : %d\n",current_image->nb_add_file,current_image->nb_add_folder,current_image->nb_add_error);
@@ -428,7 +434,13 @@ int main(int argc, char *argv[])
       DeleteProdosFile(current_image, prodos_file_name);
       log_on();
 
-      AddFile(current_image, param->file_path, param->prodos_folder_path,1);
+      AddFile(
+        current_image,
+        param->file_path,
+        param->prodos_folder_path,
+        param->zero_case_bits,
+        1
+      );
 
       free(prodos_file_name);
       mem_free_image(current_image);
@@ -563,14 +575,17 @@ void usage(char *program_path)
   logf("        %s DELETEVOLUME  <[2mg|hdv|po]_image_path>\n",program_path);
   logf("        ----\n");
   logf("        %s ADDFILE       <[2mg|hdv|po]_image_path>   <prodos_folder_path>  <file_path>\n",program_path);
+  logf("        [-C write zeros for name case word]\n");
   logf("        Specify a file's type and auxtype by formatting the file name: THING.S16#B30000\n");
   logf("        Delimiter must be '#'. Also works with REPLACEFILE, DELETEFILE, etc.\n");
   logf("        ----\n");
   logf("        %s REPLACEFILE   <[2mg|hdv|po]_image_path>   <prodos_folder_path>  <file_path>\n",program_path);
+  logf("        [-C write zeros for name case word]\n");
   logf("        You may also specify a different type/auxtype for the file you intend to replace\n");
   logf("        (i.e. by changing the suffix) \n");
   logf("        ----\n");
   logf("        %s ADDFOLDER     <[2mg|hdv|po]_image_path>   <prodos_folder_path>  <folder_path>\n",program_path);
+  logf("        [-C write zeros for name case word]\n");
   logf("        ----\n");
   logf("        %s CREATEFOLDER  <[2mg|hdv|po]_image_path>   <prodos_folder_path>\n",program_path);
   logf("        %s CREATEVOLUME  <[2mg|hdv|po]_image_path>   <volume_name>         <volume_size>\n",program_path);
@@ -985,7 +1000,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** ADDFILE <2mg_image_path> <target_folder_path> <file_path> **/
-  if(!my_stricmp(argv[1],"ADDFILE") && argc == 5)
+  if(!my_stricmp(argv[1],"ADDFILE") && argc >= 5)
     {
       param->action = ACTION_ADD_FILE;
 
@@ -997,6 +1012,11 @@ struct parameter *GetParamLine(int argc, char *argv[])
 
       /* Chemin du fichier Windows */
       param->file_path = strdup(argv[4]);
+
+      // Write zeros for case bits
+      if (!my_stricmp(argv[5], "-C")) {
+        param -> zero_case_bits = true;
+      }
 
       /* Vérification */
       if(param->image_file_path == NULL || param->file_path == NULL || param->prodos_folder_path == NULL)
@@ -1037,7 +1057,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** ADDFOLDER <2mg_image_path> <target_folder_path> <folder_path> **/
-  if(!my_stricmp(argv[1],"ADDFOLDER") && argc == 5)
+  if(!my_stricmp(argv[1],"ADDFOLDER") && argc >= 5)
     {
       param->action = ACTION_ADD_FOLDER;
 
@@ -1049,6 +1069,11 @@ struct parameter *GetParamLine(int argc, char *argv[])
 
       /* Chemin du fichier Windows */
       param->folder_path = strdup(argv[4]);
+
+      // Write zeros for case bits
+      if (!my_stricmp(argv[5], "-C")) {
+        param->zero_case_bits = true;
+      }
 
       /* Vérification */
       if(param->image_file_path == NULL || param->prodos_folder_path == NULL || param->folder_path == NULL)
