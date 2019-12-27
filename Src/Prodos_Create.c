@@ -59,13 +59,20 @@ unsigned char bitmap_mask[8] =
 /***********************************************************/
 /*  CreateProdosVolume() :  Création d'un nouveau Dossier. */
 /***********************************************************/
-void CreateProdosFolder(struct prodos_image *current_image, char *prodos_folder_path)
+void CreateProdosFolder(struct prodos_image *current_image, char *prodos_folder_path, bool zero_case_bits)
 {
   int error, is_volume_header;
   struct file_descriptive_entry *new_folder;
 
   /** Création du Dossier **/
-  new_folder = BuildProdosFolderPath(current_image,prodos_folder_path,&is_volume_header,0);
+  new_folder = BuildProdosFolderPath(
+    current_image,
+    prodos_folder_path,
+    &is_volume_header,
+    zero_case_bits,
+    0
+  );
+
   if(new_folder == NULL)
     return;
 
@@ -77,7 +84,12 @@ void CreateProdosFolder(struct prodos_image *current_image, char *prodos_folder_
 /********************************************************************/
 /*  CreateProdosVolume() :  Création d'une image Prodos 2mg/hdv/po. */
 /********************************************************************/
-struct prodos_image *CreateProdosVolume(char *image_file_path, char *volume_name, int volume_size_kb)
+struct prodos_image *CreateProdosVolume(
+  char *image_file_path,
+  char *volume_name,
+  int volume_size_kb,
+  bool zero_case_bits
+)
 {
   int i, error, is_valid, nb_image_block, nb_bitmap_block, image_format, image_header_size;
   DWORD nb_block, nb_byte;
@@ -130,7 +142,7 @@ struct prodos_image *CreateProdosVolume(char *image_file_path, char *volume_name
     upper_case[i] = toupper(upper_case[i]);
 
   /* 16 bit décrivant la case */
-  name_case = BuildProdosCase(volume_name);
+  name_case = zero_case_bits ? 0 : BuildProdosCase(volume_name);
 
   /* Date actuelle */
   GetCurrentDate(&now_date,&now_time);
@@ -262,7 +274,13 @@ struct prodos_image *CreateProdosVolume(char *image_file_path, char *volume_name
 /********************************************************************************************/
 /*  BuildProdosFolderPath() :  Création des dossiers nécessaires pour y ajouter le fichier. */
 /********************************************************************************************/
-struct file_descriptive_entry *BuildProdosFolderPath(struct prodos_image *current_image, char *target_folder_path_param, int *is_volume_header_rtn, int verbose)
+struct file_descriptive_entry *BuildProdosFolderPath(
+  struct prodos_image *current_image,
+  char *target_folder_path_param,
+  int *is_volume_header_rtn,
+  bool zero_case_bits,
+  int verbose
+)
 {
   int first_one, name_length;
   char *begin;
@@ -347,7 +365,7 @@ struct file_descriptive_entry *BuildProdosFolderPath(struct prodos_image *curren
         break;
 
       /* Création d'un répertoire vide dans le Dossier ou à la Racine du volume */
-      new_folder = CreateOneProdosFolder(current_image,current_folder,begin,verbose);
+      new_folder = CreateOneProdosFolder(current_image,current_folder,begin,zero_case_bits,verbose);
       if(new_folder == NULL)
         return(NULL);
 
@@ -367,7 +385,13 @@ struct file_descriptive_entry *BuildProdosFolderPath(struct prodos_image *curren
 /******************************************************************************************************/
 /*  CreateOneProdosFolder() :  Création d'un dossier vide dans un Directory ou à la Racine du volume. */
 /******************************************************************************************************/
-struct file_descriptive_entry *CreateOneProdosFolder(struct prodos_image *current_image, struct file_descriptive_entry *current_folder, char *folder_name, int verbose)
+struct file_descriptive_entry *CreateOneProdosFolder(
+  struct prodos_image *current_image,
+  struct file_descriptive_entry *current_folder,
+  char *folder_name,
+  bool zero_case_bits,
+  int verbose
+)
 {
   char upper_case[256];
   WORD name_case, now_date, now_time, file_count;
@@ -418,7 +442,7 @@ struct file_descriptive_entry *CreateOneProdosFolder(struct prodos_image *curren
     upper_case[i] = toupper(upper_case[i]);
 
   /* 16 bit décrivant la case */
-  name_case = BuildProdosCase(folder_name);
+  name_case = zero_case_bits ? 0 : BuildProdosCase(folder_name);
 
   /* Longueur du nom */
   name_length = (unsigned char) strlen(folder_name);

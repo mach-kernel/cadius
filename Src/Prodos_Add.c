@@ -104,7 +104,7 @@ int AddFile(
     }
 
   /** Recherche/Construit le dossier Prodos Cible où placer le fichier **/
-  target_folder = BuildProdosFolderPath(current_image,target_folder_path,&is_volume_header,1);
+  target_folder = BuildProdosFolderPath(current_image,target_folder_path,&is_volume_header,zero_case_bits,1);
   if(target_folder == NULL && is_volume_header == 0)
     {
       mem_free_file(current_file);
@@ -220,7 +220,7 @@ void AddFolder(struct prodos_image *current_image, char *folder_path, char *targ
   char prodos_folder_path[1024];
 
   /** Recherche/Construit le dossier Prodos Cible où placer les fichiers **/
-  target_folder = BuildProdosFolderPath(current_image,target_folder_path,&is_volume_header,1);
+  target_folder = BuildProdosFolderPath(current_image,target_folder_path,&is_volume_header,zero_case_bits,1);
   if(target_folder == NULL && is_volume_header == 0)
     {
       current_image->nb_add_error++;

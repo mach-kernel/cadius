@@ -52,7 +52,7 @@ void DumpProdosImage(struct prodos_image *current_image, int dump_structure)
   logf("Type   Aux      Size     Data     Res  Data   Res  Sparse Index  Struct  Access    Creation Date     Modification Date\n");
 
   /* Volume Name */
-  logf("/%s/\n",current_image->volume_header->volume_name);
+  logf("/%s/\n",current_image->volume_header->volume_name_case);
 
   /** Volume : Files **/
   for(i=0; i<current_image->nb_file; i++)
@@ -94,7 +94,7 @@ static void DumpOneDirectory(struct file_descriptive_entry *current_file, int ma
     logf("  ");
 
   /* Directory Name */
-  logf("/%s/\n",current_file->file_name);
+  logf("/%s/\n",current_file->file_name_case);
 
   /** All File **/
   for(i=0; i<current_file->nb_file; i++)

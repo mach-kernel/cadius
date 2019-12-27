@@ -61,6 +61,7 @@
 #define ACTION_OUTDENT_FILE      83
 
 int apply_global_flags(struct parameter*, int, char**);
+void apply_command_flags(struct parameter*, int, int, char**);
 void usage(char *);
 struct parameter *GetParamLine(int,char *[]);
 
@@ -76,7 +77,7 @@ int main(int argc, char *argv[])
   struct file_descriptive_entry *folder_entry;
 
   /* Message Information */
-  logf("%s v 1.4.2 (c) Brutal Deluxe 2011-2013.\n",argv[0]);
+  logf("%s v 1.4.3 (c) Brutal Deluxe 2011-2013.\n",argv[0]);
 
   /* Vérification des paramètres */
   if(argc < 3)
@@ -341,7 +342,11 @@ int main(int argc, char *argv[])
       logf_info("  - Create folder '%s' :\n",param->prodos_folder_path);
 
       /** Création du Folder **/
-      CreateProdosFolder(current_image,param->prodos_folder_path);
+      CreateProdosFolder(
+        current_image,
+        param->prodos_folder_path,
+        param->zero_case_bits
+      );
 
       /* Libération mémoire */
       mem_free_image(current_image);
@@ -352,7 +357,13 @@ int main(int argc, char *argv[])
       logf_info("  - Create volume '%s' :\n",param->image_file_path);
 
       /** Création de l'image 2mg **/
-      current_image = CreateProdosVolume(param->image_file_path,param->new_volume_name,param->new_volume_size_kb);
+      current_image = CreateProdosVolume(
+        param->image_file_path,
+        param->new_volume_name,
+        param->new_volume_size_kb,
+        param->zero_case_bits
+      );
+
       if(current_image == NULL)
         return(3);
 
@@ -552,10 +563,16 @@ void apply_command_flags(struct parameter *params, int start, int argc, char **a
 {
   for (int i = start; i < argc; i++) {
     if ((
-      params->action == ACTION_ADD_FILE ||
-      params->action == ACTION_REPLACE_FILE ||
-      params->action == ACTION_ADD_FOLDER)
-      && !my_stricmp(argv[i], "-C")
+        params->action == ACTION_ADD_FILE ||
+        params->action == ACTION_REPLACE_FILE ||
+        params->action == ACTION_ADD_FOLDER ||
+        params->action == ACTION_CREATE_FOLDER ||
+        params->action == ACTION_CREATE_VOLUME
+      )
+      && (
+        !my_stricmp(argv[i], "-C") ||
+        !my_stricmp(argv[i], "--no-case-bits")
+      )
     ) {
       params->zero_case_bits = true;
     }
@@ -589,20 +606,22 @@ void usage(char *program_path)
   logf("        %s DELETEVOLUME  <[2mg|hdv|po]_image_path>\n",program_path);
   logf("        ----\n");
   logf("        %s ADDFILE       <[2mg|hdv|po]_image_path>   <prodos_folder_path>  <file_path>\n",program_path);
-  logf("        [-C write zeros for name case word]\n");
+  logf("        [-C | --no-case-bits]\n");
   logf("        Specify a file's type and auxtype by formatting the file name: THING.S16#B30000\n");
   logf("        Delimiter must be '#'. Also works with REPLACEFILE, DELETEFILE, etc.\n");
   logf("        ----\n");
   logf("        %s REPLACEFILE   <[2mg|hdv|po]_image_path>   <prodos_folder_path>  <file_path>\n",program_path);
-  logf("        [-C write zeros for name case word]\n");
+  logf("        [-C | --no-case-bits]\n");
   logf("        You may also specify a different type/auxtype for the file you intend to replace\n");
   logf("        (i.e. by changing the suffix) \n");
   logf("        ----\n");
   logf("        %s ADDFOLDER     <[2mg|hdv|po]_image_path>   <prodos_folder_path>  <folder_path>\n",program_path);
-  logf("        [-C write zeros for name case word]\n");
+  logf("        [-C | --no-case-bits]\n");
   logf("        ----\n");
   logf("        %s CREATEFOLDER  <[2mg|hdv|po]_image_path>   <prodos_folder_path>\n",program_path);
+  logf("        [-C | --no-case-bits]\n");
   logf("        %s CREATEVOLUME  <[2mg|hdv|po]_image_path>   <volume_name>         <volume_size>\n",program_path);
+  logf("        [-C | --no-case-bits]\n");
   logf("        ----\n");
   logf("        %s CLEARHIGHBIT  <source_file_path>\n",program_path);
   logf("        %s SETHIGHBIT    <source_file_path>\n",program_path);
@@ -642,10 +661,10 @@ struct parameter *GetParamLine(int argc, char *argv[])
       return(NULL);
     }
 
-  argc = apply_global_flags(param, argc, argv);
+  int argc_no_global_flags = apply_global_flags(param, argc, argv);
 
   /** CATALOG <image_path> **/
-  if(!my_stricmp(argv[1],"CATALOG") && argc == 3)
+  if(!my_stricmp(argv[1],"CATALOG") && argc_no_global_flags == 3)
     {
       param->action = ACTION_CATALOG;
 
@@ -663,7 +682,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** CHECKVOLUME <image_path> **/
-  if(!my_stricmp(argv[1],"CHECKVOLUME") && argc == 3)
+  if(!my_stricmp(argv[1],"CHECKVOLUME") && argc_no_global_flags == 3)
     {
       param->action = ACTION_CHECK_VOLUME;
 
@@ -681,7 +700,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** EXTRACTFILE <image_path> <prodos_file_path> <output_directory> **/
-  if(!my_stricmp(argv[1],"EXTRACTFILE") && argc >= 5)
+  if(!my_stricmp(argv[1],"EXTRACTFILE") && argc_no_global_flags >= 5)
     {
       param->action = ACTION_EXTRACT_FILE;
 
@@ -707,7 +726,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** EXTRACTFOLDER <image_path> <prodos_folder_path> <output_directory> **/
-  if(!my_stricmp(argv[1],"EXTRACTFOLDER") && argc >= 5)
+  if(!my_stricmp(argv[1],"EXTRACTFOLDER") && argc_no_global_flags >= 5)
     {
       param->action = ACTION_EXTRACT_FOLDER;
 
@@ -733,7 +752,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** EXTRACTVOLUME <image_path> <output_directory> **/
-  if(!my_stricmp(argv[1],"EXTRACTVOLUME") && argc >= 4)
+  if(!my_stricmp(argv[1],"EXTRACTVOLUME") && argc_no_global_flags >= 4)
     {
       param->action = ACTION_EXTRACT_VOLUME;
 
@@ -756,7 +775,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** RENAMEFILE <2mg_image_path> <prodos_file_path> <new_file_name> **/
-  if(!my_stricmp(argv[1],"RENAMEFILE") && argc == 5)
+  if(!my_stricmp(argv[1],"RENAMEFILE") && argc_no_global_flags == 5)
     {
       param->action = ACTION_RENAME_FILE;
 
@@ -782,7 +801,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** RENAMEFOLDER <2mg_image_path> <prodos_folder_path> <new_folder_name> **/
-  if(!my_stricmp(argv[1],"RENAMEFOLDER") && argc == 5)
+  if(!my_stricmp(argv[1],"RENAMEFOLDER") && argc_no_global_flags == 5)
     {
       param->action = ACTION_RENAME_FOLDER;
 
@@ -808,7 +827,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** RENAMEVOLUME <2mg_image_path> <new_volume_name> **/
-  if(!my_stricmp(argv[1],"RENAMEVOLUME") && argc == 4)
+  if(!my_stricmp(argv[1],"RENAMEVOLUME") && argc_no_global_flags == 4)
     {
       param->action = ACTION_RENAME_VOLUME;
 
@@ -831,7 +850,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** MOVEFILE <2mg_image_path> <prodos_file_path> <new_file_path> **/
-  if(!my_stricmp(argv[1],"MOVEFILE") && argc == 5)
+  if(!my_stricmp(argv[1],"MOVEFILE") && argc_no_global_flags == 5)
     {
       param->action = ACTION_MOVE_FILE;
 
@@ -857,7 +876,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** MOVEFOLDER <2mg_image_path> <prodos_folder_path> <target_folder_path> **/
-  if(!my_stricmp(argv[1],"MOVEFOLDER") && argc == 5)
+  if(!my_stricmp(argv[1],"MOVEFOLDER") && argc_no_global_flags == 5)
     {
       param->action = ACTION_MOVE_FOLDER;
 
@@ -883,7 +902,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** DELETEFILE <2mg_image_path> <prodos_file_path> **/
-  if(!my_stricmp(argv[1],"DELETEFILE") && argc == 4)
+  if(!my_stricmp(argv[1],"DELETEFILE") && argc_no_global_flags == 4)
     {
       param->action = ACTION_DELETE_FILE;
 
@@ -906,7 +925,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** DELETEFOLDER <2mg_image_path> <prodos_folder_path> **/
-  if(!my_stricmp(argv[1],"DELETEFOLDER") && argc == 4)
+  if(!my_stricmp(argv[1],"DELETEFOLDER") && argc_no_global_flags == 4)
     {
       param->action = ACTION_DELETE_FOLDER;
 
@@ -929,7 +948,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** DELETEVOLUME <2mg_image_path> **/
-  if(!my_stricmp(argv[1],"DELETEVOLUME") && argc == 3)
+  if(!my_stricmp(argv[1],"DELETEVOLUME") && argc_no_global_flags == 3)
     {
       param->action = ACTION_DELETE_VOLUME;
 
@@ -949,7 +968,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** CREATEFOLDER <2mg_image_path> <folder_name> **/
-  if(!my_stricmp(argv[1],"CREATEFOLDER") && argc == 4)
+  if(!my_stricmp(argv[1],"CREATEFOLDER") && argc_no_global_flags >= 4)
     {
       param->action = ACTION_CREATE_FOLDER;
 
@@ -958,6 +977,8 @@ struct parameter *GetParamLine(int argc, char *argv[])
 
       /* Nom du Dossier Prodos */
       param->prodos_folder_path = strdup(argv[3]);
+
+      apply_command_flags(param, 3, argc, argv);
 
       /* Vérification */
       if(param->image_file_path == NULL || param->prodos_folder_path == NULL)
@@ -972,7 +993,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** CREATEVOLUME <2mg_image_path> <volume_name> <volume_size> **/
-  if(!my_stricmp(argv[1],"CREATEVOLUME") && argc == 5)
+  if(!my_stricmp(argv[1],"CREATEVOLUME") && argc_no_global_flags >= 5)
     {
       param->action = ACTION_CREATE_VOLUME;
 
@@ -1001,6 +1022,8 @@ struct parameter *GetParamLine(int argc, char *argv[])
           return(NULL);
         }
 
+      apply_command_flags(param, 4, argc, argv);
+
       /* Vérification */
       if(param->image_file_path == NULL || param->new_volume_name == NULL)
         {
@@ -1014,7 +1037,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** ADDFILE <2mg_image_path> <target_folder_path> <file_path> **/
-  if(!my_stricmp(argv[1],"ADDFILE") && argc >= 5)
+  if(!my_stricmp(argv[1],"ADDFILE") && argc_no_global_flags >= 5)
     {
       param->action = ACTION_ADD_FILE;
 
@@ -1027,9 +1050,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Chemin du fichier Windows */
       param->file_path = strdup(argv[4]);
 
-      if (argc > 4) {
-        apply_command_flags(param, 5, argc, argv);
-      }
+      apply_command_flags(param, 4, argc, argv);
 
       /* Vérification */
       if(param->image_file_path == NULL || param->file_path == NULL || param->prodos_folder_path == NULL)
@@ -1044,7 +1065,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** REPLACEFILE <2mg_image_path> <target_folder_path> <file_path> **/
-  if(!my_stricmp(argv[1],"REPLACEFILE") && argc >= 5)
+  if(!my_stricmp(argv[1],"REPLACEFILE") && argc_no_global_flags >= 5)
     {
       param->action = ACTION_REPLACE_FILE;
 
@@ -1057,9 +1078,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Chemin du fichier Windows */
       param->file_path = strdup(argv[4]);
 
-      if (argc > 4) {
-        apply_command_flags(param, 5, argc, argv);
-      }
+      apply_command_flags(param, 4, argc, argv);
 
       /* Vérification */
       if(param->image_file_path == NULL || param->file_path == NULL || param->prodos_folder_path == NULL)
@@ -1074,7 +1093,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** ADDFOLDER <2mg_image_path> <target_folder_path> <folder_path> **/
-  if(!my_stricmp(argv[1],"ADDFOLDER") && argc >= 5)
+  if(!my_stricmp(argv[1],"ADDFOLDER") && argc_no_global_flags >= 5)
     {
       param->action = ACTION_ADD_FOLDER;
 
@@ -1087,9 +1106,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* Chemin du fichier Windows */
       param->folder_path = strdup(argv[4]);
 
-      if (argc > 4) {
-        apply_command_flags(param, 5, argc, argv);
-      }
+      apply_command_flags(param, 4, argc, argv);
 
       /* Vérification */
       if(param->image_file_path == NULL || param->prodos_folder_path == NULL || param->folder_path == NULL)
@@ -1104,7 +1121,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** CLEARHIGHBIT <file_path> **/
-  if(!my_stricmp(argv[1],"CLEARHIGHBIT") && argc == 3)
+  if(!my_stricmp(argv[1],"CLEARHIGHBIT") && argc_no_global_flags == 3)
     {
       param->action = ACTION_CLEAR_HIGH_BIT;
 
@@ -1124,7 +1141,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** SETHIGHBIT <file_path> **/
-  if(!my_stricmp(argv[1],"SETHIGHBIT") && argc == 3)
+  if(!my_stricmp(argv[1],"SETHIGHBIT") && argc_no_global_flags == 3)
     {
       param->action = ACTION_SET_HIGH_BIT;
 
@@ -1144,7 +1161,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** INDENTFILE <file_path> **/
-  if(!my_stricmp(argv[1],"INDENTFILE") && argc == 3)
+  if(!my_stricmp(argv[1],"INDENTFILE") && argc_no_global_flags == 3)
     {
       param->action = ACTION_INDENT_FILE;
 
@@ -1164,7 +1181,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
     }
 
   /** OUTDENTFILE <file_path> **/
-  if(!my_stricmp(argv[1],"OUTDENTFILE") && argc == 3)
+  if(!my_stricmp(argv[1],"OUTDENTFILE") && argc_no_global_flags == 3)
     {
       param->action = ACTION_OUTDENT_FILE;
 
