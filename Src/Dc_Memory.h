@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <stdbool.h>
+
 #define MEMORY_INIT                 10
 #define MEMORY_FREE                 11
 
@@ -57,6 +59,8 @@ struct parameter
   char *folder_path;
 
   int verbose;
+  bool output_apple_single;
+  bool zero_case_bits;
 };
 
 struct error

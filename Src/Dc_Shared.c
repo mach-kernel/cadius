@@ -91,7 +91,7 @@ unsigned char *LoadTextFile(char *file_path, int *data_length_rtn)
   fseek(fd,0L,SEEK_SET);
    
   /* Allocation mémoire */
-  data = (unsigned char *) calloc(1,file_size+10);
+  data = calloc(1,file_size+10);
   if(data == NULL)
     {
       fclose(fd);

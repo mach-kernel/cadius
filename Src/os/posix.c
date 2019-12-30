@@ -80,39 +80,38 @@ int os_GetFolderFiles(char *folder_path, char *hierarchy)
     char *heap_path = calloc(1, strlen(folder_path) + 2);
     strcpy(heap_path, folder_path);
 
-    // If there's no trailing dir slash, we append it, and a glob
-    // (but no longer check for the Win-style terminator)
+    // If there's no trailing dir slash, we append it
     char last_char = heap_path[strlen(heap_path) - 1];
     if (last_char != '/') strcat(heap_path, FOLDER_CHARACTER);
 
-    // Most POSIX filename limits are 255 bytes.
-    char *heap_path_filename = calloc(1, strlen(folder_path) + 256);
-    strcpy(heap_path_filename, heap_path);
-
     // Append the filename to the path we copied earlier
-    strcat(heap_path_filename, entry->d_name);
+    strcat(heap_path, entry->d_name);
 
     // POSIX only guarantees that you'll have d_name,
     // so we're going to use the S_ISREG macro which is more reliable
     struct stat dirent_stat;
-    int staterr = stat(heap_path_filename, &dirent_stat);
+    int staterr = stat(heap_path, &dirent_stat);
     if (staterr) return(staterr);
 
     if (S_ISREG(dirent_stat.st_mode)) {
-      if (MatchHierarchie(heap_path_filename, hierarchy)){
-        my_Memory(MEMORY_ADD_FILE, heap_path_filename, NULL);
+      if (MatchHierarchie(heap_path, hierarchy)){
+        my_Memory(MEMORY_ADD_FILE, heap_path, NULL);
       }
     }
     else if (S_ISDIR(dirent_stat.st_mode)) {
       if (!my_stricmp(entry->d_name, ".") || !my_stricmp(entry->d_name, "..")) {
+        free(heap_path);
         continue;
       }
 
-      error = os_GetFolderFiles(heap_path_filename, hierarchy);
+      error = os_GetFolderFiles(heap_path, hierarchy);
       if (error) break;
     }
+
+    free(heap_path);
   }
 
+  free(dirstream);
   return error;
 }
 

@@ -27,7 +27,7 @@
 #include "File_AppleSingle.h"
 #include "log.h"
 
-static struct prodos_file *LoadFile(char *);
+static struct prodos_file *LoadFile(char *, bool);
 static int GetFileInformation(char *,char *,struct prodos_file *);
 static void GetLineValue(char *,char *,char *);
 static void ComputeFileBlockUsage(struct prodos_file *);
@@ -48,8 +48,13 @@ static WORD CreateTreeContent(struct prodos_image *,struct prodos_file *,unsigne
  *
  * @return     { description_of_the_return_value }
  */
-int AddFile(struct prodos_image *current_image, char *file_path, char *target_folder_path, int update_image)
-{
+int AddFile(
+  struct prodos_image *current_image,
+  char *file_path,
+  char *target_folder_path,
+  bool zero_case_bits,
+  int update_image
+) {
   int i, is_volume_header, error, is_valid;
   WORD file_block_number, directory_block_number, directory_header_pointer;
   BYTE directory_entry_number;
@@ -57,7 +62,7 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
   struct prodos_file *current_file;
 
   /** Charge le fichier depuis le disque **/
-  current_file = LoadFile(file_path);
+  current_file = LoadFile(file_path, zero_case_bits);
   if(current_file == NULL) return(1);
 
   /** On vérifie si ce fichier est compatible Prodos **/
@@ -99,7 +104,7 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
     }
 
   /** Recherche/Construit le dossier Prodos Cible où placer le fichier **/
-  target_folder = BuildProdosFolderPath(current_image,target_folder_path,&is_volume_header,1);
+  target_folder = BuildProdosFolderPath(current_image,target_folder_path,&is_volume_header,zero_case_bits,1);
   if(target_folder == NULL && is_volume_header == 0)
     {
       mem_free_file(current_file);
@@ -205,7 +210,7 @@ int AddFile(struct prodos_image *current_image, char *file_path, char *target_fo
 /********************************************************************************/
 /*  AddFolder() :  Ajoute les fichiers Windows d'un dossier à l'archive Prodos. */
 /********************************************************************************/
-void AddFolder(struct prodos_image *current_image, char *folder_path, char *target_folder_path)
+void AddFolder(struct prodos_image *current_image, char *folder_path, char *target_folder_path, bool zero_case_bits)
 {
   int i, j, error, is_volume_header;
   int nb_file;
@@ -215,7 +220,7 @@ void AddFolder(struct prodos_image *current_image, char *folder_path, char *targ
   char prodos_folder_path[1024];
 
   /** Recherche/Construit le dossier Prodos Cible où placer les fichiers **/
-  target_folder = BuildProdosFolderPath(current_image,target_folder_path,&is_volume_header,1);
+  target_folder = BuildProdosFolderPath(current_image,target_folder_path,&is_volume_header,zero_case_bits,1);
   if(target_folder == NULL && is_volume_header == 0)
     {
       current_image->nb_add_error++;
@@ -274,7 +279,7 @@ void AddFolder(struct prodos_image *current_image, char *folder_path, char *targ
           }
       
       /** Ajoute ce fichier à l'archive **/
-      error = AddFile(current_image,tab_file[i],prodos_folder_path,0);
+      error = AddFile(current_image,tab_file[i],prodos_folder_path,zero_case_bits,0);
     }
 
   /* Libération table des fichiers */
@@ -292,7 +297,7 @@ void AddFolder(struct prodos_image *current_image, char *folder_path, char *targ
  *
  * @return     { description_of_the_return_value }
  */
-static struct prodos_file *LoadFile(char *file_path_data)
+static struct prodos_file *LoadFile(char *file_path_data, bool zero_case_bits)
 {
   int i, found;
   struct prodos_file *current_file;
@@ -310,7 +315,7 @@ static struct prodos_file *LoadFile(char *file_path_data)
 
   // Start from end of string until we arrive to path delimiter
   strcpy(folder_path,file_path_data);
-  for(i=strlen(folder_path); i>=0; i--)
+  for(i=strlen(folder_path) - 1; i>=0; i--)
     if(!strncmp(&folder_path[i], FOLDER_CHARACTER, strlen(FOLDER_CHARACTER)))
       {
         folder_path[i+1] = '\0';
@@ -319,7 +324,7 @@ static struct prodos_file *LoadFile(char *file_path_data)
 
   // Similarly, also extract the filename
   strcpy(file_name,file_path_data);
-  for(i=strlen(file_path_data); i>=0; i--)
+  for(i=strlen(file_path_data) - 1; i>=0; i--)
     if(!strncmp(&folder_path[i], FOLDER_CHARACTER, strlen(FOLDER_CHARACTER)))
       {
         strcpy(file_name,&file_path_data[i+1]);
@@ -348,7 +353,7 @@ static struct prodos_file *LoadFile(char *file_path_data)
   for(i=0; i<(int)strlen(current_file->file_name); i++)
     current_file->file_name[i] = toupper(current_file->file_name[i]);
   /* Proper Case */
-  current_file->name_case = BuildProdosCase(current_file->file_name_case);
+  current_file->name_case = zero_case_bits ? 0 : BuildProdosCase(current_file->file_name_case);
 
   // Load data. If an AppleSingle file, parse it.
   unsigned char *data = LoadBinaryFile(file_path_data, &current_file->data_length);
@@ -456,45 +461,45 @@ static int GetFileInformation(char *file_information_path, char *file_name, stru
           GetLineValue(line_tab[i],"Type",local_buffer);
           if(strlen(local_buffer) == 2)
             {
-              sscanf(local_buffer,"%02lX",&value);
+              sscanf(local_buffer,"%2X",&value);
               current_file->type = (unsigned char) value;
             }
           GetLineValue(line_tab[i],"AuxType",local_buffer);
           if(strlen(local_buffer) == 4)
             {
-              sscanf(local_buffer,"%04lX",&value);
+              sscanf(local_buffer,"%4X",&value);
               current_file->aux_type = (WORD) value;
             }
           GetLineValue(line_tab[i],"VersionCreate",local_buffer);
           if(strlen(local_buffer) == 2)
             {
-              sscanf(local_buffer,"%02lX",&value);
+              sscanf(local_buffer,"%2X",&value);
               current_file->version_create = (unsigned char) value;
             }
           GetLineValue(line_tab[i],"MinVersion",local_buffer);
           if(strlen(local_buffer) == 2)
             {
-              sscanf(local_buffer,"%02lX",&value);
+              sscanf(local_buffer,"%2X",&value);
               current_file->min_version = (unsigned char) value;
             }
           GetLineValue(line_tab[i],"Access",local_buffer);
           if(strlen(local_buffer) == 2)
             {
-              sscanf(local_buffer,"%02lX",&value);
+              sscanf(local_buffer,"%2X",&value);
               current_file->access = (unsigned char) value;
             }
           GetLineValue(line_tab[i],"FolderInfo1",local_buffer);
           if(strlen(local_buffer) == 36)
             for(j=0; j<18; j++)
               {
-                sscanf(&local_buffer[2*j],"%02lX",&value);
+                sscanf(&local_buffer[2*j],"%2X",&value);
                 current_file->resource_finderinfo_1[j] = (unsigned char) value;
               }
           GetLineValue(line_tab[i],"FolderInfo2",local_buffer);
           if(strlen(local_buffer) == 36)
             for(j=0; j<18; j++)
               {
-                sscanf(&local_buffer[2*j],"%02lX",&value);
+                sscanf(&local_buffer[2*j],"%2X",&value);
                 current_file->resource_finderinfo_2[j] = (unsigned char) value;
               }
             
@@ -704,6 +709,10 @@ static WORD CreateFileContent(struct prodos_image *current_image, struct prodos_
           if(file_block_number == 0)
             return(0);
         }
+      else
+        {
+          return(1);
+        }
     }
   else  /** Fichier Resource **/
     {
@@ -752,6 +761,10 @@ static WORD CreateFileContent(struct prodos_image *current_image, struct prodos_
           resource_block_number = CreateTreeContent(current_image,current_file,current_file->resource,current_file->resource_length,current_file->block_disk_resource,current_file->index_resource,0);
           if(resource_block_number == 0)
             return(0);
+        }
+      else
+        {
+          return(1); 
         }
 
       /** Remplissage de l'Extended block **/

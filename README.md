@@ -37,6 +37,11 @@ Any and all contributions are welcome. Included is also a `cadius.pro` file you 
 
 ## Changelog
 
+#### 1.4.3
+- `os_GetFolderFiles` segfault fixed. Thanks [@beevik](https://github.com/beevik): [#26](https://github.com/mach-kernel/cadius/pull/26)!
+- `-C | --no-case-bits` option added to `ADDFILE`, `ADDFOLDER`, `REPLACEFILE`, `CREATEVOLUME`, and `CREATEFOLDER` actions: [#27](https://github.com/mach-kernel/cadius/pull/27).
+- Fix warnings.
+
 #### 1.4.2
 - `CREATEVOLUME` did not previously allow for the creation of 143kb images. Thanks [@inexorabletash](https://github.com/inexorabletash)!
 

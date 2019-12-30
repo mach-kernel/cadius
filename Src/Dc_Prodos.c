@@ -23,7 +23,7 @@ static struct sub_directory_header *ODSReadSubDirectoryHeader(unsigned char *);
 static void GetAllDirectoryFile(struct prodos_image *);
 static void GetOneSubDirectoryFile(struct prodos_image *,char *,struct file_descriptive_entry *);
 static void BuildStorageTypeAscii(BYTE,char *,char *);
-static void BuildFileTypeAscii(BYTE,WORD,char *);
+static void BuildFileTypeAscii(BYTE,char *);
 static void BuildAccessAscii(BYTE,char *);
 static void BuildLowerCase(char *,WORD,char *);
 static int GetFileDataResourceSize(struct prodos_image *,struct file_descriptive_entry *);
@@ -413,7 +413,7 @@ struct file_descriptive_entry *ODSReadFileDescriptiveEntry(struct prodos_image *
 
   /* Valeurs Ascii */
   BuildStorageTypeAscii(file_entry->storage_type,file_entry->storage_type_ascii,file_entry->storage_type_ascii_short);
-  BuildFileTypeAscii(file_entry->file_type,file_entry->file_aux_type,file_entry->file_type_ascii);
+  BuildFileTypeAscii(file_entry->file_type,file_entry->file_type_ascii);
   BuildAccessAscii(file_entry->access,file_entry->access_ascii);
 
   /* Nom LowerCase */
@@ -854,7 +854,7 @@ static void BuildStorageTypeAscii(BYTE storage_type, char *ascii_rtn, char *asci
 /**************************************************************************/
 /*  BuildFileTypeAscii() :  Construction de la valeur Ascii du File Type. */
 /**************************************************************************/
-static void BuildFileTypeAscii(BYTE file_type, WORD file_auxtype, char *ascii_rtn)
+static void BuildFileTypeAscii(BYTE file_type, char *ascii_rtn)
 {
   if(file_type == 0x00)
     strcpy(ascii_rtn,"UNK");
@@ -1080,6 +1080,10 @@ static int GetFileDataResourceSize(struct prodos_image *current_image, struct fi
                   return(1);
                 }
             }
+          else 
+            {
+              nb_block = 0;
+            }
 
           /* On compte tous les blocs à 0 = Sparse */
           for(i=0; i<nb_block; i++)
@@ -1163,6 +1167,11 @@ static int GetFileDataResourceSize(struct prodos_image *current_image, struct fi
                     free(tab_index_block);
                   return(1);
                 }
+            }
+          else 
+            {
+              nb_block = 0;
+              index_block = 0;
             }
           file_entry->index_block += index_block;
 

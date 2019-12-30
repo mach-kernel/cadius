@@ -48,7 +48,14 @@ void MoveProdosFile(struct prodos_image *current_image, char *prodos_file_path, 
     }
 
   /** Recherche le dossier Prodos Cible où déplacer le fichier **/
-  target_folder = BuildProdosFolderPath(current_image,target_folder_path,&is_volume_header,0);
+  target_folder = BuildProdosFolderPath(
+    current_image,
+    target_folder_path,
+    &is_volume_header,
+    current_entry->lowercase,
+    0
+  );
+
   if(target_folder == NULL && is_volume_header == 0)
     return;
 
@@ -80,7 +87,14 @@ void MoveProdosFolder(struct prodos_image *current_image, char *prodos_folder_pa
     }
 
   /** Recherche le dossier Prodos Cible où déplacer le dossier **/
-  target_folder = BuildProdosFolderPath(current_image,target_folder_path,&is_volume_header,0);
+  target_folder = BuildProdosFolderPath(
+    current_image,
+    target_folder_path,
+    &is_volume_header,
+    current_entry->lowercase,
+    0
+  );
+
   if(target_folder == NULL && is_volume_header == 0)
     return;
 

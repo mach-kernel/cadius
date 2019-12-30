@@ -292,7 +292,7 @@ static int CreateOutputFile(struct prodos_file *current_file, char *output_direc
     }
   strcpy(directory_path,output_directory_path);
 
-  if(strlen(directory_path) > 0 && directory_path[strlen(directory_path)-1] != FOLDER_CHARACTER)
+  if(strlen(directory_path) > 0 && strncmp(&directory_path[strlen(directory_path)-1], FOLDER_CHARACTER, 1))
     strcat(directory_path,FOLDER_CHARACTER);
 
   // Data file path
@@ -447,11 +447,11 @@ static void SetFileInformation(char *file_information_path, struct prodos_file *
 
       /* On ne recopie pas la ligne du fichier */
       if(my_stricmp(file_name,current_file->entry->file_name_case))
-         logf(fd,"%s\n",line_tab[i]);
+         logf("%s\n",line_tab[i]);
     }
 
   /* Nouvelle ligne */
-   logf(fd,"%s\n",local_buffer);
+   logf("%s\n",local_buffer);
 
   /* Fermeture */
   fclose(fd);

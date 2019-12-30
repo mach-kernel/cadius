@@ -42,10 +42,10 @@ struct line
   struct line *next;
 };
 
-static char *BuildIndentBuffer(int,struct line **);
-static char *BuildOutdentBuffer(int,struct line **);
+static unsigned char *BuildIndentBuffer(int,struct line **);
+static unsigned char *BuildOutdentBuffer(int,struct line **);
 static struct line **BuildLineTab(unsigned char *,int,int *);
-static struct line *BuildOneLine(char *,int);
+static struct line *BuildOneLine(unsigned char *,int);
 static int GetLineValue(char *,int,char **);
 static void mem_free_line(struct line *);
 
@@ -181,7 +181,7 @@ int IndentFile(char *file_path)
     return(3);
 
   /** Ecriture du fichier **/
-  length_dst = strlen(data);
+  length_dst = strlen((const char *) data);
   result = CreateTextFile(file_path,data,length_dst);
   if(result)
     {
@@ -239,7 +239,7 @@ int OutdentFile(char *file_path)
     return(3);
 
   /** Ecriture du fichier **/
-  result = CreateTextFile(file_path,data,strlen(data));
+  result = CreateTextFile(file_path,data,strlen((const char *) data));
   if(result)
     {
       logf_error("  Error : Impossible to update file '%s'.\n",file_path);
@@ -257,7 +257,7 @@ int OutdentFile(char *file_path)
 /************************************************************************/
 /*  BuildIndentBuffer() :  Construction du buffer des lignes indentées. */
 /************************************************************************/
-static char *BuildIndentBuffer(int nb_line, struct line **tab_line)
+static unsigned char *BuildIndentBuffer(int nb_line, struct line **tab_line)
 {
   int i, j, length, offset;
   int label_length, opcode_length, operand_length, operand_data_length, comment_length, line_length;
@@ -303,7 +303,7 @@ static char *BuildIndentBuffer(int nb_line, struct line **tab_line)
     line_length = (label_length + opcode_length + operand_data_length + comment_length);
 
   /* Allocation mémoire du fichier */
-  data = (char *) calloc(nb_line,line_length+1);
+  data = calloc(nb_line,line_length+1);
   if(data == NULL)
     {
       logf_error("  Error : Impossible to allocate memory to process the file.\n");
@@ -410,7 +410,7 @@ static char *BuildIndentBuffer(int nb_line, struct line **tab_line)
 /****************************************************************************/
 /*  BuildOutdentBuffer() :  Construction du buffer des lignes dé-indentées. */
 /****************************************************************************/
-static char *BuildOutdentBuffer(int nb_line, struct line **tab_line)
+static unsigned char *BuildOutdentBuffer(int nb_line, struct line **tab_line)
 {
   int i, length, offset, line_length;
   unsigned char *data;
@@ -431,7 +431,7 @@ static char *BuildOutdentBuffer(int nb_line, struct line **tab_line)
     }
 
   /* Allocation mémoire du fichier */
-  data = (char *) calloc(nb_line,line_length+1);
+  data = calloc(nb_line,line_length+1);
   if(data == NULL)
     {
       logf_error("  Error : Impossible to allocate memory to process the file.\n");
@@ -502,8 +502,8 @@ static char *BuildOutdentBuffer(int nb_line, struct line **tab_line)
 /*********************************************************************/
 static struct line **BuildLineTab(unsigned char *data, int length, int *nb_line_rtn)
 {
-  char *end;
-  char *begin;
+  unsigned char *end;
+  unsigned char *begin;
   int i, nb_line;
   struct line *current_line;
   struct line **tab_line;
@@ -527,7 +527,7 @@ static struct line **BuildLineTab(unsigned char *data, int length, int *nb_line_
   while(begin)
     {
       /* Fin de ligne */
-      end = strchr(begin,'\n');
+      end = (unsigned char *) strchr((const char *) begin,'\n');
       if(end != NULL)
         *end = '\0';
 
@@ -557,7 +557,7 @@ static struct line **BuildLineTab(unsigned char *data, int length, int *nb_line_
 /************************************************/
 /*  BuildOneLine() :  Décode une ligne de Code. */
 /************************************************/
-static struct line *BuildOneLine(char *line, int line_nb)
+static struct line *BuildOneLine(unsigned char *line, int line_nb)
 {
   int i, offset, length;
   struct line *current_line;
@@ -571,10 +571,10 @@ static struct line *BuildOneLine(char *line, int line_nb)
       return(NULL);
     }
   current_line->number = line_nb;
-  current_line->length = strlen(line) + 1;
+  current_line->length = strlen((const char *) line) + 1;
 
   /* Ligne vide ? */
-  if(strlen(line) == 0)
+  if(strlen((const char *) line) == 0)
     {
       current_line->type = TYPE_LINE_EMPTY;
       return(current_line);
@@ -584,7 +584,7 @@ static struct line *BuildOneLine(char *line, int line_nb)
   if(line[0] == ';' || line[0] == '*')
     {
       current_line->type = TYPE_LINE_COMMENT;
-      current_line->comment = strdup(line);
+      current_line->comment = strdup((const char *) line);
       if(current_line->comment == NULL)
         {
           logf_error("  Error processing line %d (%s) : %s\n",line_nb,line,ERR_MEMORY_ALLOC);
@@ -599,7 +599,7 @@ static struct line *BuildOneLine(char *line, int line_nb)
 
   /** Label **/
   offset = 0;
-  length = GetLineValue(&line[offset],0,&current_line->label);
+  length = GetLineValue((char *) &line[offset],0,&current_line->label);
   if(length < 0)
     {
       logf_error("  Error processing line %d (%s) : %s\n",line_nb,line,(length == -1)?ERR_MEMORY_ALLOC:ERR_LINE_FORMAT);
@@ -609,7 +609,7 @@ static struct line *BuildOneLine(char *line, int line_nb)
 
   /** Opcode **/
   offset += length;
-  length = GetLineValue(&line[offset],0,&current_line->opcode);
+  length = GetLineValue((char *) &line[offset],0,&current_line->opcode);
   if(length < 0)
     {
       logf_error("  Error processing line %d (%s) : %s\n",line_nb,line,(length == -1)?ERR_MEMORY_ALLOC:ERR_LINE_FORMAT);
@@ -619,7 +619,7 @@ static struct line *BuildOneLine(char *line, int line_nb)
 
   /** Operand **/
   offset += length;
-  length = GetLineValue(&line[offset],0,&current_line->operand);
+  length = GetLineValue((char *) &line[offset],0,&current_line->operand);
   if(length < 0)
     {
       logf_error("  Error processing line %d (%s) : %s\n",line_nb,line,(length == -1)?ERR_MEMORY_ALLOC:ERR_LINE_FORMAT);
@@ -629,7 +629,7 @@ static struct line *BuildOneLine(char *line, int line_nb)
 
   /** Comment **/
   offset += length;
-  length = GetLineValue(&line[offset],1,&current_line->comment);
+  length = GetLineValue((char *) &line[offset],1,&current_line->comment);
   if(length < 0)
     {
       logf_error("  Error processing line %d (%s) : %s\n",line_nb,line,(length == -1)?ERR_MEMORY_ALLOC:ERR_LINE_FORMAT);
@@ -731,7 +731,7 @@ static int GetLineValue(char *line_data, int is_comment, char **value_rtn)
       length = i;
 
       /* Allocation mémoire */
-      value = (char *) calloc(1,length+1);
+      value = calloc(1,length+1);
       if(value == NULL)
         return(-1);
       memcpy(value,line_data,length);
