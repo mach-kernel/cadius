@@ -166,8 +166,6 @@ void os_GetFileCreationModificationDate(char *path, struct prodos_file *file) {
   file->file_creation_time = BuildProdosTime(time->tm_min, time->tm_hour);
   file->file_modification_date = BuildProdosDate(time->tm_mday, time->tm_mon + 1, time->tm_year + 1900);
   file->file_modification_time = BuildProdosTime(time->tm_min, time->tm_hour);
-
-  free(time);
 }
 
 
