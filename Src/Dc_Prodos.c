@@ -38,8 +38,6 @@ static void mem_free_subdirectory(struct sub_directory_header *);
 /******************************************************/
 struct prodos_image *LoadProdosImage(char *file_path)
 {
-  unsigned char *data_file;
-  int i, nb_block, data_length;
   struct prodos_image *current_image;
   unsigned char one_block[BLOCK_SIZE];
 
@@ -58,56 +56,14 @@ struct prodos_image *LoadProdosImage(char *file_path)
       return(NULL);
     }
 
-  /** Type d'image **/
-  current_image->image_format = IMAGE_UNKNOWN;
-  for(i=strlen(current_image->image_file_path); i>=0; i--)
-    if(current_image->image_file_path[i] == '.')
-      {
-        if(!my_stricmp(&current_image->image_file_path[i],".2MG"))
-          {
-            current_image->image_format = IMAGE_2MG;
-            current_image->image_header_size = IMG_HEADER_SIZE;
-          }
-        else if(!my_stricmp(&current_image->image_file_path[i],".HDV"))
-          {
-            current_image->image_format = IMAGE_HDV;
-            current_image->image_header_size = HDV_HEADER_SIZE;
-          }
-        else if(!my_stricmp(&current_image->image_file_path[i],".PO"))
-          {
-            current_image->image_format = IMAGE_PO;
-            current_image->image_header_size = PO_HEADER_SIZE;
-          }
-        break;
-      }
-  if(current_image->image_format == IMAGE_UNKNOWN)
-    {
-      logf_error("  Error, Unknown image file format : '%s'.\n",current_image->image_file_path);
-      mem_free_image(current_image);
-      return(NULL);
-    }
+  if (os_IsBlockDevice(file_path)) {
+    current_image = LoadProdosDataFromBlock(current_image, file_path);
+  } else {
+    current_image = LoadProdosDataFromFile(current_image, file_path);
+  }
 
-  /** Chargement du fichier image en mémoire **/
-  data_file = LoadBinaryFile(file_path,&data_length);
-  if(data_file == NULL)
-    {
-      logf_error("  Error, Impossible to load Image file : '%s'\n",file_path);
-      mem_free_image(current_image);
-      return(NULL);
-    }
+  if (!current_image) { return(NULL); }
 
-  /* Saut au dessus du header de l'image */
-  data_file += current_image->image_header_size;
-  data_length -= current_image->image_header_size;
-
-  /* On élimine les derniers octets parasites */
-  nb_block = data_length / BLOCK_SIZE;
-  data_length = nb_block*BLOCK_SIZE;
-
-  /** Remplit la structure **/
-  current_image->nb_block = nb_block;
-  current_image->image_data = data_file;
-  current_image->image_length = data_length;
   current_image->block_allocation_table = (int *) calloc(current_image->nb_block+8,sizeof(int));
   if(current_image->block_allocation_table == NULL)
     {
@@ -161,6 +117,75 @@ struct prodos_image *LoadProdosImage(char *file_path)
   return(current_image);
 }
 
+struct prodos_image *LoadProdosDataFromBlock(struct prodos_image *current_image, char *path) {
+  // TODO: use O_RDONLY for CATALOG, O_RDWR for any modifications
+  current_image->fd = open(path, O_RDWR);
+}
+
+/**
+ * @brief Load ProDOS image data from a file
+ * 
+ * @param image 
+ * @param path 
+ * @return unsigned char* 
+ */
+struct prodos_image *LoadProdosDataFromFile(struct prodos_image *current_image, char *path) {
+  /** Type d'image **/
+  current_image->fd = -1;
+  current_image->image_format = IMAGE_UNKNOWN;
+  for (int i = strlen(current_image->image_file_path); i >= 0; i--)
+    if (current_image->image_file_path[i] == '.')
+    {
+      if (!my_stricmp(&current_image->image_file_path[i], ".2MG"))
+      {
+        current_image->image_format = IMAGE_2MG;
+        current_image->image_header_size = IMG_HEADER_SIZE;
+      }
+      else if (!my_stricmp(&current_image->image_file_path[i], ".HDV"))
+      {
+        current_image->image_format = IMAGE_HDV;
+        current_image->image_header_size = HDV_HEADER_SIZE;
+      }
+      else if (!my_stricmp(&current_image->image_file_path[i], ".PO"))
+      {
+        current_image->image_format = IMAGE_PO;
+        current_image->image_header_size = PO_HEADER_SIZE;
+      }
+      break;
+    }
+  if (current_image->image_format == IMAGE_UNKNOWN)
+  {
+    logf_error("  Error, Unknown image file format : '%s'.\n", current_image->image_file_path);
+    mem_free_image(current_image);
+    return (NULL);
+  }
+
+  /** Chargement du fichier image en mémoire **/
+  int data_length;
+  unsigned char *data = LoadBinaryFile(path, &data_length);
+
+  if (data == NULL)
+  {
+    logf_error("  Error, Impossible to load Image file : '%s'\n", path);
+    mem_free_image(current_image);
+    return (NULL);
+  }
+
+  /* Saut au dessus du header de l'image */
+  data += current_image->image_header_size;
+  data_length -= current_image->image_header_size;
+
+  /* On élimine les derniers octets parasites */
+  int nb_block = data_length / BLOCK_SIZE;
+  data_length = nb_block * BLOCK_SIZE;
+
+  /** Remplit la structure **/
+  current_image->nb_block = nb_block;
+  current_image->image_data = data;
+  current_image->image_length = data_length;
+
+  return current_image;
+}
 
 /************************************************************/
 /*  UpdateProdosImage() :  Enregistre un fichier image 2mg. */
@@ -662,15 +687,19 @@ static void GetOneSubDirectoryFile(struct prodos_image *current_image, char *fol
 /******************************************************************/
 void GetBlockData(struct prodos_image *current_image, int block_number, unsigned char *block_data_rtn)
 {
-  /* Vérifie les limites */
-  if(block_number >= current_image->nb_block)
-    {
-      memset(block_data_rtn,0,BLOCK_SIZE);
-      return;
-    }
-
-  /* Récupère les data */
-  memcpy(block_data_rtn,&current_image->image_data[block_number*BLOCK_SIZE],BLOCK_SIZE);
+  if (current_image->fd != -1) {
+    lseek(current_image->fd, block_number * BLOCK_SIZE, BLOCK_SIZE);
+    read(current_image->fd, block_data_rtn, BLOCK_SIZE);
+  } else {
+    /* Vérifie les limites */
+    if(block_number >= current_image->nb_block)
+      {
+        memset(block_data_rtn,0,BLOCK_SIZE);
+        return;
+      }
+    /* Récupère les data */
+    memcpy(block_data_rtn,&current_image->image_data[block_number*BLOCK_SIZE],BLOCK_SIZE);
+  }
 }
 
 

@@ -5,7 +5,7 @@
  *
  */
 
-#include "os.h" 
+#include "os.h"
 
 #ifdef BUILD_POSIX
 
@@ -167,7 +167,6 @@ void os_GetFileCreationModificationDate(char *path, struct prodos_file *file) {
   file->file_modification_date = BuildProdosDate(time->tm_mday, time->tm_mon + 1, time->tm_year + 1900);
   file->file_modification_time = BuildProdosTime(time->tm_min, time->tm_hour);
 }
-
 
 char *my_strcpy(char *s1, char *s2) 
 {

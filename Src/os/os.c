@@ -58,3 +58,17 @@ int os_CreateDirectory(char *directory)
 
 	return error;
 }
+
+/**
+ * Checks to see if the provided path is for a block device.
+ * 
+ * @param path 
+ * @return true 
+ * @return false 
+ */
+bool os_IsBlockDevice(char *path)
+{
+	struct stat path_stat;
+	if (stat(path, &path_stat)) return false;
+	return S_ISBLK(path_stat.st_mode);
+}

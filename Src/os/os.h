@@ -67,6 +67,7 @@ void os_DeleteFile(char *file_path);
 void os_SetFileCreationModificationDate(char *,struct file_descriptive_entry *);
 void os_GetFileCreationModificationDate(char *,struct prodos_file *);
 void os_SetFileAttribute(char *,int);
+bool os_IsBlockDevice(char *);
 int my_stricmp(char *,char *);
 int my_strnicmp(char *,char *,size_t);
 int my_mkdir(char *path);

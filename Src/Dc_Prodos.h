@@ -55,6 +55,7 @@ struct prodos_time
 struct prodos_image
 {
   char *image_file_path;
+  int fd;
 
   int image_format;   /* 2mg, hdv, po*/
   int image_header_size;
@@ -297,6 +298,8 @@ struct prodos_file
 };
 
 struct prodos_image *LoadProdosImage(char *);
+struct prodos_image *LoadProdosDataFromFile(struct prodos_image *, char *);
+struct prodos_image *LoaddProdosDataFromBlock(struct prodos_image *, char *);
 struct file_descriptive_entry *ODSReadFileDescriptiveEntry(struct prodos_image *,char *,unsigned char *);
 int UpdateProdosImage(struct prodos_image *);
 struct file_descriptive_entry *GetProdosFile(struct prodos_image *,char *);

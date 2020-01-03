@@ -59,6 +59,7 @@ struct parameter
   char *folder_path;
 
   int verbose;
+
   bool output_apple_single;
   bool zero_case_bits;
 };
