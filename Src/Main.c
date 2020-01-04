@@ -517,6 +517,10 @@ int main(int argc, char *argv[])
       mem_free_list(nb_filepath,filepath_tab);
     }
 
+  if (current_image->fd != -1) {
+    close(current_image->fd);
+  }
+
   /* Libération mémoire */
   mem_free_param(param);
   my_Memory(MEMORY_FREE,NULL,NULL);

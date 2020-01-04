@@ -64,6 +64,23 @@ struct prodos_image *LoadProdosImage(char *file_path)
 
   if (!current_image) { return(NULL); }
 
+  /** Décodage du Volume Header (Block 2) **/
+  GetBlockData(current_image, 2, one_block);
+  current_image->volume_header = ODSReadVolumeDirectoryHeader(one_block);
+
+  if (current_image->volume_header == NULL)
+  {
+    mem_free_image(current_image);
+    return (NULL);
+  }
+
+  // TODO: we should use the length values here rather than total file open read
+  if (!current_image->nb_block)
+  {
+    current_image->nb_block = current_image->volume_header->total_blocks;
+    current_image->image_length = current_image->nb_block * BLOCK_SIZE;
+  }
+
   current_image->block_allocation_table = (int *) calloc(current_image->nb_block+8,sizeof(int));
   if(current_image->block_allocation_table == NULL)
     {
@@ -97,15 +114,6 @@ struct prodos_image *LoadProdosImage(char *file_path)
       return(NULL);
     }
 
-  /** Décodage du Volume Header (Block 2) **/
-  GetBlockData(current_image,2,one_block);
-  current_image->volume_header = ODSReadVolumeDirectoryHeader(one_block);
-  if(current_image->volume_header == NULL)
-    {
-      mem_free_image(current_image);
-      return(NULL);
-    }
-
   /**************************************************************/
   /** Décodage des entrées du Volume Directory + Sub Directory **/
   GetAllDirectoryFile(current_image);
@@ -120,6 +128,9 @@ struct prodos_image *LoadProdosImage(char *file_path)
 struct prodos_image *LoadProdosDataFromBlock(struct prodos_image *current_image, char *path) {
   // TODO: use O_RDONLY for CATALOG, O_RDWR for any modifications
   current_image->fd = open(path, O_RDWR);
+  current_image->image_format = IMAGE_HDV;
+  current_image->image_header_size = HDV_HEADER_SIZE;  
+  return current_image;
 }
 
 /**
@@ -252,7 +263,7 @@ static struct volume_directory_header *ODSReadVolumeDirectoryHeader(unsigned cha
   volume_header->next_block = GetWordValue(block_data,offset);
   offset += 2;
   volume_header->storage_type = ((block_data[offset] & 0xF0) >> 4);
-  volume_header->name_length = (int) (block_data[offset] & 0x0F);
+  volume_header->name_length = (int)(block_data[offset] & 0x0F);
   offset++;
   memcpy(volume_header->volume_name,&block_data[offset],volume_header->name_length);
   volume_header->volume_name[volume_header->name_length] = '\0';
@@ -688,7 +699,7 @@ static void GetOneSubDirectoryFile(struct prodos_image *current_image, char *fol
 void GetBlockData(struct prodos_image *current_image, int block_number, unsigned char *block_data_rtn)
 {
   if (current_image->fd != -1) {
-    lseek(current_image->fd, block_number * BLOCK_SIZE, BLOCK_SIZE);
+    lseek(current_image->fd, block_number * BLOCK_SIZE, SEEK_SET);
     read(current_image->fd, block_data_rtn, BLOCK_SIZE);
   } else {
     /* Vérifie les limites */
