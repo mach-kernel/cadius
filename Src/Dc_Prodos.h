@@ -8,17 +8,19 @@
 
 #pragma once
 
-#define IMG_HEADER_SIZE  0x40   /* 2MG Header Size */
-#define HDV_HEADER_SIZE  0x00   /* HDV Header Size */
-#define  PO_HEADER_SIZE  0x00   /*  PO Header Size */
+#define IMG_HEADER_SIZE  0x40         /* 2MG Header Size */
+#define IMG_HEADER_MAGIC 0x32494D47
+
+#define HDV_HEADER_SIZE  0x00         /* HDV Header Size */
+#define  PO_HEADER_SIZE  0x00         /*  PO Header Size */
 
 #define IMAGE_UNKNOWN       0
-#define IMAGE_2MG           1   /* 2MG */
-#define IMAGE_HDV           2   /* HDV */
-#define IMAGE_PO            3   /*  PO */
+#define IMAGE_2MG           1         /* 2MG */
+#define IMAGE_HDV           2         /* HDV */
+#define IMAGE_PO            3         /*  PO */
 
-#define BLOCK_SIZE       512    /* Taille d'un block */
-#define INDEX_PER_BLOCK  256    /* Nombre d'index de block dans un block */
+#define BLOCK_SIZE       512          /* Taille d'un block */
+#define INDEX_PER_BLOCK  256          /* Nombre d'index de block dans un block */
 
 #define UPDATE_ADD     1
 #define UPDATE_REMOVE  2
@@ -298,6 +300,7 @@ struct prodos_file
 };
 
 struct prodos_image *LoadProdosImage(char *);
+struct prodos_image *DetectImageType(struct prodos_image *);
 struct prodos_image *LoadProdosDataFromFile(struct prodos_image *, char *);
 struct prodos_image *LoadProdosDataFromBlock(struct prodos_image *, char *);
 struct file_descriptive_entry *ODSReadFileDescriptiveEntry(struct prodos_image *,char *,unsigned char *);

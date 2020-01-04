@@ -11,6 +11,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
+#include <errno.h>
 
 #include "Dc_Shared.h"
 #include "Dc_Memory.h"
@@ -18,6 +19,7 @@
 #include "Dc_Prodos.h"
 #include "log.h"
 
+extern int errno;
 static struct volume_directory_header *ODSReadVolumeDirectoryHeader(unsigned char *);
 static struct sub_directory_header *ODSReadSubDirectoryHeader(unsigned char *);
 static void GetAllDirectoryFile(struct prodos_image *);
@@ -61,7 +63,9 @@ struct prodos_image *LoadProdosImage(char *file_path)
   } else {
     current_image = LoadProdosDataFromFile(current_image, file_path);
   }
+  if (!current_image) { return(NULL); }
 
+  current_image = DetectImageType(current_image);
   if (!current_image) { return(NULL); }
 
   /** Décodage du Volume Header (Block 2) **/
@@ -74,12 +78,8 @@ struct prodos_image *LoadProdosImage(char *file_path)
     return (NULL);
   }
 
-  // TODO: we should use the length values here rather than total file open read
-  if (!current_image->nb_block)
-  {
-    current_image->nb_block = current_image->volume_header->total_blocks;
-    current_image->image_length = current_image->nb_block * BLOCK_SIZE;
-  }
+  current_image->nb_block = current_image->volume_header->total_blocks;
+  current_image->image_length = current_image->nb_block * BLOCK_SIZE;
 
   current_image->block_allocation_table = (int *) calloc(current_image->nb_block+8,sizeof(int));
   if(current_image->block_allocation_table == NULL)
@@ -125,11 +125,79 @@ struct prodos_image *LoadProdosImage(char *file_path)
   return(current_image);
 }
 
+/**
+ * @brief Determine image type. HDV and PO seem to not have header offsets, so
+ * we detect 2MG here via its file header.
+ * 
+ * @param current_image 
+ * @return struct prodos_image* 
+ */
+struct prodos_image *DetectImageType(struct prodos_image *current_image) {
+  current_image->image_format = IMAGE_UNKNOWN;
+  uint32_t header;
+
+  if (current_image->fd == -1) {
+    memcpy(&header, current_image->image_data, sizeof(uint32_t));
+  } else {
+    const int ofs = lseek(current_image->fd, 0, SEEK_SET);
+    const int read_len = read(current_image->fd, &header, sizeof(uint32_t));
+
+    if (ofs == -1 || read_len == -1) {
+      logf_error(
+        "  Error identifying image format for : '%s' (%s).\n",
+        current_image->image_file_path,
+        strerror(errno)
+      );
+      return(NULL);
+    }
+  }
+
+  header = ntohl(header);
+  current_image->image_format = header == IMG_HEADER_MAGIC ? IMAGE_2MG : IMAGE_HDV;
+  current_image->image_header_size = header == IMG_HEADER_MAGIC ? IMG_HEADER_SIZE : 0;
+
+  for (int i = strlen(current_image->image_file_path); i >= 0; i--)
+    if (current_image->image_file_path[i] == '.')
+    {
+      if (!my_stricmp(&current_image->image_file_path[i], ".HDV"))
+      {
+        current_image->image_format = IMAGE_HDV;
+        current_image->image_header_size = HDV_HEADER_SIZE;
+      }
+      else if (!my_stricmp(&current_image->image_file_path[i], ".PO"))
+      {
+        current_image->image_format = IMAGE_PO;
+        current_image->image_header_size = PO_HEADER_SIZE;
+      }
+      break;
+    }
+
+  if (current_image->image_format == IMAGE_UNKNOWN)
+  {
+    logf_error("  Error, Unknown image file format : '%s'.\n", current_image->image_file_path);
+    mem_free_image(current_image);
+    return (NULL);
+  }
+
+  return current_image;
+}
+
+/**
+ * @brief Obtain an fd for the block device specified by the user
+ * 
+ * @param current_image 
+ * @param path 
+ * @return struct prodos_image* 
+ */
 struct prodos_image *LoadProdosDataFromBlock(struct prodos_image *current_image, char *path) {
   // TODO: use O_RDONLY for CATALOG, O_RDWR for any modifications
   current_image->fd = open(path, O_RDWR);
-  current_image->image_format = IMAGE_HDV;
-  current_image->image_header_size = HDV_HEADER_SIZE;  
+
+  if (current_image->fd == -1) {
+    logf_error("Unable to open %s (%s)\n", path, strerror(errno));
+    return NULL;
+  }
+
   return current_image;
 }
 
@@ -143,33 +211,6 @@ struct prodos_image *LoadProdosDataFromBlock(struct prodos_image *current_image,
 struct prodos_image *LoadProdosDataFromFile(struct prodos_image *current_image, char *path) {
   /** Type d'image **/
   current_image->fd = -1;
-  current_image->image_format = IMAGE_UNKNOWN;
-  for (int i = strlen(current_image->image_file_path); i >= 0; i--)
-    if (current_image->image_file_path[i] == '.')
-    {
-      if (!my_stricmp(&current_image->image_file_path[i], ".2MG"))
-      {
-        current_image->image_format = IMAGE_2MG;
-        current_image->image_header_size = IMG_HEADER_SIZE;
-      }
-      else if (!my_stricmp(&current_image->image_file_path[i], ".HDV"))
-      {
-        current_image->image_format = IMAGE_HDV;
-        current_image->image_header_size = HDV_HEADER_SIZE;
-      }
-      else if (!my_stricmp(&current_image->image_file_path[i], ".PO"))
-      {
-        current_image->image_format = IMAGE_PO;
-        current_image->image_header_size = PO_HEADER_SIZE;
-      }
-      break;
-    }
-  if (current_image->image_format == IMAGE_UNKNOWN)
-  {
-    logf_error("  Error, Unknown image file format : '%s'.\n", current_image->image_file_path);
-    mem_free_image(current_image);
-    return (NULL);
-  }
 
   /** Chargement du fichier image en mémoire **/
   int data_length;
@@ -182,19 +223,7 @@ struct prodos_image *LoadProdosDataFromFile(struct prodos_image *current_image, 
     return (NULL);
   }
 
-  /* Saut au dessus du header de l'image */
-  data += current_image->image_header_size;
-  data_length -= current_image->image_header_size;
-
-  /* On élimine les derniers octets parasites */
-  int nb_block = data_length / BLOCK_SIZE;
-  data_length = nb_block * BLOCK_SIZE;
-
-  /** Remplit la structure **/
-  current_image->nb_block = nb_block;
   current_image->image_data = data;
-  current_image->image_length = data_length;
-
   return current_image;
 }
 
@@ -698,21 +727,40 @@ static void GetOneSubDirectoryFile(struct prodos_image *current_image, char *fol
 /******************************************************************/
 void GetBlockData(struct prodos_image *current_image, int block_number, unsigned char *block_data_rtn)
 {
+  /* Vérifie les limites */
+  if(block_number > 2 && block_number >= current_image->nb_block)
+    {
+      memset(block_data_rtn,0,BLOCK_SIZE);
+      return;
+    }
+
   if (current_image->fd != -1) {
-    lseek(current_image->fd, block_number * BLOCK_SIZE, SEEK_SET);
-    read(current_image->fd, block_data_rtn, BLOCK_SIZE);
+    const int ofs = lseek(
+      current_image->fd,
+      current_image->image_header_size + (block_number * BLOCK_SIZE),
+      SEEK_SET
+    );
+    if (ofs == -1) {
+      logf_error("Unable to seek block %i (%s)\n", block_number, strerror(errno));
+      memset(block_data_rtn, 0, BLOCK_SIZE);
+      return;
+    }
+
+    const int read_len = read(current_image->fd, block_data_rtn, BLOCK_SIZE);
+    if (read_len == -1) {
+      logf_error("Unable to read block %i (%s)\n", block_number, strerror(errno));
+      memset(block_data_rtn, 0, BLOCK_SIZE);
+      return;
+    }
   } else {
-    /* Vérifie les limites */
-    if(block_number >= current_image->nb_block)
-      {
-        memset(block_data_rtn,0,BLOCK_SIZE);
-        return;
-      }
     /* Récupère les data */
-    memcpy(block_data_rtn,&current_image->image_data[block_number*BLOCK_SIZE],BLOCK_SIZE);
+    memcpy(
+      block_data_rtn,
+      &((current_image->image_data + current_image->image_header_size)[block_number*BLOCK_SIZE]),
+      BLOCK_SIZE
+    );
   }
 }
-
 
 /***************************************************************/
 /*  SetBlockData() :  Ecrit les données d'un block de l'image. */
