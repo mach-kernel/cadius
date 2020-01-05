@@ -232,6 +232,12 @@ struct prodos_image *LoadProdosDataFromFile(struct prodos_image *current_image, 
 /************************************************************/
 int UpdateProdosImage(struct prodos_image *current_image)
 {
+  // If SetBlockData was invoked while using a block device,
+  // then it already persisted the changes.
+  if (current_image->fd != -1) {
+    return(0);
+  }
+
   int i, nb_write;
   FILE *fd;
 
@@ -777,11 +783,31 @@ void SetBlockData(struct prodos_image *current_image, int block_number, unsigned
     return;
 
   /* Ecrit les data */
-  memcpy(
-    &current_image->image_data[current_image->image_header_size + block_number*BLOCK_SIZE],
-    block_data,
-    BLOCK_SIZE
-  );
+  if (current_image->fd != -1) {
+    const int ofs = lseek(
+      current_image->fd, 
+      current_image->image_header_size + block_number * BLOCK_SIZE,
+      SEEK_SET
+    );
+
+    if (ofs == -1) {
+      logf_error("Unable to seek block %i (%s)\n", block_number, strerror(errno));
+      return;
+    }
+
+    const int write_len = write(current_image->fd, block_data, BLOCK_SIZE);
+    if (write_len == -1)
+    {
+      logf_error("Unable to write block %i (%s)\n", block_number, strerror(errno));
+      return;
+    }
+  } else {
+    memcpy(
+      &current_image->image_data[current_image->image_header_size + block_number*BLOCK_SIZE],
+      block_data,
+      BLOCK_SIZE
+    );
+  }
 
   /* Marque le block comme ayant été modifié */
   current_image->block_modified[block_number] = 1;
