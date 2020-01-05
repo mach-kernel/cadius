@@ -4,16 +4,6 @@
 
 const unsigned static int AS_MAGIC = (uint32_t) 0x00051600;
 
-static uint32_t as_field32(uint32_t num)
-{
-  return IS_LITTLE_ENDIAN ? swap32(num) : num;
-}
-
-static uint16_t as_field16(uint16_t num)
-{
-  return IS_LITTLE_ENDIAN ? swap16(num) : num;
-}
-
 /**
  * Is this an AppleSingle file?
  * @brief ASIsAppleSingle
@@ -24,7 +14,7 @@ bool ASIsAppleSingle(unsigned char *buf)
 {
   int buf_magic;
   memcpy(&buf_magic, buf, sizeof(AS_MAGIC));
-  buf_magic = as_field32(buf_magic);
+  buf_magic = ntohl(buf_magic);
 
   return buf_magic == AS_MAGIC;
 }
@@ -40,9 +30,9 @@ struct as_file_header *ASParseHeader(unsigned char *buf)
   struct as_file_header *header = malloc(sizeof(as_file_header));
   struct as_file_header *buf_header = (as_file_header *) buf;
 
-  header->magic = as_field32(buf_header->magic);
-  header->version = as_field32(buf_header->version);
-  header->num_entries = as_field16(buf_header->num_entries);
+  header->magic = ntohl(buf_header->magic);
+  header->version = ntohl(buf_header->version);
+  header->num_entries = ntohs(buf_header->num_entries);
 
   return header;
 }
@@ -57,9 +47,9 @@ struct as_prodos_info *ASParseProdosEntry(unsigned char *entry_buf)
   struct as_prodos_info *prodos_entry = malloc(sizeof(as_prodos_info));
   struct as_prodos_info *buf_prodos_entry = (as_prodos_info *) entry_buf;
 
-  prodos_entry->access = as_field16(buf_prodos_entry->access);
-  prodos_entry->filetype = as_field16(buf_prodos_entry->filetype);
-  prodos_entry->auxtype = as_field32(buf_prodos_entry->auxtype);
+  prodos_entry->access = ntohs(buf_prodos_entry->access);
+  prodos_entry->filetype = ntohs(buf_prodos_entry->filetype);
+  prodos_entry->auxtype = ntohl(buf_prodos_entry->auxtype);
 
   return prodos_entry;
 }
@@ -85,13 +75,12 @@ struct as_file_entry *ASGetEntries(struct as_file_header *header, unsigned char 
   struct as_file_entry *buf_entries = (as_file_entry *) (buf + sizeof(as_file_header));
   memcpy(entries, buf_entries, header->num_entries * sizeof(as_file_entry));
 
-  if (IS_LITTLE_ENDIAN)
-    for (int i = 0; i < header->num_entries; ++i)
-    {
-      entries[i].entry_id = swap32(entries[i].entry_id);
-      entries[i].offset = swap32(entries[i].offset);
-      entries[i].length = swap32(entries[i].length);
-    }
+  for (int i = 0; i < header->num_entries; ++i)
+  {
+    entries[i].entry_id = ntohl(entries[i].entry_id);
+    entries[i].offset = ntohl(entries[i].offset);
+    entries[i].length = ntohl(entries[i].length);
+  }
 
   return entries;
 }
@@ -172,27 +161,27 @@ void ASDecorateProdosFile(struct prodos_file *current_file, unsigned char *data)
 struct as_from_prodos ASFromProdosFile(struct prodos_file *file)
 {
   struct as_file_header *as_header = malloc(sizeof(as_file_header));
-  as_header->magic = as_field32(AS_MAGIC);
+  as_header->magic = ntohl(AS_MAGIC);
   for (int i = 0; i < 4; ++i) as_header->filler[i] = 0;
-  as_header->version = as_field32(0x00020000);
-  as_header->num_entries = as_field16(2);
+  as_header->version = ntohl(0x00020000);
+  as_header->num_entries = ntohs(2);
 
   uint32_t header_offset = sizeof(as_file_header) + (2 * sizeof(as_file_entry));
   struct as_file_entry *data_entry = malloc(sizeof(as_file_entry));
-  data_entry->entry_id = as_field32(data_fork);
-  data_entry->length = as_field32(file->data_length);
-  data_entry->offset = as_field32(header_offset);
+  data_entry->entry_id = ntohl(data_fork);
+  data_entry->length = ntohl(file->data_length);
+  data_entry->offset = ntohl(header_offset);
 
   uint32_t prodos_entry_offset = header_offset + file->data_length;
   struct as_file_entry *prodos_entry = malloc(sizeof(as_file_entry));
-  prodos_entry->entry_id = as_field32(prodos_file_info);
-  prodos_entry->length = as_field32(sizeof(as_prodos_info));
-  prodos_entry->offset = as_field32(prodos_entry_offset);
+  prodos_entry->entry_id = ntohl(prodos_file_info);
+  prodos_entry->length = ntohl(sizeof(as_prodos_info));
+  prodos_entry->offset = ntohl(prodos_entry_offset);
 
   struct as_prodos_info *prodos_info = malloc(sizeof(as_prodos_info));
-  prodos_info->access = as_field16(file->entry->access);
-  prodos_info->filetype = as_field16(file->entry->file_type);
-  prodos_info->auxtype = as_field32(file->entry->file_aux_type);
+  prodos_info->access = ntohs(file->entry->access);
+  prodos_info->filetype = ntohs(file->entry->file_type);
+  prodos_info->auxtype = ntohl(file->entry->file_aux_type);
 
   uint32_t payload_size = prodos_entry_offset + sizeof(as_prodos_info);
   unsigned char *payload = malloc(payload_size);

@@ -251,7 +251,12 @@ int UpdateProdosImage(struct prodos_image *current_image)
         fseek(fd,(long)(i*BLOCK_SIZE+current_image->image_header_size),SEEK_SET);
 
         /* Ecrit le block */
-        nb_write = fwrite(&current_image->image_data[i*BLOCK_SIZE],1,BLOCK_SIZE,fd);
+        nb_write = fwrite(
+          &current_image->image_data[current_image->image_header_size + (i*BLOCK_SIZE)],
+          1,
+          BLOCK_SIZE,
+          fd
+        );
 
         /* Indique que c'est fait */
         current_image->block_modified[i] = 0;
@@ -756,7 +761,7 @@ void GetBlockData(struct prodos_image *current_image, int block_number, unsigned
     /* Récupère les data */
     memcpy(
       block_data_rtn,
-      &((current_image->image_data + current_image->image_header_size)[block_number*BLOCK_SIZE]),
+      &current_image->image_data[current_image->image_header_size + block_number*BLOCK_SIZE],
       BLOCK_SIZE
     );
   }
@@ -772,7 +777,11 @@ void SetBlockData(struct prodos_image *current_image, int block_number, unsigned
     return;
 
   /* Ecrit les data */
-  memcpy(&current_image->image_data[block_number*BLOCK_SIZE],block_data,BLOCK_SIZE);
+  memcpy(
+    &current_image->image_data[current_image->image_header_size + block_number*BLOCK_SIZE],
+    block_data,
+    BLOCK_SIZE
+  );
 
   /* Marque le block comme ayant été modifié */
   current_image->block_modified[block_number] = 1;
