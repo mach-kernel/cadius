@@ -302,7 +302,6 @@ struct prodos_file
 struct prodos_image *LoadProdosImage(char *);
 struct prodos_image *DetectImageType(struct prodos_image *);
 struct prodos_image *LoadProdosDataFromFile(struct prodos_image *, char *);
-struct prodos_image *LoadProdosDataFromBlock(struct prodos_image *, char *);
 struct file_descriptive_entry *ODSReadFileDescriptiveEntry(struct prodos_image *,char *,unsigned char *);
 int UpdateProdosImage(struct prodos_image *);
 struct file_descriptive_entry *GetProdosFile(struct prodos_image *,char *);

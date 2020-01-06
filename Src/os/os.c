@@ -10,6 +10,9 @@
  */
 
 #include "os.h"
+#include "../log.h"
+
+extern int errno;
 
 /**
 * Delete file at path
@@ -71,4 +74,24 @@ bool os_IsBlockDevice(char *path)
 	struct stat path_stat;
 	if (stat(path, &path_stat)) return false;
 	return S_ISBLK(path_stat.st_mode);
+}
+
+/**
+ * @brief Open fd to a block device
+ * 
+ * @param path 
+ * @return int 
+ */
+int os_OpenBlockFd(char *path)
+{
+	// TODO: use O_RDONLY for CATALOG, O_RDWR for any modifications
+	const int fd = open(path, O_RDWR);
+
+	if (fd == -1)
+	{
+		logf_error("  Error: Unable to open block device %s (%s)\n", path, strerror(errno));
+		return fd;
+	}
+
+	return fd;
 }

@@ -26,6 +26,7 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
+#include <errno.h>
 
 #ifdef BUILD_POSIX
 
@@ -68,6 +69,7 @@ void os_SetFileCreationModificationDate(char *,struct file_descriptive_entry *);
 void os_GetFileCreationModificationDate(char *,struct prodos_file *);
 void os_SetFileAttribute(char *,int);
 bool os_IsBlockDevice(char *);
+int os_OpenBlockFd(char *);
 int my_stricmp(char *,char *);
 int my_strnicmp(char *,char *,size_t);
 int my_mkdir(char *path);

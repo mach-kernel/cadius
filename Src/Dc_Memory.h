@@ -49,6 +49,7 @@ struct parameter
   char *new_file_name;
   char *new_folder_name;
   char *new_volume_name;
+  int new_volume_format;
 
   char *new_file_path;
   char *new_folder_path;

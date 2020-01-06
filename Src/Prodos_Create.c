@@ -55,7 +55,6 @@ unsigned char bitmap_mask[8] =
   0x7F,0xBF,0xDF,0xEF,0xF7,0xFB,0xFD,0xFE
 };
 
-
 /***********************************************************/
 /*  CreateProdosVolume() :  Création d'un nouveau Dossier. */
 /***********************************************************/
@@ -88,6 +87,7 @@ struct prodos_image *CreateProdosVolume(
   char *image_file_path,
   char *volume_name,
   int volume_size_kb,
+  int new_volume_format,
   bool zero_case_bits
 )
 {
@@ -99,29 +99,56 @@ struct prodos_image *CreateProdosVolume(
   char upper_case[256];
   unsigned char *image_data;
   struct prodos_image *current_image;
+  int block_fd;
+
+  if (os_IsBlockDevice(image_file_path)) {
+    block_fd = os_OpenBlockFd(image_file_path);
+
+    /* If writing to a block device, check to see that the image can fit */
+    // if (block_fd != -1)
+    // {
+    //   lseek(block_fd, 0, SEEK_SET);
+    //   const off_t target_size = lseek(block_fd, 0, SEEK_END);
+    //   if (target_size < 0 || (target_size / 1024) < volume_size_kb)
+    //   {
+    //     logf_error(
+    //       "   Error : Target device too small %s\n    %i / %i",
+    //       image_file_path,
+    //       volume_size_kb,
+    //       target_size / 1024
+    //     );
+    //     return (NULL);
+    //   }
+    // }
+  }
 
   /** Type d'image **/
-  image_format = IMAGE_UNKNOWN;
-  for(i=strlen(image_file_path); i>=0; i--)
-    if(image_file_path[i] == '.')
-      {
-        if(!my_stricmp(&image_file_path[i],".2MG"))
-          {
-            image_format = IMAGE_2MG;
-            image_header_size = IMG_HEADER_SIZE;
-          }
-        else if(!my_stricmp(&image_file_path[i],".HDV"))
-          {
-            image_format = IMAGE_HDV;
-            image_header_size = HDV_HEADER_SIZE;
-          }
-        else if(!my_stricmp(&image_file_path[i],".PO"))
-          {
-            image_format = IMAGE_PO;
-            image_header_size = PO_HEADER_SIZE;
-          }
-        break;
-      }
+  image_format = new_volume_format || IMAGE_UNKNOWN;
+  image_header_size = image_format == IMAGE_2MG ? IMG_HEADER_SIZE : 0;
+
+  if (image_format == IMAGE_UNKNOWN) {
+    for(i=strlen(image_file_path); i>=0; i--)
+      if(image_file_path[i] == '.')
+        {
+          if(!my_stricmp(&image_file_path[i],".2MG"))
+            {
+              image_format = IMAGE_2MG;
+              image_header_size = IMG_HEADER_SIZE;
+            }
+          else if(!my_stricmp(&image_file_path[i],".HDV"))
+            {
+              image_format = IMAGE_HDV;
+              image_header_size = HDV_HEADER_SIZE;
+            }
+          else if(!my_stricmp(&image_file_path[i],".PO"))
+            {
+              image_format = IMAGE_PO;
+              image_header_size = PO_HEADER_SIZE;
+            }
+          break;
+        }
+  }
+
   if(image_format == IMAGE_UNKNOWN)
     {
       logf_error("  Error, Unknown image file format : '%s'.\n",image_file_path);
@@ -253,7 +280,16 @@ struct prodos_image *CreateProdosVolume(
     image_data[image_header_size+6*BLOCK_SIZE+i/8] |= (0x01<<(7-i%8));
 
   /** Création du fichier sur disque **/
-  error = CreateBinaryFile(image_file_path,image_data,1024*volume_size_kb + image_header_size);
+  const int total_image_length = 1024 * volume_size_kb + image_header_size;
+  if (block_fd != -1) {
+    error = 0;
+    lseek(block_fd, 0, SEEK_SET);
+    const int written = write(block_fd, image_data, total_image_length);
+    error = !(written == total_image_length);
+  } else {
+    error = CreateBinaryFile(image_file_path,image_data,total_image_length);
+  }
+
   if(error)
     {
       free(image_data);

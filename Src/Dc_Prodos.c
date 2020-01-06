@@ -11,7 +11,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
-#include <errno.h>
 
 #include "Dc_Shared.h"
 #include "Dc_Memory.h"
@@ -19,7 +18,6 @@
 #include "Dc_Prodos.h"
 #include "log.h"
 
-extern int errno;
 static struct volume_directory_header *ODSReadVolumeDirectoryHeader(unsigned char *);
 static struct sub_directory_header *ODSReadSubDirectoryHeader(unsigned char *);
 static void GetAllDirectoryFile(struct prodos_image *);
@@ -59,7 +57,7 @@ struct prodos_image *LoadProdosImage(char *file_path)
     }
 
   if (os_IsBlockDevice(file_path)) {
-    current_image = LoadProdosDataFromBlock(current_image, file_path);
+    current_image->fd = os_OpenBlockFd(file_path);
   } else {
     current_image = LoadProdosDataFromFile(current_image, file_path);
   }
@@ -156,46 +154,29 @@ struct prodos_image *DetectImageType(struct prodos_image *current_image) {
   current_image->image_format = header == IMG_HEADER_MAGIC ? IMAGE_2MG : IMAGE_HDV;
   current_image->image_header_size = header == IMG_HEADER_MAGIC ? IMG_HEADER_SIZE : 0;
 
-  for (int i = strlen(current_image->image_file_path); i >= 0; i--)
-    if (current_image->image_file_path[i] == '.')
-    {
-      if (!my_stricmp(&current_image->image_file_path[i], ".HDV"))
+  if (current_image->image_format == IMAGE_UNKNOWN) {
+    for (int i = strlen(current_image->image_file_path); i >= 0; i--)
+      if (current_image->image_file_path[i] == '.')
       {
-        current_image->image_format = IMAGE_HDV;
-        current_image->image_header_size = HDV_HEADER_SIZE;
+        if (!my_stricmp(&current_image->image_file_path[i], ".HDV"))
+        {
+          current_image->image_format = IMAGE_HDV;
+          current_image->image_header_size = HDV_HEADER_SIZE;
+        }
+        else if (!my_stricmp(&current_image->image_file_path[i], ".PO"))
+        {
+          current_image->image_format = IMAGE_PO;
+          current_image->image_header_size = PO_HEADER_SIZE;
+        }
+        break;
       }
-      else if (!my_stricmp(&current_image->image_file_path[i], ".PO"))
-      {
-        current_image->image_format = IMAGE_PO;
-        current_image->image_header_size = PO_HEADER_SIZE;
-      }
-      break;
-    }
+  }
 
   if (current_image->image_format == IMAGE_UNKNOWN)
   {
     logf_error("  Error, Unknown image file format : '%s'.\n", current_image->image_file_path);
     mem_free_image(current_image);
     return (NULL);
-  }
-
-  return current_image;
-}
-
-/**
- * @brief Obtain an fd for the block device specified by the user
- * 
- * @param current_image 
- * @param path 
- * @return struct prodos_image* 
- */
-struct prodos_image *LoadProdosDataFromBlock(struct prodos_image *current_image, char *path) {
-  // TODO: use O_RDONLY for CATALOG, O_RDWR for any modifications
-  current_image->fd = open(path, O_RDWR);
-
-  if (current_image->fd == -1) {
-    logf_error("Unable to open %s (%s)\n", path, strerror(errno));
-    return NULL;
   }
 
   return current_image;
@@ -746,7 +727,7 @@ void GetBlockData(struct prodos_image *current_image, int block_number, unsigned
     }
 
   if (current_image->fd != -1) {
-    const int ofs = lseek(
+    const off_t ofs = lseek(
       current_image->fd,
       current_image->image_header_size + (block_number * BLOCK_SIZE),
       SEEK_SET
@@ -757,7 +738,7 @@ void GetBlockData(struct prodos_image *current_image, int block_number, unsigned
       return;
     }
 
-    const int read_len = read(current_image->fd, block_data_rtn, BLOCK_SIZE);
+    const ssize_t read_len = read(current_image->fd, block_data_rtn, BLOCK_SIZE);
     if (read_len == -1) {
       logf_error("Unable to read block %i (%s)\n", block_number, strerror(errno));
       memset(block_data_rtn, 0, BLOCK_SIZE);
@@ -784,7 +765,7 @@ void SetBlockData(struct prodos_image *current_image, int block_number, unsigned
 
   /* Ecrit les data */
   if (current_image->fd != -1) {
-    const int ofs = lseek(
+    const off_t ofs = lseek(
       current_image->fd, 
       current_image->image_header_size + block_number * BLOCK_SIZE,
       SEEK_SET
@@ -795,7 +776,7 @@ void SetBlockData(struct prodos_image *current_image, int block_number, unsigned
       return;
     }
 
-    const int write_len = write(current_image->fd, block_data, BLOCK_SIZE);
+    const ssize_t write_len = write(current_image->fd, block_data, BLOCK_SIZE);
     if (write_len == -1)
     {
       logf_error("Unable to write block %i (%s)\n", block_number, strerror(errno));
