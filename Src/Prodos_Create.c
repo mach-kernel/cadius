@@ -104,22 +104,22 @@ struct prodos_image *CreateProdosVolume(
   if (os_IsBlockDevice(image_file_path)) {
     block_fd = os_OpenBlockFd(image_file_path);
 
+
     /* If writing to a block device, check to see that the image can fit */
-    // if (block_fd != -1)
-    // {
-    //   lseek(block_fd, 0, SEEK_SET);
-    //   const off_t target_size = lseek(block_fd, 0, SEEK_END);
-    //   if (target_size < 0 || (target_size / 1024) < volume_size_kb)
-    //   {
-    //     logf_error(
-    //       "   Error : Target device too small %s\n    %i / %i",
-    //       image_file_path,
-    //       volume_size_kb,
-    //       target_size / 1024
-    //     );
-    //     return (NULL);
-    //   }
-    // }
+    if (block_fd != -1)
+    {
+      const uint64_t target_size_kb = os_GetBlockDeviceSizeKB(block_fd);
+      if (target_size_kb < 0 || (target_size_kb < volume_size_kb))
+      {
+        logf_error(
+          "   Error : Target device too small %s\n    %i / %i\n",
+          image_file_path,
+          volume_size_kb,
+          target_size_kb
+        );
+        return (NULL);
+      }
+    }
   }
 
   /** Type d'image **/

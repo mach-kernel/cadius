@@ -95,3 +95,24 @@ int os_OpenBlockFd(char *path)
 
 	return fd;
 }
+
+uint64_t os_GetBlockDeviceSizeKB(int fd) {
+	uint32_t block_size;
+	uint64_t size;
+
+	#ifdef __APPLE__
+	ioctl(fd, DKIOCGETBLOCKSIZE, &block_size);
+	ioctl(fd, DKIOCGETBLOCKCOUNT, &size);
+	#endif
+	#ifdef __linux__
+	ioctl(fd, BLKPBSZGET, &block_size);
+	ioctl(fd, BLKGETSIZE, &size);
+	#endif
+	// BSD
+	#ifdef DIOCGMEDIASIZE
+	ioctl(fd, DIOCGMEDIASIZE, &size);
+	block_size = 1;
+	#endif
+
+	return (size * block_size) >> 10;
+}
