@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
   struct file_descriptive_entry *folder_entry;
 
   /* Message Information */
-  logf("%s v 1.4.3 (c) Brutal Deluxe 2011-2013.\n",argv[0]);
+  logf("%s v 1.4.4 (c) Brutal Deluxe 2011-2013.\n",argv[0]);
 
   /* Vérification des paramètres */
   if(argc < 3)
@@ -1013,7 +1013,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
           if(!my_stricmp(&argv[4][strlen(argv[4])-2],"MB"))
             param->new_volume_size_kb *= 1024;
         }
-      if(param->new_volume_size_kb < 143 || param->new_volume_size_kb > 32768)
+      if(param->new_volume_size_kb < 140 || param->new_volume_size_kb > 32768)
         param->new_volume_size_kb = 0;
       if(param->new_volume_size_kb == 0)
         {
