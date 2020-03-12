@@ -1013,7 +1013,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
           if(!my_stricmp(&argv[4][strlen(argv[4])-2],"MB"))
             param->new_volume_size_kb *= 1024;
         }
-      if(param->new_volume_size_kb < 143 || param->new_volume_size_kb > 32768)
+      if(param->new_volume_size_kb < 140 || param->new_volume_size_kb > 32768)
         param->new_volume_size_kb = 0;
       if(param->new_volume_size_kb == 0)
         {
