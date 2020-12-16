@@ -20,8 +20,9 @@ static uint16_t as_field16(uint16_t num)
  * @param buf
  * @return
  */
-bool ASIsAppleSingle(unsigned char *buf)
+bool ASIsAppleSingle(unsigned char *buf, size_t buflen)
 {
+  if (buflen < sizeof(AS_MAGIC)) return false;
   int buf_magic;
   memcpy(&buf_magic, buf, sizeof(AS_MAGIC));
   buf_magic = as_field32(buf_magic);
@@ -35,9 +36,11 @@ bool ASIsAppleSingle(unsigned char *buf)
  * @param buf The buffer
  * @return
  */
-struct as_file_header *ASParseHeader(unsigned char *buf)
+struct as_file_header *ASParseHeader(unsigned char *buf, size_t buflen)
 {
+  if (buflen < sizeof(as_file_header)) return NULL;
   struct as_file_header *header = malloc(sizeof(as_file_header));
+  if (!header) return NULL;
   struct as_file_header *buf_header = (as_file_header *) buf;
 
   header->magic = as_field32(buf_header->magic);
@@ -52,9 +55,11 @@ struct as_file_header *ASParseHeader(unsigned char *buf)
  * @param entry_buf  The entry buffer
  * @return
  */
-struct as_prodos_info *ASParseProdosEntry(unsigned char *entry_buf)
+struct as_prodos_info *ASParseProdosEntry(unsigned char *entry_buf, size_t buflen)
 {
+  if (buflen < sizeof(as_prodos_info)) return NULL;
   struct as_prodos_info *prodos_entry = malloc(sizeof(as_prodos_info));
+  if (!prodos_entry) return NULL;
   struct as_prodos_info *buf_prodos_entry = (as_prodos_info *) entry_buf;
 
   prodos_entry->access = as_field16(buf_prodos_entry->access);
@@ -70,7 +75,7 @@ struct as_prodos_info *ASParseProdosEntry(unsigned char *entry_buf)
  * @param buf
  * @return
  */
-struct as_file_entry *ASGetEntries(struct as_file_header *header, unsigned char *buf)
+struct as_file_entry *ASGetEntries(struct as_file_header *header, unsigned char *buf, size_t buflen)
 {
   if (!header)
   {
@@ -78,11 +83,12 @@ struct as_file_entry *ASGetEntries(struct as_file_header *header, unsigned char 
     return NULL;
   }
 
-  struct as_file_entry *entries = malloc(
-    header->num_entries * sizeof(as_file_entry)
-  );
+  size_t entries_length = header->num_entries * sizeof(as_file_entry);
+  if (buflen < sizeof(as_file_header) + entries_length) return NULL;
 
+  struct as_file_entry *entries = malloc(entries_length);
   struct as_file_entry *buf_entries = (as_file_entry *) (buf + sizeof(as_file_header));
+
   memcpy(entries, buf_entries, header->num_entries * sizeof(as_file_entry));
 
   if (IS_LITTLE_ENDIAN)
@@ -103,9 +109,10 @@ struct as_file_entry *ASGetEntries(struct as_file_header *header, unsigned char 
  * @param data             The data
  * @param data_fork_entry  The data fork entry
  */
-void ASDecorateDataFork(struct prodos_file *current_file, unsigned char *data, as_file_entry *data_fork_entry)
+void ASDecorateDataFork(struct prodos_file *current_file, unsigned char *data, size_t datalen, as_file_entry *data_fork_entry)
 {
   if (data_fork_entry->entry_id != data_fork) return;
+  if (datalen < data_fork_entry->offset + data_fork_entry->length) return;
 
   unsigned char *data_entry = malloc(data_fork_entry->length);
   memcpy(data_entry, data + data_fork_entry->offset, data_fork_entry->length);
@@ -123,12 +130,14 @@ void ASDecorateDataFork(struct prodos_file *current_file, unsigned char *data, a
  * @param data          The data
  * @param prodos_entry  The prodos entry
  */
-void ASDecorateProdosFileInfo(struct prodos_file *current_file, unsigned char *data, as_file_entry *prodos_entry)
+void ASDecorateProdosFileInfo(struct prodos_file *current_file, unsigned char *data, size_t datalen, as_file_entry *prodos_entry)
 {
   if (prodos_entry->entry_id != prodos_file_info) return;
+  if (datalen < prodos_entry->offset + prodos_entry->length) return;
 
   struct as_prodos_info *info_meta = ASParseProdosEntry(
-    data + prodos_entry->offset
+    data + prodos_entry->offset,
+    prodos_entry->length
   );
 
   if (!info_meta) return;
@@ -147,19 +156,19 @@ void ASDecorateProdosFileInfo(struct prodos_file *current_file, unsigned char *d
  * @param current_file
  * @param data
  */
-void ASDecorateProdosFile(struct prodos_file *current_file, unsigned char *data)
+void ASDecorateProdosFile(struct prodos_file *current_file, unsigned char *data, size_t datalen)
 {
-    struct as_file_header *header = ASParseHeader(data);
-    struct as_file_entry *entries = ASGetEntries(header, data);
+    struct as_file_header *header = ASParseHeader(data, datalen);
+    struct as_file_entry *entries = ASGetEntries(header, data, datalen);
 
     for (int i = 0; i < header->num_entries; ++i)
       switch(entries[i].entry_id)
       {
         case data_fork:
-          ASDecorateDataFork(current_file, data, &entries[i]);
+          ASDecorateDataFork(current_file, data, datalen, &entries[i]);
           break;
         case prodos_file_info:
-          ASDecorateProdosFileInfo(current_file, data, &entries[i]);
+          ASDecorateProdosFileInfo(current_file, data, datalen, &entries[i]);
           break;
         default:
           logf_info("        Entry ID %d unsupported, ignoring!\n", entries[i].entry_id);
