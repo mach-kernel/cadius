@@ -70,14 +70,14 @@ typedef struct as_from_prodos
 
 #pragma pack(pop)
 
-bool ASIsAppleSingle(unsigned char *buf);
+bool ASIsAppleSingle(unsigned char *buf, size_t buflen);
 
-struct as_file_header *ASParseHeader(unsigned char *buf);
-struct as_prodos_info *ASParseProdosEntry(unsigned char *entry_buf);
-struct as_file_entry *ASGetEntries(struct as_file_header *header, unsigned char *buf);
+struct as_file_header *ASParseHeader(unsigned char *buf, size_t buflen);
+struct as_prodos_info *ASParseProdosEntry(unsigned char *entry_buf, size_t buflen);
+struct as_file_entry *ASGetEntries(struct as_file_header *header, unsigned char *buf, size_t buflen);
 
-void ASDecorateDataFork(struct prodos_file *current_file, unsigned char *data, as_file_entry *data_fork_entry);
-void ASDeocrateProdosFileInfo(struct prodos_file *current_file, unsigned char *data, as_file_entry *prodos_entry);
-void ASDecorateProdosFile(struct prodos_file *current_file, unsigned char *data);
+void ASDecorateDataFork(struct prodos_file *current_file, unsigned char *data, size_t datalen, as_file_entry *data_fork_entry);
+void ASDeocrateProdosFileInfo(struct prodos_file *current_file, unsigned char *data, size_t datalen, as_file_entry *prodos_entry);
+void ASDecorateProdosFile(struct prodos_file *current_file, unsigned char *data, size_t datalen);
 
 struct as_from_prodos ASFromProdosFile(struct prodos_file *file);

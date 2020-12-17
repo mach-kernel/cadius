@@ -37,6 +37,10 @@ Any and all contributions are welcome. Included is also a `cadius.pro` file you 
 
 ## Changelog
 
+#### 1.4.5
+- Fix `os_GetFolderFiles` calloc too small.
+- AppleSingle check for OOB accesses (thanks [@peterferrie](https://github.com/peterferrie)). [#34](https://github.com/mach-kernel/cadius/pull/34)
+
 #### 1.4.4
 - Fix 140KiB volume size assertion (thanks [@inexorabletash](https://github.com/inexorabletash)): [#30](https://github.com/mach-kernel/cadius/pull/27)
 

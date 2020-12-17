@@ -77,7 +77,7 @@ int os_GetFolderFiles(char *folder_path, char *hierarchy)
     if (entry == NULL) break;
 
     // +2 for \0 and a possible slash
-    char *heap_path = calloc(1, strlen(folder_path) + 2);
+    char *heap_path = calloc(1, strlen(folder_path) + strlen(entry->d_name) + 2);
     strcpy(heap_path, folder_path);
 
     // If there's no trailing dir slash, we append it
