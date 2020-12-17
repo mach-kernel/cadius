@@ -364,12 +364,12 @@ static struct prodos_file *LoadFile(char *file_path_data, bool zero_case_bits)
     return NULL;
   }
 
-  bool is_apple_single = ASIsAppleSingle(data, &current_file->data_length);
+  bool is_apple_single = ASIsAppleSingle(data, (size_t) current_file->data_length);
 
   if (is_apple_single)
   {
     logf_info("      AppleSingle format detected!\n");
-    ASDecorateProdosFile(current_file, data, &current_file->data_length);
+    ASDecorateProdosFile(current_file, data, (size_t) current_file->data_length);
   }
   else
   {
