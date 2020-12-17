@@ -18,7 +18,6 @@
 #include "Dc_Prodos.h"
 
 const unsigned static int AS_MAGIC;
-#define IS_LITTLE_ENDIAN 'APPL' == (uint32_t) 0x4150504C
 
 #pragma pack(push, 1)
 

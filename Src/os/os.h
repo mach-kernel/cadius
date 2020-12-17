@@ -26,6 +26,7 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
+#include <errno.h>
 
 #ifdef BUILD_POSIX
 
@@ -33,6 +34,9 @@
 
 #include <dirent.h>
 #include <utime.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <sys/disk.h>
 
 #endif
 
@@ -67,6 +71,9 @@ void os_DeleteFile(char *file_path);
 void os_SetFileCreationModificationDate(char *,struct file_descriptive_entry *);
 void os_GetFileCreationModificationDate(char *,struct prodos_file *);
 void os_SetFileAttribute(char *,int);
+bool os_IsBlockDevice(char *);
+int os_OpenBlockFd(char *);
+uint64_t os_GetBlockDeviceSizeKB(int);
 int my_stricmp(char *,char *);
 int my_strnicmp(char *,char *,size_t);
 int my_mkdir(char *path);

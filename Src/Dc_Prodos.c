@@ -38,8 +38,6 @@ static void mem_free_subdirectory(struct sub_directory_header *);
 /******************************************************/
 struct prodos_image *LoadProdosImage(char *file_path)
 {
-  unsigned char *data_file;
-  int i, nb_block, data_length;
   struct prodos_image *current_image;
   unsigned char one_block[BLOCK_SIZE];
 
@@ -58,56 +56,29 @@ struct prodos_image *LoadProdosImage(char *file_path)
       return(NULL);
     }
 
-  /** Type d'image **/
-  current_image->image_format = IMAGE_UNKNOWN;
-  for(i=strlen(current_image->image_file_path); i>=0; i--)
-    if(current_image->image_file_path[i] == '.')
-      {
-        if(!my_stricmp(&current_image->image_file_path[i],".2MG"))
-          {
-            current_image->image_format = IMAGE_2MG;
-            current_image->image_header_size = IMG_HEADER_SIZE;
-          }
-        else if(!my_stricmp(&current_image->image_file_path[i],".HDV"))
-          {
-            current_image->image_format = IMAGE_HDV;
-            current_image->image_header_size = HDV_HEADER_SIZE;
-          }
-        else if(!my_stricmp(&current_image->image_file_path[i],".PO"))
-          {
-            current_image->image_format = IMAGE_PO;
-            current_image->image_header_size = PO_HEADER_SIZE;
-          }
-        break;
-      }
-  if(current_image->image_format == IMAGE_UNKNOWN)
-    {
-      logf_error("  Error, Unknown image file format : '%s'.\n",current_image->image_file_path);
-      mem_free_image(current_image);
-      return(NULL);
-    }
+  if (os_IsBlockDevice(file_path)) {
+    current_image->fd = os_OpenBlockFd(file_path);
+  } else {
+    current_image = LoadProdosDataFromFile(current_image, file_path);
+  }
+  if (!current_image) { return(NULL); }
 
-  /** Chargement du fichier image en mémoire **/
-  data_file = LoadBinaryFile(file_path,&data_length);
-  if(data_file == NULL)
-    {
-      logf_error("  Error, Impossible to load Image file : '%s'\n",file_path);
-      mem_free_image(current_image);
-      return(NULL);
-    }
+  current_image = DetectImageType(current_image);
+  if (!current_image) { return(NULL); }
 
-  /* Saut au dessus du header de l'image */
-  data_file += current_image->image_header_size;
-  data_length -= current_image->image_header_size;
+  /** Décodage du Volume Header (Block 2) **/
+  GetBlockData(current_image, 2, one_block);
+  current_image->volume_header = ODSReadVolumeDirectoryHeader(one_block);
 
-  /* On élimine les derniers octets parasites */
-  nb_block = data_length / BLOCK_SIZE;
-  data_length = nb_block*BLOCK_SIZE;
+  if (current_image->volume_header == NULL)
+  {
+    mem_free_image(current_image);
+    return (NULL);
+  }
 
-  /** Remplit la structure **/
-  current_image->nb_block = nb_block;
-  current_image->image_data = data_file;
-  current_image->image_length = data_length;
+  current_image->nb_block = current_image->volume_header->total_blocks;
+  current_image->image_length = current_image->nb_block * BLOCK_SIZE;
+
   current_image->block_allocation_table = (int *) calloc(current_image->nb_block+8,sizeof(int));
   if(current_image->block_allocation_table == NULL)
     {
@@ -141,15 +112,6 @@ struct prodos_image *LoadProdosImage(char *file_path)
       return(NULL);
     }
 
-  /** Décodage du Volume Header (Block 2) **/
-  GetBlockData(current_image,2,one_block);
-  current_image->volume_header = ODSReadVolumeDirectoryHeader(one_block);
-  if(current_image->volume_header == NULL)
-    {
-      mem_free_image(current_image);
-      return(NULL);
-    }
-
   /**************************************************************/
   /** Décodage des entrées du Volume Directory + Sub Directory **/
   GetAllDirectoryFile(current_image);
@@ -161,12 +123,102 @@ struct prodos_image *LoadProdosImage(char *file_path)
   return(current_image);
 }
 
+/**
+ * @brief Determine image type. HDV and PO seem to not have header offsets, so
+ * we detect 2MG here via its file header.
+ * 
+ * @param current_image 
+ * @return struct prodos_image* 
+ */
+struct prodos_image *DetectImageType(struct prodos_image *current_image) {
+  current_image->image_format = IMAGE_UNKNOWN;
+  uint32_t header;
+
+  if (current_image->fd == -1) {
+    memcpy(&header, current_image->image_data, sizeof(uint32_t));
+  } else {
+    const int ofs = lseek(current_image->fd, 0, SEEK_SET);
+    const int read_len = read(current_image->fd, &header, sizeof(uint32_t));
+
+    if (ofs == -1 || read_len == -1) {
+      logf_error(
+        "  Error identifying image format for : '%s' (%s).\n",
+        current_image->image_file_path,
+        strerror(errno)
+      );
+      return(NULL);
+    }
+  }
+
+  header = ntohl(header);
+  current_image->image_format = header == IMG_HEADER_MAGIC ? IMAGE_2MG : IMAGE_HDV;
+  current_image->image_header_size = header == IMG_HEADER_MAGIC ? IMG_HEADER_SIZE : 0;
+
+  if (current_image->image_format == IMAGE_UNKNOWN) {
+    for (int i = strlen(current_image->image_file_path); i >= 0; i--)
+      if (current_image->image_file_path[i] == '.')
+      {
+        if (!my_stricmp(&current_image->image_file_path[i], ".HDV"))
+        {
+          current_image->image_format = IMAGE_HDV;
+          current_image->image_header_size = HDV_HEADER_SIZE;
+        }
+        else if (!my_stricmp(&current_image->image_file_path[i], ".PO"))
+        {
+          current_image->image_format = IMAGE_PO;
+          current_image->image_header_size = PO_HEADER_SIZE;
+        }
+        break;
+      }
+  }
+
+  if (current_image->image_format == IMAGE_UNKNOWN)
+  {
+    logf_error("  Error, Unknown image file format : '%s'.\n", current_image->image_file_path);
+    mem_free_image(current_image);
+    return (NULL);
+  }
+
+  return current_image;
+}
+
+/**
+ * @brief Load ProDOS image data from a file
+ * 
+ * @param image 
+ * @param path 
+ * @return unsigned char* 
+ */
+struct prodos_image *LoadProdosDataFromFile(struct prodos_image *current_image, char *path) {
+  /** Type d'image **/
+  current_image->fd = -1;
+
+  /** Chargement du fichier image en mémoire **/
+  int data_length;
+  unsigned char *data = LoadBinaryFile(path, &data_length);
+
+  if (data == NULL)
+  {
+    logf_error("  Error, Impossible to load Image file : '%s'\n", path);
+    mem_free_image(current_image);
+    return (NULL);
+  }
+
+  current_image->image_data = data;
+  return current_image;
+}
 
 /************************************************************/
 /*  UpdateProdosImage() :  Enregistre un fichier image 2mg. */
 /************************************************************/
 int UpdateProdosImage(struct prodos_image *current_image)
 {
+  // If SetBlockData was invoked while using a block device,
+  // then it already persisted the changes.
+  if (current_image->fd != -1) {
+    return(0);
+  }
+
   int i, nb_write;
   FILE *fd;
 
@@ -186,7 +238,12 @@ int UpdateProdosImage(struct prodos_image *current_image)
         fseek(fd,(long)(i*BLOCK_SIZE+current_image->image_header_size),SEEK_SET);
 
         /* Ecrit le block */
-        nb_write = fwrite(&current_image->image_data[i*BLOCK_SIZE],1,BLOCK_SIZE,fd);
+        nb_write = fwrite(
+          &current_image->image_data[current_image->image_header_size + (i*BLOCK_SIZE)],
+          1,
+          BLOCK_SIZE,
+          fd
+        );
 
         /* Indique que c'est fait */
         current_image->block_modified[i] = 0;
@@ -227,7 +284,7 @@ static struct volume_directory_header *ODSReadVolumeDirectoryHeader(unsigned cha
   volume_header->next_block = GetWordValue(block_data,offset);
   offset += 2;
   volume_header->storage_type = ((block_data[offset] & 0xF0) >> 4);
-  volume_header->name_length = (int) (block_data[offset] & 0x0F);
+  volume_header->name_length = (int)(block_data[offset] & 0x0F);
   offset++;
   memcpy(volume_header->volume_name,&block_data[offset],volume_header->name_length);
   volume_header->volume_name[volume_header->name_length] = '\0';
@@ -663,16 +720,39 @@ static void GetOneSubDirectoryFile(struct prodos_image *current_image, char *fol
 void GetBlockData(struct prodos_image *current_image, int block_number, unsigned char *block_data_rtn)
 {
   /* Vérifie les limites */
-  if(block_number >= current_image->nb_block)
+  if(block_number > 2 && block_number >= current_image->nb_block)
     {
       memset(block_data_rtn,0,BLOCK_SIZE);
       return;
     }
 
-  /* Récupère les data */
-  memcpy(block_data_rtn,&current_image->image_data[block_number*BLOCK_SIZE],BLOCK_SIZE);
-}
+  if (current_image->fd != -1) {
+    const off_t ofs = lseek(
+      current_image->fd,
+      current_image->image_header_size + (block_number * BLOCK_SIZE),
+      SEEK_SET
+    );
+    if (ofs == -1) {
+      logf_error("Unable to seek block %i (%s)\n", block_number, strerror(errno));
+      memset(block_data_rtn, 0, BLOCK_SIZE);
+      return;
+    }
 
+    const ssize_t read_len = read(current_image->fd, block_data_rtn, BLOCK_SIZE);
+    if (read_len == -1) {
+      logf_error("Unable to read block %i (%s)\n", block_number, strerror(errno));
+      memset(block_data_rtn, 0, BLOCK_SIZE);
+      return;
+    }
+  } else {
+    /* Récupère les data */
+    memcpy(
+      block_data_rtn,
+      &current_image->image_data[current_image->image_header_size + block_number*BLOCK_SIZE],
+      BLOCK_SIZE
+    );
+  }
+}
 
 /***************************************************************/
 /*  SetBlockData() :  Ecrit les données d'un block de l'image. */
@@ -684,7 +764,31 @@ void SetBlockData(struct prodos_image *current_image, int block_number, unsigned
     return;
 
   /* Ecrit les data */
-  memcpy(&current_image->image_data[block_number*BLOCK_SIZE],block_data,BLOCK_SIZE);
+  if (current_image->fd != -1) {
+    const off_t ofs = lseek(
+      current_image->fd, 
+      current_image->image_header_size + block_number * BLOCK_SIZE,
+      SEEK_SET
+    );
+
+    if (ofs == -1) {
+      logf_error("Unable to seek block %i (%s)\n", block_number, strerror(errno));
+      return;
+    }
+
+    const ssize_t write_len = write(current_image->fd, block_data, BLOCK_SIZE);
+    if (write_len == -1)
+    {
+      logf_error("Unable to write block %i (%s)\n", block_number, strerror(errno));
+      return;
+    }
+  } else {
+    memcpy(
+      &current_image->image_data[current_image->image_header_size + block_number*BLOCK_SIZE],
+      block_data,
+      BLOCK_SIZE
+    );
+  }
 
   /* Marque le block comme ayant été modifié */
   current_image->block_modified[block_number] = 1;

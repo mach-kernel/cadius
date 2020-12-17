@@ -361,6 +361,7 @@ int main(int argc, char *argv[])
         param->image_file_path,
         param->new_volume_name,
         param->new_volume_size_kb,
+        param->new_volume_format,
         param->zero_case_bits
       );
 
@@ -517,6 +518,10 @@ int main(int argc, char *argv[])
       mem_free_list(nb_filepath,filepath_tab);
     }
 
+  if (current_image->fd != -1) {
+    close(current_image->fd);
+  }
+
   /* Libération mémoire */
   mem_free_param(param);
   my_Memory(MEMORY_FREE,NULL,NULL);
@@ -576,6 +581,28 @@ void apply_command_flags(struct parameter *params, int start, int argc, char **a
     ) {
       params->zero_case_bits = true;
     }
+    else if (
+      params->action == ACTION_CREATE_VOLUME && (
+        strstr(argv[i], "-F") ||
+        strstr(argv[i], "--format")
+      )
+    ) {
+      char *format = strchr(argv[i], '=');
+
+      if (format) format++;
+      else if (!format && (i+1) < argc)
+        format = argv[i + 1];
+
+      if (!my_stricmp(format, "2mg")) {
+        params->new_volume_format = IMAGE_2MG;
+      }
+      else if (!my_stricmp(format, "hdv")) {
+        params->new_volume_format = IMAGE_HDV;
+      }
+      else if (!my_stricmp(format, "po")) {
+        params->new_volume_format = IMAGE_PO;
+      }
+    }
   }
 }
 
@@ -621,6 +648,7 @@ void usage(char *program_path)
   logf("        %s CREATEFOLDER  <[2mg|hdv|po]_image_path>   <prodos_folder_path>\n",program_path);
   logf("        [-C | --no-case-bits]\n");
   logf("        %s CREATEVOLUME  <[2mg|hdv|po]_image_path>   <volume_name>         <volume_size>\n",program_path);
+  logf("        [-F | --format 2mg|hdv|po] If image path is a block device, format must be specified.\n");
   logf("        [-C | --no-case-bits]\n");
   logf("        ----\n");
   logf("        %s CLEARHIGHBIT  <source_file_path>\n",program_path);
