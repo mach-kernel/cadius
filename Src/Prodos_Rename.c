@@ -55,7 +55,7 @@ void RenameProdosFile(struct prodos_image *current_image, char *prodos_file_path
     return;
 
   /* Nom en majuscule */
-  my_strcpy(upper_case,new_file_name);
+  my_strcpy(upper_case,sizeof(upper_case),new_file_name);
   for(i=0; i<(int)strlen(upper_case); i++)
     upper_case[i] = toupper(upper_case[i]);
 

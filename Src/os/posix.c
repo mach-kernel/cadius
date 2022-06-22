@@ -169,7 +169,7 @@ void os_GetFileCreationModificationDate(char *path, struct prodos_file *file) {
 }
 
 
-char *my_strcpy(char *s1, char *s2) 
+char *my_strcpy(char *s1, int s1_size, char *s2) 
 {
   return strcpy(s1, s2);
 }

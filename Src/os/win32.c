@@ -249,9 +249,9 @@ int my_strnicmp(char *string1, char *string2, size_t length)
   return strnicmp(string1, string2, length);
 }
 
-char *my_strcpy(char *s1, char *s2)
+char *my_strcpy(char *s1, int s1_size, char *s2)
 {
-	return strcpy_s(s1, strlen(s2), s2);
+	return strcpy_s(s1, s1_size, s2);
 }
 
 char *my_strdup(char *s)
