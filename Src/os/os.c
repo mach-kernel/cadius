@@ -41,6 +41,8 @@ int os_CreateDirectory(char *directory)
 	char *dir_tokenize = strdup(directory);
 
 	char *buffer = calloc(1, 1024);
+	if (dir_tokenize[0] == FOLDER_CHARACTER[0])
+		strcat(buffer, FOLDER_CHARACTER);
 	char *token = strtok(dir_tokenize, FOLDER_CHARACTER);
 
 	while (token) {
