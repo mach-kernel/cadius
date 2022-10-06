@@ -1974,7 +1974,7 @@ int *AllocateImageBlock(struct prodos_image *current_image, int nb_block)
     }
 
   /** 1ère passe, on recherche les X blocs consécutifs **/
-  for(i=0,nb_free_block=0; i<current_image->nb_block-nb_block; i++)
+  for(i=0,nb_free_block=0; i<=current_image->nb_block-nb_block; i++)
     {
       if(current_image->block_allocation_table[i] == 1)
         {
