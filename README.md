@@ -37,6 +37,9 @@ Any and all contributions are welcome. Included is also a `cadius.pro` file you 
 
 ## Changelog
 
+#### 1.4.6
+- Fix ADDFILE erroneously making the first block of a file sparse (thanks [@inexorabletash](https://github.com/inexorabletash)). [#43](https://github.com/mach-kernel/cadius/pull/43)
+
 #### 1.4.5
 - Fix `os_GetFolderFiles` calloc too small.
 - AppleSingle check for OOB accesses (thanks [@peterferrie](https://github.com/peterferrie)). [#34](https://github.com/mach-kernel/cadius/pull/34)
