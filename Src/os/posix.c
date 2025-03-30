@@ -5,7 +5,7 @@
  *
  */
 
-#include "os.h" 
+#include "os.h"
 
 #ifdef BUILD_POSIX
 
@@ -66,14 +66,15 @@ int my_strnicmp(char *string1, char *string2, size_t length)
  */
 int os_GetFolderFiles(char *folder_path, char *hierarchy)
 {
+  struct dirent **entrylist;
+  struct dirent *entry;
+  int count, i;
   int error = 0;
   if (folder_path == NULL || strlen(folder_path) == 0) return(0);
-
-  DIR *dirstream = opendir(folder_path);
-  if (dirstream == NULL) return(1);
-
-  while(dirstream != NULL) {
-    struct dirent *entry = readdir(dirstream);
+  count = scandir(folder_path, &entrylist, NULL, alphasort);
+  if (count < 0) return(1);
+  for (i=0; i<count; i++) {
+    entry = entrylist[i];
     if (entry == NULL) break;
 
     // +2 for \0 and a possible slash
@@ -109,9 +110,10 @@ int os_GetFolderFiles(char *folder_path, char *hierarchy)
     }
 
     free(heap_path);
+    free(entry);
   }
+  free(entrylist);
 
-  free(dirstream);
   return error;
 }
 
@@ -169,7 +171,7 @@ void os_GetFileCreationModificationDate(char *path, struct prodos_file *file) {
 }
 
 
-char *my_strcpy(char *s1, int s1_size, char *s2) 
+char *my_strcpy(char *s1, int s1_size, char *s2)
 {
   return strcpy(s1, s2);
 }
