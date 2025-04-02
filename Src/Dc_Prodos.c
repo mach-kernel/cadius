@@ -1090,6 +1090,9 @@ static int GetFileDataResourceSize(struct prodos_image *current_image, struct fi
             if(tab_block[i] == 0)
               file_entry->nb_sparse++;
 
+          if(tab_block[0] == 0)
+            logf_error("  Warning : Block 0 is sparse in file: '%s'.\n", file_entry->file_path);
+
           /* Table des blocs utilisés */
           file_entry->tab_used_block = BuildUsedBlockTable(nb_block,tab_block,nb_index_block,tab_index_block,&file_entry->nb_used_block);
           if(file_entry->tab_used_block == NULL)
@@ -1180,6 +1183,9 @@ static int GetFileDataResourceSize(struct prodos_image *current_image, struct fi
             if(tab_block[i] == 0)
               file_entry->nb_sparse++;
 
+          if(tab_block[0] == 0)
+            logf_error("  Warning : Block 0 is sparse in data fork of file: '%s'.\n", file_entry->file_path);
+
           /* Table des blocs utilisés (Data) */
           tab_used_block_data = BuildUsedBlockTable(nb_block,tab_block,nb_index_block,tab_index_block,&nb_used_block_data);
           if(tab_used_block_data == NULL)
@@ -1249,6 +1255,9 @@ static int GetFileDataResourceSize(struct prodos_image *current_image, struct fi
           for(i=0; i<nb_block; i++)
             if(tab_block[i] == 0)
               file_entry->nb_sparse++;
+
+          if(tab_block[0] == 0)
+            logf_error("  Warning : Block 0 is sparse in resource fork of file: '%s'.\n", file_entry->file_path);
 
           /* Table des blocs utilisés (Resource) */
           tab_used_block_resource = BuildUsedBlockTable(nb_block,tab_block,nb_index_block,tab_index_block,&nb_used_block_resource);
