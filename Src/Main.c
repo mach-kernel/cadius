@@ -60,6 +60,13 @@
 #define ACTION_INDENT_FILE       82
 #define ACTION_OUTDENT_FILE      83
 
+#define ERROR_HELP                1
+#define ERROR_PARAM               2
+#define ERROR_LOAD                3
+#define ERROR_GET                 4
+#define ERROR_EXTRACT             5
+#define ERROR_ADD                 6
+
 int apply_global_flags(struct parameter*, int, char**);
 void apply_command_flags(struct parameter*, int, int, char**);
 void usage(char *);
@@ -70,7 +77,7 @@ struct parameter *GetParamLine(int,char *[]);
 /****************************************************/
 int main(int argc, char *argv[])
 {
-  int i, nb_filepath;
+  int i, nb_filepath, application_error=0;
   char **filepath_tab;
   struct parameter *param;
   struct prodos_image *current_image;
@@ -83,7 +90,7 @@ int main(int argc, char *argv[])
   if(argc < 3)
     {
       usage(argv[0]);
-      return(1);
+      return(ERROR_HELP);
     }
 
   /* Initialisation */
@@ -92,7 +99,7 @@ int main(int argc, char *argv[])
   /** Décode les paramètres **/
   param = GetParamLine(argc, argv);
   if(param == NULL)
-    return(2);
+    return(ERROR_PARAM);
 
   /** Actions **/
   if(param->action == ACTION_CATALOG)
@@ -103,7 +110,7 @@ int main(int argc, char *argv[])
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
       if(current_image == NULL)
-        return(3);
+        return(ERROR_LOAD);
 
       /** Affichage du contenu de l'image **/
       DumpProdosImage(current_image,param->verbose);
@@ -119,7 +126,7 @@ int main(int argc, char *argv[])
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
       if(current_image == NULL)
-        return(3);
+        return(ERROR_LOAD);
 
       /** Affichage des informations sur le contenu de l'image **/
       CheckProdosImage(current_image,param->verbose);
@@ -136,7 +143,7 @@ int main(int argc, char *argv[])
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
       if(current_image == NULL)
-        return(3);
+        return(ERROR_LOAD);
 
       /** Extrait le fichier sur disque **/
       ExtractOneFile(
@@ -158,12 +165,12 @@ int main(int argc, char *argv[])
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
       if(current_image == NULL)
-        return(3);
+        return(ERROR_LOAD);
 
       /** Recherche l'entrée du dossier **/
       folder_entry = GetProdosFolder(current_image,param->prodos_folder_path,1);
       if(folder_entry == NULL)
-        return(4);
+        return(ERROR_GET);
 
       /** Extrait les fichiers du répertoire **/
       ExtractFolderFiles(
@@ -175,6 +182,7 @@ int main(int argc, char *argv[])
 
       /* Stat */
       logf("    => File(s) : %d,  Folder(s) : %d,  Error(s) : %d\n",current_image->nb_extract_file,current_image->nb_extract_folder,current_image->nb_extract_error);
+      if (current_image->nb_extract_error > 0) application_error = ERROR_EXTRACT;
 
       /* Libération mémoire */
       mem_free_image(current_image);
@@ -184,7 +192,7 @@ int main(int argc, char *argv[])
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
       if(current_image == NULL)
-        return(3);
+        return(ERROR_LOAD);
 
       /* Information */
       logf_info("  - Extract volume '%s' :\n",current_image->volume_header->volume_name_case);
@@ -199,6 +207,7 @@ int main(int argc, char *argv[])
 
       /* Stat */
       logf("    => File(s) : %d,  Folder(s) : %d,  Error(s) : %d\n",current_image->nb_extract_file,current_image->nb_extract_folder,current_image->nb_extract_error);
+      if (current_image->nb_extract_error > 0) application_error = ERROR_EXTRACT;
 
       /* Libération mémoire */
       mem_free_image(current_image);
@@ -208,7 +217,7 @@ int main(int argc, char *argv[])
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
       if(current_image == NULL)
-        return(3);
+        return(ERROR_LOAD);
 
       /* Information */
       logf_info("  - Rename file '%s' as '%s' :\n",param->prodos_file_path,param->new_file_name);
@@ -224,7 +233,7 @@ int main(int argc, char *argv[])
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
       if(current_image == NULL)
-        return(3);
+        return(ERROR_LOAD);
 
       /* Information */
       logf_info("  - Rename folder '%s' as '%s' :\n",param->prodos_folder_path,param->new_folder_name);
@@ -240,7 +249,7 @@ int main(int argc, char *argv[])
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
       if(current_image == NULL)
-        return(3);
+        return(ERROR_LOAD);
 
       /* Information */
       logf_info("  - Rename volume '%s' as '%s' :\n",current_image->volume_header->volume_name_case,param->new_volume_name);
@@ -256,7 +265,7 @@ int main(int argc, char *argv[])
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
       if(current_image == NULL)
-        return(3);
+        return(ERROR_LOAD);
 
       /* Information */
       logf_info("  - Move file '%s' to folder '%s' :\n",param->prodos_file_path,param->new_file_path);
@@ -272,7 +281,7 @@ int main(int argc, char *argv[])
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
       if(current_image == NULL)
-        return(3);
+        return(ERROR_LOAD);
 
       /* Information */
       logf_info("  - Move folder '%s' to '%s' :\n",param->prodos_folder_path,param->new_folder_path);
@@ -288,7 +297,7 @@ int main(int argc, char *argv[])
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
       if(current_image == NULL)
-        return(3);
+        return(ERROR_LOAD);
 
       /* Information */
       logf_info("  - Delete file '%s' :\n",param->prodos_file_path);
@@ -304,7 +313,7 @@ int main(int argc, char *argv[])
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
       if(current_image == NULL)
-        return(3);
+        return(ERROR_LOAD);
 
       /* Information */
       logf_info("  - Delete folder '%s' :\n",param->prodos_folder_path);
@@ -320,7 +329,7 @@ int main(int argc, char *argv[])
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
       if(current_image == NULL)
-        return(3);
+        return(ERROR_LOAD);
 
       /* Information */
       logf_info("  - Delete volume '%s' :\n",current_image->volume_header->volume_name_case);
@@ -336,7 +345,7 @@ int main(int argc, char *argv[])
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
       if(current_image == NULL)
-        return(3);
+        return(ERROR_LOAD);
 
       /* Information */
       logf_info("  - Create folder '%s' :\n",param->prodos_folder_path);
@@ -365,7 +374,7 @@ int main(int argc, char *argv[])
       );
 
       if(current_image == NULL)
-        return(3);
+        return(ERROR_LOAD);
 
       /* Libération mémoire */
       mem_free_image(current_image);
@@ -375,7 +384,7 @@ int main(int argc, char *argv[])
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
       if(current_image == NULL)
-        return(3);
+        return(ERROR_LOAD);
 
       /* Information */
       logf_info("  - Add file '%s' :\n",param->file_path);
@@ -388,6 +397,7 @@ int main(int argc, char *argv[])
         param->zero_case_bits,
         1
       );
+      if (current_image->nb_add_error > 0) application_error = ERROR_ADD;
 
       /* Libération mémoire */
       mem_free_image(current_image);
@@ -397,13 +407,14 @@ int main(int argc, char *argv[])
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
       if(current_image == NULL)
-        return(3);
+        return(ERROR_LOAD);
 
       /* Information */
       logf_info("  - Add folder '%s' :\n",param->folder_path);
 
       /** Ajoute l'ensemble des fichiers du répertoire dans l'archive **/
       AddFolder(current_image,param->folder_path,param->prodos_folder_path,param->zero_case_bits);
+      if (current_image->nb_add_error > 0) application_error = ERROR_ADD;
 
       /* Stat */
       logf("    => File(s) : %d,  Folder(s) : %d,  Error(s) : %d\n",current_image->nb_add_file,current_image->nb_add_folder,current_image->nb_add_error);
@@ -411,12 +422,12 @@ int main(int argc, char *argv[])
       /* Libération mémoire */
       mem_free_image(current_image);
     }
-  else if(param->action == ACTION_REPLACE_FILE) 
+  else if(param->action == ACTION_REPLACE_FILE)
     {
       /** Charge l'image 2mg **/
       current_image = LoadProdosImage(param->image_file_path);
       if(current_image == NULL)
-        return(3);
+        return(ERROR_LOAD);
 
       int fcharloc = 0;
       for (int i=strlen(param->file_path); i >= 0; --i) {
@@ -445,13 +456,14 @@ int main(int argc, char *argv[])
       DeleteProdosFile(current_image, prodos_file_name);
       log_on();
 
-      AddFile(
+      int add_error = AddFile(
         current_image,
         param->file_path,
         param->prodos_folder_path,
         param->zero_case_bits,
         1
       );
+      if (add_error != 0) application_error = ERROR_ADD;
 
       free(prodos_file_name);
       mem_free_image(current_image);
@@ -521,23 +533,23 @@ int main(int argc, char *argv[])
   mem_free_param(param);
   my_Memory(MEMORY_FREE,NULL,NULL);
 
-  /* OK */              
-  return(0);
+  /* return final error code, if any */
+  return(application_error);
 }
 
 /**
  * Parse tail end of args and toggle global settings
- * 
- * @param argc 
- * @param args 
+ *
+ * @param argc
+ * @param args
  */
-int apply_global_flags(struct parameter *params, int argc, char **argv) 
+int apply_global_flags(struct parameter *params, int argc, char **argv)
 {
   int found = 0;
 
-  for (int i=3; i < argc; ++i) 
+  for (int i=3; i < argc; ++i)
   {
-    if (!my_stricmp(argv[i], "--quiet")) 
+    if (!my_stricmp(argv[i], "--quiet"))
     {
       log_set_level(ERROR);
       found += 1;
@@ -549,7 +561,7 @@ int apply_global_flags(struct parameter *params, int argc, char **argv)
       found += 1;
     }
 
-    if (!my_stricmp(argv[i], "-A")) 
+    if (!my_stricmp(argv[i], "-A"))
     {
       params -> output_apple_single = true;
       found += 1;
@@ -1199,7 +1211,7 @@ struct parameter *GetParamLine(int argc, char *argv[])
       /* OK */
       return(param);
     }
-  
+
   /* Action inconnue */
   usage(argv[0]);
 

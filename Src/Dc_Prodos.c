@@ -463,7 +463,7 @@ static void GetAllDirectoryFile(struct prodos_image *current_image)
   first_directory = NULL;
   sprintf(volume_path,"/%s",current_image->volume_header->volume_name_case);
 
-  /*******************************************/  
+  /*******************************************/
   /**  Volume Directory (Block 2+suivants)  **/
   block_number = 2;
   GetBlockData(current_image,block_number,one_block);
@@ -729,13 +729,13 @@ WORD BuildProdosDate(int day, int month, int year)
 {
   WORD prodos_date;
   int prodos_year;
-  
+
   /* Création de la Date */
   prodos_year = year - 1900;
   if(prodos_year > 100)
     prodos_year -= 100;
   prodos_date = ((prodos_year << 9) & 0xFE00) | ((month << 5) & 0x01E0) | (day & 0x001F);
-  
+
   /* Renvoie la date */
   return(prodos_date);
 }
@@ -765,7 +765,7 @@ static void BuildLowerCase(char *file_name, WORD lowercase, char *file_name_case
 
   /* Init */
   strcpy(file_name_case_rtn,file_name);
-  
+
   /* Vérifie la présence du 0x8000 */
   if((lowercase & 0x8000) == 0x0000)
     return;
@@ -1080,7 +1080,7 @@ static int GetFileDataResourceSize(struct prodos_image *current_image, struct fi
                   return(1);
                 }
             }
-          else 
+          else
             {
               nb_block = 0;
             }
@@ -1171,7 +1171,7 @@ static int GetFileDataResourceSize(struct prodos_image *current_image, struct fi
                   return(1);
                 }
             }
-          else 
+          else
             {
               nb_block = 0;
               index_block = 0;
@@ -1510,7 +1510,7 @@ struct file_descriptive_entry *GetProdosFile(struct prodos_image *current_image,
         }
       else if(is_root_name == 1)
         {
-          /* Nom du Dossier à la racine */ 
+          /* Nom du Dossier à la racine */
           if(begin != NULL)
             {
               for(i=0; i<current_image->nb_directory; i++)
@@ -1647,7 +1647,7 @@ struct file_descriptive_entry *GetProdosFolder(struct prodos_image *current_imag
         }
       else if(is_root_name == 1)
         {
-          /* Nom du Dossier à la racine */ 
+          /* Nom du Dossier à la racine */
           for(i=0; i<current_image->nb_directory; i++)
             if(!my_stricmp(current_image->tab_directory[i]->file_name,name))
               {
@@ -1970,7 +1970,7 @@ int *AllocateImageBlock(struct prodos_image *current_image, int nb_block)
   /* Pas assez de place ! */
   if(current_image->nb_free_block < nb_block)
     {
-      logf_error("  Error : Impossible to allocate %d blocks. No space left on image.\n",nb_block);  
+      logf_error("  Error : Impossible to allocate %d blocks. No space left on image.\n",nb_block);
       return(NULL);
     }
 
@@ -2207,14 +2207,22 @@ int CheckProdosName(char *name)
 void GetCurrentDate(WORD *now_date_rtn, WORD *now_time_rtn)
 {
   time_t clock;
+  struct tm source_date_epoch_tm;
   struct tm *p;
   WORD now_date, now_time;
   WORD year, month, day;
   WORD hour, minute;
 
-  /* Récupère l'heure actuelle */
-  time(&clock);
-  p = localtime(&clock);
+  char* source_date_epoch_env = getenv("SOURCE_DATE_EPOCH");
+  if (source_date_epoch_env) {
+    /* get time from environment variable (for reproducible builds) */
+    strptime(source_date_epoch_env, "%s", &source_date_epoch_tm);
+    p = &source_date_epoch_tm;
+  } else {
+    /* Récupère l'heure actuelle */
+    time(&clock);
+    p = localtime(&clock);
+  }
   year = (WORD) p->tm_year;
   if(year > 100)
     year -= 100;
@@ -2395,7 +2403,7 @@ void mem_free_file(struct prodos_file *current_file)
 
       if(current_file->file_name_case)
         free(current_file->file_name_case);
-        
+
       if(current_file->tab_data_block)
         free(current_file->tab_data_block);
 

@@ -82,7 +82,7 @@ int AddFile(
       current_image->nb_add_error++;
       mem_free_file(current_file);
       return(1);
-    } 
+    }
 
   /** Calcule le nombre de block nécessaire pour stocker le fichier (gestion du Sparse) **/
   ComputeFileBlockUsage(current_file);
@@ -173,7 +173,7 @@ int AddFile(
     }
 
   /*** Création du contenu fichier (index+data+resource) ***/
-  file_block_number = CreateFileContent(current_image,current_file);  
+  file_block_number = CreateFileContent(current_image,current_file);
   if(file_block_number == 0)
     {
       current_image->nb_add_error++;
@@ -196,7 +196,7 @@ int AddFile(
 
   /* Libération mémoire */
   mem_free_file(current_file);
-    
+
   /** Ecrit le fichier Image **/
   if(update_image)
     error = UpdateProdosImage(current_image);
@@ -212,10 +212,10 @@ int AddFile(
 /********************************************************************************/
 void AddFolder(struct prodos_image *current_image, char *folder_path, char *target_folder_path, bool zero_case_bits)
 {
-  int i, j, error, is_volume_header;
+  int i, j, is_volume_header;
   int nb_file;
   char **tab_file;
-  struct file_descriptive_entry *target_folder;  
+  struct file_descriptive_entry *target_folder;
   char full_folder_path[1024];
   char prodos_folder_path[1024];
 
@@ -256,7 +256,7 @@ void AddFolder(struct prodos_image *current_image, char *folder_path, char *targ
       if(strlen(tab_file[i]) > strlen("_FileInformation.txt"))
         if(!my_stricmp(&tab_file[i][strlen(tab_file[i])-strlen("_FileInformation.txt")],"_FileInformation.txt"))
           continue;
-      
+
       /** Chemin Prodos du fichier dans l'image **/
       strcpy(prodos_folder_path,target_folder_path);
       if(prodos_folder_path[strlen(prodos_folder_path)-1] != '/')
@@ -277,16 +277,16 @@ void AddFolder(struct prodos_image *current_image, char *folder_path, char *targ
             prodos_folder_path[j+1] = '\0';
             break;
           }
-      
+
       /** Ajoute ce fichier à l'archive **/
-      error = AddFile(current_image,tab_file[i],prodos_folder_path,zero_case_bits,0);
+      AddFile(current_image,tab_file[i],prodos_folder_path,zero_case_bits,0);
     }
 
   /* Libération table des fichiers */
   mem_free_list(nb_file,tab_file);
 
   /** Ecrit le fichier Image **/
-  error = UpdateProdosImage(current_image);  
+  UpdateProdosImage(current_image);
 }
 
 
@@ -358,7 +358,7 @@ static struct prodos_file *LoadFile(char *file_path_data, bool zero_case_bits)
   // Load data. If an AppleSingle file, parse it.
   unsigned char *data = LoadBinaryFile(file_path_data, &current_file->data_length);
 
-  if (data == NULL) 
+  if (data == NULL)
   {
     logf_error("  Error : Cannot load file %s\n", file_path_data);
     return NULL;
@@ -427,7 +427,7 @@ static struct prodos_file *LoadFile(char *file_path_data, bool zero_case_bits)
 
 
 /********************************************************************/
-/*  GetFileInformation() :  Récupère les informations d'un fichier. */ 
+/*  GetFileInformation() :  Récupère les informations d'un fichier. */
 /********************************************************************/
 static int GetFileInformation(char *file_information_path, char *file_name, struct prodos_file *current_file)
 {
@@ -502,7 +502,7 @@ static int GetFileInformation(char *file_information_path, char *file_name, stru
                 sscanf(&local_buffer[2*j],"%2X",&value);
                 current_file->resource_finderinfo_2[j] = (unsigned char) value;
               }
-            
+
           /* Trouvé */
           mem_free_list(nb_line,line_tab);
           return(1);
@@ -552,14 +552,14 @@ static void ComputeFileBlockUsage(struct prodos_file *current_file)
 {
   int i, result;
   unsigned char empty_block[BLOCK_SIZE];
-  
+
   /* Init */
   memset(empty_block,0x00,BLOCK_SIZE);
   current_file->block_disk_data = 0;      /* Nb de blocks disk utilisés pour les data */
   current_file->empty_data = 0;           /* Tout est à zéro */
   current_file->block_disk_resource = 0;  /* Nb de blocks disk utilisés pour les resource */
   current_file->empty_resource = 0;       /* Tout est à zéro */
-  
+
   /** Nombre de block pour les Data **/
   current_file->block_data = GetContainerNumber(current_file->data_length,BLOCK_SIZE);
   for(i=0; i<current_file->data_length; i+=BLOCK_SIZE)
@@ -571,7 +571,7 @@ static void ComputeFileBlockUsage(struct prodos_file *current_file)
         result = memcmp(&current_file->data[i],empty_block,BLOCK_SIZE);
       else
         result = memcmp(&current_file->data[i],empty_block,current_file->data_length-i);
-        
+
       /* Block à réserver ? */
       current_file->block_disk_data += (result == 0) ? 0 : 1;
     }
@@ -594,7 +594,7 @@ static void ComputeFileBlockUsage(struct prodos_file *current_file)
             result = memcmp(&current_file->resource[i],empty_block,BLOCK_SIZE);
           else
             result = memcmp(&current_file->resource[i],empty_block,current_file->resource_length-i);
-            
+
           /* Block à réserver ? */
           current_file->block_disk_resource += (result == 0) ? 0 : 1;
         }
@@ -768,7 +768,7 @@ static WORD CreateFileContent(struct prodos_image *current_image, struct prodos_
         }
       else
         {
-          return(1); 
+          return(1);
         }
 
       /** Remplissage de l'Extended block **/
@@ -893,7 +893,7 @@ static WORD CreateSaplingContent(struct prodos_image *current_image, struct prod
         is_empty = !memcmp(&data[i],empty_block,BLOCK_SIZE);
       else
         is_empty = !memcmp(&data[i],empty_block,data_length-i);
-        
+
       /* Numéro du block */
       if(is_data)
         data_block_number = (is_empty == 1) ? 0 : current_file->tab_data_block[j++];
@@ -1018,7 +1018,7 @@ static WORD CreateTreeContent(struct prodos_image *current_image, struct prodos_
         is_empty = !memcmp(&data[i],empty_block,BLOCK_SIZE);
       else
         is_empty = !memcmp(&data[i],empty_block,data_length-i);
-        
+
       /* Numéro du block */
       data_block_number = (is_empty == 1) ? 0 : ((is_data) ? current_file->tab_data_block[j++] : current_file->tab_resource_block[j++]);
 
